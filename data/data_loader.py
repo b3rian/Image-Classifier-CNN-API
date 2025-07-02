@@ -23,3 +23,18 @@ example = tf.train.Example(
         }
     )
 )
+
+feature_description = {
+    'height': tf.io.FixedLenFeature([], tf.int64),
+    'width': tf.io.FixedLenFeature([], tf.int64),
+    'depth': tf.io.FixedLenFeature([], tf.int64),
+    'label': tf.io.FixedLenFeature([], tf.int64),
+    'image_raw': tf.io.FixedLenFeature([], tf.string),
+}
+
+def _parse_function(proto):
+    return tf.io.parse_single_example(proto, feature_description)
+
+# Load TFRecord dataset
+raw_dataset = tf.data.TFRecordDataset('data.tfrecord')
+parsed_dataset = raw_dataset.map(_parse_function)
