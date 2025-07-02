@@ -33,6 +33,7 @@ def preprocess_image(image, label):
     image = tf.image.resize(image, [IMAGE_SIZE, IMAGE_SIZE])
     return image, label
 
+# dataset builder function
 def build_dataset(filenames, training=True):
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTOTUNE)
     
@@ -50,3 +51,8 @@ def build_dataset(filenames, training=True):
     dataset = dataset.prefetch(AUTOTUNE)
     return dataset
 
+TRAIN_FILENAMES = tf.io.gfile.glob("gs://imagenet-cils/TFRs/train/*.tfrecord")
+VAL_FILENAMES = tf.io.gfile.glob("gs://imagenet-cils/TFRs/validation/*.tfrecord")
+
+train_ds = build_dataset(TRAIN_FILENAMES, training=True)
+val_ds = build_dataset(VAL_FILENAMES, training=False)
