@@ -24,28 +24,9 @@ def _parse_function(proto):
     parsed['image'] = tf.io.decode_raw(parsed['image'], tf.uint8)
     return parsed['image'], parsed['label']
 
-def _parse_function(proto):
-    return tf.io.parse_single_example(proto, feature_description)
-
-# Load TFRecord dataset
-raw_dataset = tf.data.TFRecordDataset('data.tfrecord')
+raw_dataset = tf.data.TFRecordDataset("data.tfrecord")
 parsed_dataset = raw_dataset.map(_parse_function)
 
-import tensorflow as tf
-import numpy as np
+for image, label in parsed_dataset.take(1):
+    print(image.shape, label.numpy())
 
-image = np.random.randint(0, 255, (28, 28), dtype=np.uint8)
-label = 5
-
-# Serialize the image
-image_raw = image.tobytes()
-
-# Create example
-example = tf.train.Example(features=tf.train.Features(feature={
-    'image': _bytes_feature(image_raw),
-    'label': _int64_feature(label),
-}))
-
-# Write to TFRecord
-with tf.io.TFRecordWriter('images.tfrecord') as writer:
-    writer.write(example.SerializeToString())
