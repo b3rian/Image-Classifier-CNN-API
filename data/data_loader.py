@@ -8,17 +8,11 @@ def create_example(image, label):
     return tf.train.Example(features=tf.train.Features(feature=feature))
 
 
-example = tf.train.Example(
-    features=tf.train.Features(
-        feature={
-            'height': _int64_feature(128),
-            'width': _int64_feature(128),
-            'depth': _int64_feature(3),
-            'label': _int64_feature(7),
-            'image_raw': _bytes_feature(image_bytes),
-        }
-    )
-)
+with tf.io.TFRecordWriter("data.tfrecord") as writer:
+    for img, label in dataset:  # assume dataset is a list of (image, label)
+        img_raw = img.tobytes()
+        example = create_example(img_raw, label)
+        writer.write(example.SerializeToString())
 
 feature_description = {
     'height': tf.io.FixedLenFeature([], tf.int64),
