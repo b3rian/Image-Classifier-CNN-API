@@ -15,12 +15,10 @@ with tf.io.TFRecordWriter("data.tfrecord") as writer:
         writer.write(example.SerializeToString())
 
 feature_description = {
-    'height': tf.io.FixedLenFeature([], tf.int64),
-    'width': tf.io.FixedLenFeature([], tf.int64),
-    'depth': tf.io.FixedLenFeature([], tf.int64),
+    'image': tf.io.FixedLenFeature([], tf.string),
     'label': tf.io.FixedLenFeature([], tf.int64),
-    'image_raw': tf.io.FixedLenFeature([], tf.string),
 }
+
 
 def _parse_function(proto):
     return tf.io.parse_single_example(proto, feature_description)
