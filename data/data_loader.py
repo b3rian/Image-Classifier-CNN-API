@@ -19,6 +19,10 @@ feature_description = {
     'label': tf.io.FixedLenFeature([], tf.int64),
 }
 
+def _parse_function(proto):
+    parsed = tf.io.parse_single_example(proto, feature_description)
+    parsed['image'] = tf.io.decode_raw(parsed['image'], tf.uint8)
+    return parsed['image'], parsed['label']
 
 def _parse_function(proto):
     return tf.io.parse_single_example(proto, feature_description)
