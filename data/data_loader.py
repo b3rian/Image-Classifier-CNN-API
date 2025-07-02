@@ -33,3 +33,20 @@ def preprocess_image(image, label):
     image = tf.image.resize(image, [IMAGE_SIZE, IMAGE_SIZE])
     return image, label
 
+def build_dataset(filenames, training=True):
+    dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTOTUNE)
+    
+    if training:
+        dataset = dataset.shuffle(buffer_size=10000)
+    
+    dataset = dataset.map(decode_example, num_parallel_calls=AUTOTUNE)
+    
+    if training:
+        dataset = dataset.map(augment_image, num_parallel_calls=AUTOTUNE)
+    else:
+        dataset = dataset.map(preprocess_image, num_parallel_calls=AUTOTUNE)
+    
+    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.prefetch(AUTOTUNE)
+    return dataset
+
