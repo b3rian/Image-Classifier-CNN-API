@@ -30,12 +30,29 @@ def build_class_index_map(class_list_file):
     return {cls_name: idx for idx, cls_name in enumerate(classes)}
 
 def write_tfrecord(images_dir, output_file, class_index_map, val_annotations=None):
-    with tf.io.TFRecordWriter(output_file) as writer:
-        if val_annotations:
-            image_paths = glob(os.path.join(images_dir, '*.JPEG'))  # validation images are flat
-        else:
-            image_paths = glob(os.path.join(images_dir, '*', 'images', '*.JPEG'))  # train images nested
+    import time
+    start = time.time()
 
+    if val_annotations:
+        image_paths = glob(os.path.join(images_dir, '*.JPEG'))
+        print(f"🧾 Found {len(image_paths)} validation images")
+    else:
+        image_paths = glob(os.path.join(images_dir, '*', 'images', '*.JPEG'))
+        print(f"🧾 Found {len(image_paths)} training images")
+
+def write_tfrecord(images_dir, output_file, class_index_map, val_annotations=None):
+    import time
+    start = time.time()
+
+    if val_annotations:
+        image_paths = glob(os.path.join(images_dir, '*.JPEG'))
+        print(f"🧾 Found {len(image_paths)} validation images")
+    else:
+        image_paths = glob(os.path.join(images_dir, '*', 'images', '*.JPEG'))
+        print(f"🧾 Found {len(image_paths)} training images")
+
+    with tf.io.TFRecordWriter(output_file) as writer:
+        count = 0
         for path in image_paths:
             try:
                 image_data = tf.io.read_file(path)
@@ -49,8 +66,13 @@ def write_tfrecord(images_dir, output_file, class_index_map, val_annotations=Non
                 label = class_index_map[class_name]
                 tf_example = image_example(image_data.numpy(), label)
                 writer.write(tf_example.SerializeToString())
-            except Exception as e:
-                print(f"Skipping {path}: {e}")
+                count += 1
 
-    
-     
+                if count % 1000 == 0:
+                    print(f"✅ Written {count} images so far...")
+
+            except Exception as e:
+                print(f"⚠️ Skipping {path}: {e}")
+
+    print(f"🎯 Done. Total: {count} images written to {output_file}")
+    print(f"🕒 Time taken: {round(time.time() - start, 2)} sec")
