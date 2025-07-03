@@ -29,20 +29,23 @@ def build_class_index_map(class_list_file):
         classes = [line.strip() for line in f]
     return {cls_name: idx for idx, cls_name in enumerate(classes)}
 
-# dataset builder function
-def build_dataset(filenames, training=True):
-    dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTOTUNE)
-    
-    if training:
-        dataset = dataset.shuffle(buffer_size=10000)
-    
-    dataset = dataset.map(decode_example, num_parallel_calls=AUTOTUNE)
-    
-    if training:
-        dataset = dataset.map(augment_image, num_parallel_calls=AUTOTUNE)
-    else:
-        dataset = dataset.map(preprocess_image, num_parallel_calls=AUTOTUNE)
-    
-    dataset = dataset.batch(BATCH_SIZE)
-    dataset = dataset.prefetch(AUTOTUNE)
-    return dataset
+def write_tfrecord(images_dir, output_file, class_index_map, val_annotations=None):
+    with tf.io.TFRecordWriter(output_file) as writer:
+        image_paths = glob(os.path.join(images_dir, '*.JPEG'))
+        for path in image_paths:
+            try:
+                image_data = tf.io.read_file(path)
+                filename = os.path.basename(path)
+
+                # Get label from directory name or annotation file
+                if val_annotations:
+                    class_name = val_annotations[filename]
+                else:
+                    class_name = os.path.basename(os.path.dirname(os.path.dirname(path)))
+                
+                label = class_index_map[class_name]
+                tf_example = image_example(image_data.numpy(), label)
+                writer.write(tf_example.SerializeToString())
+            except Exception as e:
+                print(f"Skipping {path}: {e}")
+     
