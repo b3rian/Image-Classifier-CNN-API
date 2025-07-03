@@ -31,7 +31,7 @@ def build_class_index_map(class_list_file):
 
 def write_tfrecord(images_dir, output_file, class_index_map, val_annotations=None):
     with tf.io.TFRecordWriter(output_file) as writer:
-        image_paths = glob(os.path.join(images_dir, '*.JPEG'))
+        image_paths = image_paths = glob(os.path.join(images_dir, '*', 'images', '*.JPEG')) 
         for path in image_paths:
             try:
                 image_data = tf.io.read_file(path)
