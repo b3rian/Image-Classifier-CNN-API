@@ -31,21 +31,26 @@ def build_class_index_map(class_list_file):
 
 def write_tfrecord(images_dir, output_file, class_index_map, val_annotations=None):
     with tf.io.TFRecordWriter(output_file) as writer:
-        image_paths = image_paths = glob(os.path.join(images_dir, '*', 'images', '*.JPEG')) 
+        if val_annotations:
+            image_paths = glob(os.path.join(images_dir, '*.JPEG'))  # validation images are flat
+        else:
+            image_paths = glob(os.path.join(images_dir, '*', 'images', '*.JPEG'))  # train images nested
+
         for path in image_paths:
             try:
                 image_data = tf.io.read_file(path)
                 filename = os.path.basename(path)
 
-                # Get label from directory name or annotation file
                 if val_annotations:
                     class_name = val_annotations[filename]
                 else:
                     class_name = os.path.basename(os.path.dirname(os.path.dirname(path)))
-                
+
                 label = class_index_map[class_name]
                 tf_example = image_example(image_data.numpy(), label)
                 writer.write(tf_example.SerializeToString())
             except Exception as e:
                 print(f"Skipping {path}: {e}")
+
+    
      
