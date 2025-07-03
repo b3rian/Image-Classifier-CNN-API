@@ -24,10 +24,10 @@ def get_val_labels(val_annotations_path):
             label_map[row[0]] = row[1]
     return label_map
 
-# resizing after training
-def preprocess_image(image, label):
-    image = tf.image.resize(image, [IMAGE_SIZE, IMAGE_SIZE])
-    return image, label
+def build_class_index_map(class_list_file):
+    with open(class_list_file) as f:
+        classes = [line.strip() for line in f]
+    return {cls_name: idx for idx, cls_name in enumerate(classes)}
 
 # dataset builder function
 def build_dataset(filenames, training=True):
