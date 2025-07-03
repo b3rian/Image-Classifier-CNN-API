@@ -4,7 +4,7 @@ import tensorflow as tf
 AUTOTUNE = tf.data.AUTOTUNE
 IMAGE_SIZE = (224, 224)
 BATCH_SIZE = 128
-NUM_CLASSES = 10000
+NUM_CLASSES = 1000
 
 # decode a single example from the TFRecord file
 def decode_example(serialized_example):
@@ -29,6 +29,7 @@ def augment_image(image, label):
     image = tf.image.random_contrast(image, 0.8, 1.2)
     return image, label
 
+# resizing after training
 def preprocess_image(image, label):
     image = tf.image.resize(image, [IMAGE_SIZE, IMAGE_SIZE])
     return image, label
