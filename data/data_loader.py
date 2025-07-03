@@ -1,24 +1,20 @@
 import tensorflow as tf
+import os
+import csv
+from glob import glob
 
-# Data loader configuration for TensorFlow models
-AUTOTUNE = tf.data.AUTOTUNE
-IMAGE_SIZE = (224, 224)
-BATCH_SIZE = 128
-NUM_CLASSES = 1000
+def _bytes_feature(value):
+    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
-# decode a single example from the TFRecord file
-def decode_example(serialized_example):
-    """parse a single tf.train Example from TFRecord file"""
-    feature_description = {
-        'image/encoded': tf.io.FixedLenFeature([], tf.string),
-        'image/class/label': tf.io.FixedLenFeature([], tf.int64),
-    }
-    example = tf.io.parse_single_example(serialized_example, feature_description)
-    
-    image = tf.image.decode_jpeg(example['image/encoded'], channels=3)
-    image = tf.image.convert_image_dtype(image, tf.float32)
-    label = tf.cast(example['image/class/label'], tf.int32) - 1  # Labels are 1-based
-    return image, label
+def _int64_feature(value):
+    return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+
+def image_example(image_string, label):
+    return tf.train.Example(features=tf.train.Features(feature={
+        'image': _bytes_feature(image_string),
+        'label': _int64_feature(label),
+    }))
+
  
 # image augmentation function
 def augment_image(image, label):
