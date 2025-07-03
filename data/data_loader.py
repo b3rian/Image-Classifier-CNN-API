@@ -51,8 +51,8 @@ def build_dataset(filenames, training=True):
     dataset = dataset.prefetch(AUTOTUNE)
     return dataset
 
-TRAIN_FILENAMES = tf.io.gfile.glob("gs://imagenet-cils/TFRs/train/*.tfrecord")
-VAL_FILENAMES = tf.io.gfile.glob("gs://imagenet-cils/TFRs/validation/*.tfrecord")
+TRAIN_FILENAMES = tf.io.gfile.glob("gs://imagenet2012-tfrecord/train/*.tfrecord")
+VAL_FILENAMES = tf.io.gfile.glob("gs://imagenet2012-tfrecord/validation/*.tfrecord")
 
 train_ds = build_dataset(TRAIN_FILENAMES, training=True)
 val_ds = build_dataset(VAL_FILENAMES, training=False)
