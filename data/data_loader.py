@@ -16,14 +16,13 @@ def image_example(image_string, label):
     }))
 
  
-# image augmentation function
-def augment_image(image, label):
-    image = tf.image.resize(image, [IMAGE_SIZE + 32, IMAGE_SIZE + 32])
-    image = tf.image.random_crop(image, [IMAGE_SIZE, IMAGE_SIZE, 3])
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_brightness(image, max_delta=0.2)
-    image = tf.image.random_contrast(image, 0.8, 1.2)
-    return image, label
+def get_val_labels(val_annotations_path):
+    label_map = {}
+    with open(val_annotations_path, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
+        for row in reader:
+            label_map[row[0]] = row[1]
+    return label_map
 
 # resizing after training
 def preprocess_image(image, label):
