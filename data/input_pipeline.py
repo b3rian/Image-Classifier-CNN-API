@@ -1,6 +1,8 @@
 import tensorflow as tf
+import os
 
-IMAGE_SIZE = 64
+AUTOTUNE = tf.data.AUTOTUNE
+IMAGE_SIZE = (64, 64)
 NUM_CLASSES = 200
 
 def parse_example(example_proto):
