@@ -34,3 +34,10 @@ def test_label_one_hot(datasets):
     for _, labels in val_ds.take(1):
         unique_sums = tf.unique(tf.reduce_sum(labels, axis=1))[0]
         assert tf.reduce_all(unique_sums == 1.0), "Labels are not one-hot encoded"
+
+def test_dataset_is_iterable(datasets):
+    train_ds, val_ds = datasets
+    train_count = sum(1 for _ in train_ds.take(3))
+    val_count = sum(1 for _ in val_ds.take(3))
+    assert train_count > 0, "Training dataset is empty"
+    assert val_count > 0, "Validation dataset is empty"
