@@ -42,7 +42,8 @@ def load_dataset(image_dir, label_map=None, is_training=True):
                 labels.append(class_index)
     else:
         val_img_dir = os.path.join(image_dir, "images")
-        val_annotations = os.path.join(os.path.dirname(image_dir), "val_annotations.txt")
+        val_annotations = os.path.join(image_dir, "val_annotations.txt")
+
         with open(val_annotations, 'r') as f:
             for line in f:
                 fname, class_name, *_ = line.strip().split()
