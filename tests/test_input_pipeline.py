@@ -17,4 +17,8 @@ def test_train_dataset_shape(datasets):
         assert images.shape[1:] == (64, 64, 3), "Image shape mismatch"
         assert labels.shape[1] == 200, "Label one-hot depth mismatch"
 
- 
+def test_val_dataset_shape(datasets):
+    _, val_ds = datasets
+    for images, labels in val_ds.take(1):
+        assert images.shape[1:] == (64, 64, 3), "Image shape mismatch"
+        assert labels.shape[1] == 200, "Label one-hot depth mismatch"
