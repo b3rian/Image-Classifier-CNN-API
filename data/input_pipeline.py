@@ -24,3 +24,8 @@ def process_val_image(file_path, label):
     img = decode_img(img)
     img = img / 255.0  # Normalize to [0,1]
     return img, tf.one_hot(label, NUM_CLASSES)
+
+def get_label_map(train_dir):
+    class_names = sorted(os.listdir(train_dir))
+    label_map = {name: idx for idx, name in enumerate(class_names)}
+    return label_map
