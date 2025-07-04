@@ -64,3 +64,17 @@ def create_dataset(image_paths, labels, batch_size=64, is_training=True):
     dataset = dataset.batch(batch_size, drop_remainder=True)
     dataset = dataset.prefetch(AUTOTUNE)
     return dataset
+
+def get_datasets(data_dir, batch_size=64):
+    train_dir = os.path.join(data_dir, "train")
+    val_dir = os.path.join(data_dir, "val")
+
+    label_map = get_label_map(train_dir)
+
+    train_paths, train_labels = load_dataset(train_dir, label_map, is_training=True)
+    val_paths, val_labels = load_dataset(val_dir, label_map, is_training=False)
+
+    train_ds = create_dataset(train_paths, train_labels, batch_size=batch_size, is_training=True)
+    val_ds = create_dataset(val_paths, val_labels, batch_size=batch_size, is_training=False)
+
+    return train_ds, val_ds
