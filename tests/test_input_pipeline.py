@@ -28,3 +28,9 @@ def test_pixel_range(datasets):
     for images, _ in train_ds.take(1):
         assert tf.reduce_max(images) <= 1.0, "Image values exceed 1.0"
         assert tf.reduce_min(images) >= 0.0, "Image values below 0.0"
+
+def test_label_one_hot(datasets):
+    _, val_ds = datasets
+    for _, labels in val_ds.take(1):
+        unique_sums = tf.unique(tf.reduce_sum(labels, axis=1))[0]
+        assert tf.reduce_all(unique_sums == 1.0), "Labels are not one-hot encoded"
