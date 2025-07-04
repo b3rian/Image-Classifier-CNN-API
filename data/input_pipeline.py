@@ -51,3 +51,16 @@ def load_dataset(image_dir, label_map=None, is_training=True):
                     labels.append(label_map[class_name])
 
     return image_paths, labels
+
+def create_dataset(image_paths, labels, batch_size=64, is_training=True):
+    dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
+
+    if is_training:
+        dataset = dataset.shuffle(buffer_size=len(image_paths))
+        dataset = dataset.map(process_train_image, num_parallel_calls=AUTOTUNE)
+    else:
+        dataset = dataset.map(process_val_image, num_parallel_calls=AUTOTUNE)
+
+    dataset = dataset.batch(batch_size, drop_remainder=True)
+    dataset = dataset.prefetch(AUTOTUNE)
+    return dataset
