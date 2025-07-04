@@ -12,10 +12,11 @@ def decode_img(img):
 
 def process_train_image(file_path, label):
     img = tf.io.read_file(file_path)
-    img = decode_img(img)
+    img = decode_img(img)  # Should return tf.float32 in [0,255]
     img = tf.image.random_flip_left_right(img)
-    img = tf.image.random_brightness(img, max_delta=0.1)
+    img = tf.image.random_brightness(img, max_delta=25)  # Use delta in pixel scale if img is in [0,255]
     img = tf.image.random_contrast(img, lower=0.9, upper=1.1)
+    img = tf.clip_by_value(img, 0.0, 255.0)  # Ensure values stay in valid range before normalization
     img = img / 255.0  # Normalize to [0,1]
     return img, tf.one_hot(label, NUM_CLASSES)
 
