@@ -11,6 +11,10 @@ def datasets():
     train_ds, val_ds = input_pipeline.get_datasets(DATA_DIR, batch_size=batch_size)
     return train_ds, val_ds
 
-     
+def test_train_dataset_shape(datasets):
+    train_ds, _ = datasets
+    for images, labels in train_ds.take(1):
+        assert images.shape[1:] == (64, 64, 3), "Image shape mismatch"
+        assert labels.shape[1] == 200, "Label one-hot depth mismatch"
 
  
