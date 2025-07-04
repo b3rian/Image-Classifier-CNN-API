@@ -3,7 +3,7 @@ import tensorflow as tf
 import input_pipeline
 import os
 
-DATA_DIR = "/content/drive/MyDrive/tiny-imagenet-200"
+DATA_DIR = "D:\tiny-imagenet-200"
 
 @pytest.fixture(scope="module")
 def datasets():
