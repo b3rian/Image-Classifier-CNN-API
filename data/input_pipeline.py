@@ -29,3 +29,25 @@ def get_label_map(train_dir):
     class_names = sorted(os.listdir(train_dir))
     label_map = {name: idx for idx, name in enumerate(class_names)}
     return label_map
+
+def load_dataset(image_dir, label_map=None, is_training=True):
+    image_paths = []
+    labels = []
+
+    if is_training:
+        for class_name, class_index in label_map.items():
+            class_dir = os.path.join(image_dir, class_name, "images")
+            for fname in os.listdir(class_dir):
+                image_paths.append(os.path.join(class_dir, fname))
+                labels.append(class_index)
+    else:
+        val_img_dir = os.path.join(image_dir, "images")
+        val_annotations = os.path.join(os.path.dirname(image_dir), "val_annotations.txt")
+        with open(val_annotations, 'r') as f:
+            for line in f:
+                fname, class_name, *_ = line.strip().split()
+                if class_name in label_map:
+                    image_paths.append(os.path.join(val_img_dir, fname))
+                    labels.append(label_map[class_name])
+
+    return image_paths, labels
