@@ -22,3 +22,9 @@ def test_val_dataset_shape(datasets):
     for images, labels in val_ds.take(1):
         assert images.shape[1:] == (64, 64, 3), "Image shape mismatch"
         assert labels.shape[1] == 200, "Label one-hot depth mismatch"
+
+def test_pixel_range(datasets):
+    train_ds, _ = datasets
+    for images, _ in train_ds.take(1):
+        assert tf.reduce_max(images) <= 1.0, "Image values exceed 1.0"
+        assert tf.reduce_min(images) >= 0.0, "Image values below 0.0"
