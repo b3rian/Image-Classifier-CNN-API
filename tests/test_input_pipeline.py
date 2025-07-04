@@ -1,6 +1,6 @@
 import pytest
 import tensorflow as tf
-import input_pipeline
+from data import input_pipeline
 import os
 
 DATA_DIR = "D:/tiny-imagenet-200"
