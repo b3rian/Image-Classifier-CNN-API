@@ -18,6 +18,8 @@ except ValueError:
 DATA_DIR = "/path/to/tiny-imagenet-200" 
 BATCH_SIZE = 128 * strategy.num_replicas_in_sync
 EPOCHS = 10
+CHECKPOINT_PATH = "checkpoints/best_model.h5"
+SAVED_MODEL_DIR = "saved_model/my_model"
 
 # Load datasets
 train_ds, val_ds = get_datasets(data_dir=DATA_DIR, batch_size=BATCH_SIZE)
