@@ -15,3 +15,21 @@ class BasicBlock(tf.keras.Model):
                                    padding='same', use_bias=False)
         self.bn2 = layers.BatchNormalization()
         self.downsample = downsample
+
+     def call(self, x, training=False):
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out, training=training)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out, training=training)
+
+        if self.downsample is not None:
+            identity = self.downsample(x, training=training)
+
+        out += identity
+        out = self.relu(out)
+
+        return out
