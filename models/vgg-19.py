@@ -13,3 +13,10 @@ def VGG19(input_shape=(64, 64, 3), num_classes=200):
     model.add(layers.Conv2D(128, (3, 3), activation='relu', padding='same'))
     model.add(layers.Conv2D(128, (3, 3), activation='relu', padding='same'))
     model.add(layers.MaxPooling2D((2, 2), strides=2))
+
+    # Block 3
+    model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
+    model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
+    model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
+    model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
+    model.add(layers.MaxPooling2D((2, 2), strides=2))
