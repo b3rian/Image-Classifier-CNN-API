@@ -87,3 +87,7 @@ class ResNet(Model):
         x = self.fc(x)
 
         return x
+
+# Factory function for ResNet-18
+def ResNet18(num_classes=1000):
+    return ResNet(BasicBlock, [2, 2, 2, 2], num_classes)
