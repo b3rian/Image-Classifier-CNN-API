@@ -41,9 +41,18 @@ with strategy.scope():
         metrics=['accuracy']
     )
 
+checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
+    filepath=CHECKPOINT_PATH,
+    save_best_only=True,
+    monitor='val_loss',
+    mode='min',
+    verbose=1
+)
+
 # Train the model
 model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=EPOCHS
+    epochs=EPOCHS,
+    callbacks=[checkpoint_cb]
 )
