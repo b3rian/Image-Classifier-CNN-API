@@ -53,3 +53,21 @@ class ResNet(Model):
 
         self.avgpool = layers.GlobalAveragePooling2D()
         self.fc = layers.Dense(num_classes)
+
+    def _make_layer(self, block, filters, blocks, stride=1):
+        downsample = None
+        if stride != 1 or self.in_channels != filters * block.expansion:
+            downsample = tf.keras.Sequential([
+                layers.Conv2D(filters * block.expansion,
+                              kernel_size=1, strides=stride, use_bias=False),
+                layers.BatchNormalization()
+            ])
+
+        layers_list = []
+        layers_list.append(block(filters, stride, downsample))
+        self.in_channels = filters * block.expansion
+
+        for _ in range(1, blocks):
+            layers_list.append(block(filters))
+
+        return tf.keras.Sequential(layers_list)
