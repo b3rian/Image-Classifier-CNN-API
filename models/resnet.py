@@ -71,3 +71,19 @@ class ResNet(Model):
             layers_list.append(block(filters))
 
         return tf.keras.Sequential(layers_list)
+    
+    def call(self, x, training=False):
+        x = self.conv1(x)
+        x = self.bn1(x, training=training)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.layer1(x, training=training)
+        x = self.layer2(x, training=training)
+        x = self.layer3(x, training=training)
+        x = self.layer4(x, training=training)
+
+        x = self.avgpool(x)
+        x = self.fc(x)
+
+        return x
