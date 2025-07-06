@@ -7,9 +7,9 @@ NUM_CLASSES = 200
 # ImageNet mean (RGB)
 IMAGENET_MEAN = tf.constant([123.675, 116.28, 103.53], dtype=tf.float32)  # [R, G, B]
 
+# This function decodes JPEG images to RGB format.
 def decode_img(img):
     img = tf.image.decode_jpeg(img, channels=3)
-    img = tf.image.resize(img, IMAGE_SIZE)
     return img
 
 def process_train_image(file_path, label):
