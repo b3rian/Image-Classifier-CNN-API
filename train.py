@@ -1,5 +1,6 @@
 import yaml
 import tensorflow as tf
+from data.input_pipeline import get_datasets
 from utils.seed import set_seed
 from utils.logger import logger
 from trainers.trainer import trainer
@@ -24,16 +25,8 @@ def get_model(config):
         raise ValueError(f"Unknown model type: {name}")
 
 def get_data(config):
-    # Replace this with actual dataset loading/preprocessing
-    (x_train, y_train), (x_val, y_val) = tf.keras.datasets.cifar10.load_data()
+    return get_datasets(config)
 
-    x_train = x_train / 255.0
-    x_val = x_val / 255.0
-
-    train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).shuffle(1024).batch(config["training"]["batch_size"])
-    val_ds = tf.data.Dataset.from_tensor_slices((x_val, y_val)).batch(config["training"]["batch_size"])
-
-    return train_ds, val_ds
 
 def get_callbacks(config):
     log_dir = os.path.join("logs", config["model"]["name"], datetime.now().strftime("%Y%m%d-%H%M%S"))
