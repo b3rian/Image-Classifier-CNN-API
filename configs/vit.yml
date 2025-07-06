@@ -11,3 +11,15 @@ dataset:
     center_crop: true
     resize_shorter_side: 256
     crop_size: 224
+
+model:
+  name: VisionTransformer
+  patch_size: 16
+  hidden_dim: 768
+  num_heads: 12
+  num_layers: 12
+  mlp_dim: 3072
+  dropout: 0.1
+  attention_dropout: 0.0
+  classifier: token
+  pretrained: false # train from scratch
