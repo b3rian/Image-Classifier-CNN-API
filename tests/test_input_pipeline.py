@@ -1,43 +1,44 @@
 import pytest
 import tensorflow as tf
-from data import input_pipeline
 import os
 
-DATA_DIR = "D:/tiny-imagenet-200"
+from input_pipeline import get_label_map, load_dataset, create_dataset
 
-@pytest.fixture(scope="module")
-def datasets():
-    batch_size = 32
-    train_ds, val_ds = input_pipeline.get_datasets(DATA_DIR, batch_size=batch_size)
-    return train_ds, val_ds
+@pytest.fixture(scope="session")
+def data_root():
+    # Set this to your tiny-imagenet-200 root directory
+    return "/path/to/tiny-imagenet-200"
 
-def test_train_dataset_shape(datasets):
-    train_ds, _ = datasets
-    for images, labels in train_ds.take(1):
-        assert images.shape[1:] == (64, 64, 3), "Image shape mismatch"
-        assert labels.shape[1] == 200, "Label one-hot depth mismatch"
+@pytest.fixture(scope="session")
+def label_map(data_root):
+    return get_label_map(os.path.join(data_root, "train"))
 
-def test_val_dataset_shape(datasets):
-    _, val_ds = datasets
-    for images, labels in val_ds.take(1):
-        assert images.shape[1:] == (64, 64, 3), "Image shape mismatch"
-        assert labels.shape[1] == 200, "Label one-hot depth mismatch"
+def test_train_dataset(data_root, label_map):
+    train_dir = os.path.join(data_root, "train")
+    paths, labels = load_dataset(train_dir, label_map, split="train")
+    ds = create_dataset(paths, labels, batch_size=4, split="train")
 
-def test_pixel_range(datasets):
-    train_ds, _ = datasets
-    for images, _ in train_ds.take(1):
-        assert tf.reduce_max(images) <= 1.0, "Image values exceed 1.0"
-        assert tf.reduce_min(images) >= 0.0, "Image values below 0.0"
+    for images, labels in ds.take(1):
+        assert images.shape == (4, 224, 224, 3)
+        assert labels.shape == (4, 200)
+        assert tf.reduce_all(tf.math.is_finite(images))
 
-def test_label_one_hot(datasets):
-    _, val_ds = datasets
-    for _, labels in val_ds.take(1):
-        unique_sums = tf.unique(tf.reduce_sum(labels, axis=1))[0]
-        assert tf.reduce_all(unique_sums == 1.0), "Labels are not one-hot encoded"
+def test_val_dataset(data_root, label_map):
+    val_dir = os.path.join(data_root, "val")
+    paths, labels = load_dataset(val_dir, label_map, split="val")
+    ds = create_dataset(paths, labels, batch_size=4, split="val")
 
-def test_dataset_is_iterable(datasets):
-    train_ds, val_ds = datasets
-    train_count = sum(1 for _ in train_ds.take(3))
-    val_count = sum(1 for _ in val_ds.take(3))
-    assert train_count > 0, "Training dataset is empty"
-    assert val_count > 0, "Validation dataset is empty"
+    for images, labels in ds.take(1):
+        assert images.shape == (4, 224, 224, 3)
+        assert labels.shape == (4, 200)
+        assert tf.reduce_all(tf.math.is_finite(images))
+
+def test_test_dataset(data_root, label_map):
+    test_dir = os.path.join(data_root, "test")
+    paths, labels = load_dataset(test_dir, label_map, split="test")
+    ds = create_dataset(paths, labels, batch_size=4, split="test")
+
+    for images, labels in ds.take(1):
+        assert images.shape == (4, 224, 224, 3)
+        assert labels.shape == (4, 200)
+        assert tf.reduce_all(tf.math.is_finite(images))
