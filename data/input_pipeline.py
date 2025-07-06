@@ -4,6 +4,8 @@ import os
 AUTOTUNE = tf.data.AUTOTUNE
 IMAGE_SIZE = (64, 64)
 NUM_CLASSES = 200
+# ImageNet mean (RGB)
+IMAGENET_MEAN = tf.constant([123.675, 116.28, 103.53], dtype=tf.float32)  # [R, G, B]
 
 def decode_img(img):
     img = tf.image.decode_jpeg(img, channels=3)
