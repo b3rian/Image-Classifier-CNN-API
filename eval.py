@@ -1,5 +1,5 @@
 import tensorflow as tf
-from metrics.metrics import get_classification_metrics
+from utils.metrics import get_classification_metrics
 from data.input_pipeline import get_datasets
 import yaml
 import argparse
