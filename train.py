@@ -1,17 +1,23 @@
 from trainers.trainer import Trainer
-from models import build_resnet
 from utils.logger import get_callbacks
 from data.input_pipeline import get_datasets
 from utils.seed import set_seed
 import yaml
-from models.resnet import ResNet18
-from preprocessing import get_model_preprocessing_layer
+from models.build_resnet import ResNet18
+from data.preprocessing import get_model_preprocessing_layer
 import tensorflow as tf
 
 config = yaml.safe_load(open("configs/resnet.yml"))
 set_seed(config["seed"])
 
 train_ds, val_ds = get_datasets(config)
+
+# Adapt normalization layer
+preprocess = get_model_preprocessing_layer(config)
+for layer in preprocess.layers:
+    if isinstance(layer, tf.keras.layers.Normalization):
+        print("[INFO] Adapting normalization layer...")
+        layer.adapt(train_ds.map(lambda x, y: x))
 
 def model_fn():
     preprocess = get_model_preprocessing_layer(config)
