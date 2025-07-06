@@ -30,16 +30,16 @@ def get_callbacks(log_dir_base="logs", checkpoint_dir="checkpoints", monitor="va
             save_weights_only=False,
             verbose=1
         ),
-        tf.keras.callbacks.EarlyStopping(
-            monitor=monitor,
-            patience=5,
-            restore_best_weights=True,
-            verbose=1
-        ),
         tf.keras.callbacks.ReduceLROnPlateau(
-            monitor=monitor,
+            monitor='val_loss',
             factor=0.1,
             patience=3,
             verbose=1
+        ),
+        tf.keras.callbacks.EarlyStopping(
+            monitor='val_loss',
+            patience=6,                 # greater than ReduceLROnPlateau's
+            restore_best_weights=True,
+            verbose=1
         )
-    ]
+]

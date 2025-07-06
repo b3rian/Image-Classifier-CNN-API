@@ -1,7 +1,7 @@
 import tensorflow as tf
 import os
-from input_pipeline import get_datasets
-from preprocessing import build_model
+from data.input_pipeline import get_datasets
+from data.preprocessing import build_model
 from utils.logger import get_callbacks
 
 # Initialize TPU strategy
