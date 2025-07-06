@@ -20,3 +20,19 @@ model:
     position: after_conv_before_activation
   weight_init: HeNormal  # He initialization for ReLU activations
   dropout: false
+
+training:
+  optimizer: SGD
+  batch_size: 256
+  learning_rate:
+    initial: 0.1
+    schedule:
+      type: plateau
+      factor: 0.1
+  weight_decay: 0.0001
+  momentum: 0.9
+  max_iterations: 600000 # Total number of iterations for training
+  pretrained: false  # train from scratch
+
+testing:
+  strategy: standard_and_multi_scale
