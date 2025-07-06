@@ -1,6 +1,10 @@
 import tensorflow as tf
 import os
 from input_pipeline import get_dataset
+from utils.seed import set_seed
+
+set_seed(1234)
+
 
 # Set up TPU
 try:
