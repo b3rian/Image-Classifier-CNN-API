@@ -17,12 +17,12 @@ class Trainer:
 
         # Wrap data loading and model creation inside strategy scope
         with self.strategy.scope():
-            self.model = model_fn()
-            self._compile_model()
+            self.model = model_fn() # Create the model using the provided function
+            self._compile_model() # Compile the model with optimizer, loss, and metrics
         
-        self.train_ds = train_ds
-        self.val_ds = val_ds
-        self.callbacks = get_callbacks(config)
+        self.train_ds = train_ds # Training dataset
+        self.val_ds = val_ds # Validation dataset
+        self.callbacks = get_callbacks(config) # Callbacks for training
 
     def _init_strategy(self):
         """Initialize TPU or default strategy."""
