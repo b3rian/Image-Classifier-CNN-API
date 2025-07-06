@@ -60,17 +60,19 @@ class Trainer:
         else:
             raise ValueError(f"Unsupported optimizer: {opt_name}")
 
+        # Compile the model with the optimizer, loss function, and metrics
         self.model.compile(
             optimizer=optimizer,
             loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-            metrics=get_classification_metrics()
+            metrics=get_classification_metrics() # Get classification metrics (accuracy & top-5 accuracy)
         )
-
+    
+    # training loop method (to be called externally
     def train(self):
         """Run the training loop."""
         self.model.fit(
             self.train_ds,
             validation_data=self.val_ds,
             epochs=self.config["training"]["epochs"],
-            callbacks=self.callbacks
+            callbacks=self.callbacks # Callbacks for logging, checkpointing, TensorBoard, etc.
         )
