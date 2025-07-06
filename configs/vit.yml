@@ -1,0 +1,13 @@
+# Vision Transformer (ViT) configuration for training and fine-tuning
+
+dataset:
+  name: ImageNet-200
+  train_augmentation:
+    resize_shorter_side: 256
+    crop_size: 224
+    random_horizontal_flip: true
+    normalize: true
+  test_augmentation:
+    center_crop: true
+    resize_shorter_side: 256
+    crop_size: 224
