@@ -20,3 +20,26 @@ def get_callbacks(log_dir_base="logs", checkpoint_dir="checkpoints", monitor="va
     ckpt_path = os.path.join(checkpoint_dir, f"best_model_{timestamp}.h5")
 
     os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    return [
+        tf.keras.callbacks.TensorBoard(log_dir=log_dir),
+        tf.keras.callbacks.ModelCheckpoint(
+            filepath=ckpt_path,
+            monitor=monitor,
+            save_best_only=True,
+            save_weights_only=False,
+            verbose=1
+        ),
+        tf.keras.callbacks.EarlyStopping(
+            monitor=monitor,
+            patience=5,
+            restore_best_weights=True,
+            verbose=1
+        ),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            monitor=monitor,
+            factor=0.1,
+            patience=3,
+            verbose=1
+        )
+    ]
