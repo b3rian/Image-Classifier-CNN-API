@@ -47,15 +47,15 @@ class Trainer:
         if opt_name == "adam":
             optimizer = tf.keras.optimizers.Adam(
                 learning_rate=lr,
-                beta_1=optimizer_cfg.get("beta1", 0.9),
-                beta_2=optimizer_cfg.get("beta2", 0.999),
-                weight_decay=self.config["training"].get("weight_decay", 0.0)
+                beta_1=optimizer_cfg.get("beta1", 0.9), # default beta1
+                beta_2=optimizer_cfg.get("beta2", 0.999), # default beta2
+                weight_decay=self.config["training"].get("weight_decay", 0.0) # default weight decay
             )
         elif opt_name == "sgd":
             optimizer = tf.keras.optimizers.SGD(
                 learning_rate=lr,
-                momentum=optimizer_cfg.get("momentum", 0.9),
-                weight_decay=self.config["training"].get("weight_decay", 0.0)
+                momentum=optimizer_cfg.get("momentum", 0.9), # default momentum
+                weight_decay=self.config["training"].get("weight_decay", 0.0) # default weight decay
             )
         else:
             raise ValueError(f"Unsupported optimizer: {opt_name}")
