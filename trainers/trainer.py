@@ -37,15 +37,7 @@ callbacks = get_callbacks(
 
 # Model definition inside strategy.scope()
 with strategy.scope():
-    model = tf.keras.Sequential([
-        tf.keras.layers.Input(shape=(64, 64, 3)),
-        tf.keras.layers.Conv2D(64, 3, activation='relu'),
-        tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Conv2D(128, 3, activation='relu'),
-        tf.keras.layers.MaxPooling2D(),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(256, activation='relu'),
-        tf.keras.layers.Dense(200, activation='softmax')
+    model = 
     ])
 
     model.compile(
