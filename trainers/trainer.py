@@ -27,10 +27,10 @@ class Trainer:
     def _init_strategy(self):
         """Initialize TPU or default strategy."""
         try:
-            tpu = tf.distribute.cluster_resolver.TPUClusterResolver()
+            tpu = tf.distribute.cluster_resolver.TPUClusterResolver() # Detect TPU
             tf.config.experimental_connect_to_cluster(tpu)
             tf.tpu.experimental.initialize_tpu_system(tpu)
-            strategy = tf.distribute.TPUStrategy(tpu)
+            strategy = tf.distribute.TPUStrategy(tpu) # Initialize TPU strategy
             print("[INFO] Using TPU strategy.")
         except ValueError:
             strategy = tf.distribute.get_strategy()
@@ -43,6 +43,7 @@ class Trainer:
         opt_name = optimizer_cfg["name"].lower()
         lr = self.config["training"]["learning_rate"]["initial"]
 
+        # configure optimizer based on the name
         if opt_name == "adam":
             optimizer = tf.keras.optimizers.Adam(
                 learning_rate=lr,
