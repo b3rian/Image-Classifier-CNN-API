@@ -12,11 +12,30 @@ def decode_img(img):
 
 def process_train_image(file_path, label):
     img = tf.io.read_file(file_path)
-    img = decode_img(img)  # Should return tf.float32 in [0,255]
+    img = decode_img(img)  # float32 in [0, 255]
+
+    # 1. Resize shorter side randomly between 256 and 480
+    rand_size = tf.random.uniform([], minval=256, maxval=480, dtype=tf.int32)
+    shape = tf.shape(img)[:2]
+    h, w = shape[0], shape[1]
+    scale = tf.cast(rand_size, tf.float32) / tf.cast(tf.minimum(h, w), tf.float32)
+    new_height = tf.cast(tf.round(tf.cast(h, tf.float32) * scale), tf.int32)
+    new_width = tf.cast(tf.round(tf.cast(w, tf.float32) * scale), tf.int32)
+    img = tf.image.resize(img, [new_height, new_width])
+
+    # 2. Random crop to 224×224
+    img = tf.image.random_crop(img, size=[224, 224, 3])
+
+    # Random horizontal flip
     img = tf.image.random_flip_left_right(img)
-    img = tf.image.random_brightness(img, max_delta=25)  # Use delta in pixel scale if img is in [0,255]
+
+    # Brightness & contrast (ImageNet-style color augmentation)
+    img = tf.image.random_brightness(img, max_delta=25)  # delta in pixel range
     img = tf.image.random_contrast(img, lower=0.9, upper=1.1)
-    
+
+    # Subtract per-channel ImageNet mean
+    img = img - IMAGENET_MEAN
+
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_val_image(file_path, label):
