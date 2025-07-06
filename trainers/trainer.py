@@ -2,6 +2,7 @@ import tensorflow as tf
 import os
 from input_pipeline import get_datasets
 from preprocessing import build_model
+from utils.logger import get_callbacks
 
 # Initialize TPU strategy
 try:
@@ -23,6 +24,12 @@ SAVED_MODEL_DIR = "saved_model/my_model"
 
 # Load datasets
 train_ds, val_ds = get_datasets(data_dir=DATA_DIR, batch_size=BATCH_SIZE)
+callbacks = get_callbacks(
+    log_dir_base=f"logs/{model_name}",
+    checkpoint_dir=f"checkpoints/{model_name}",
+    monitor="val_loss"
+)
+
 
 # Model definition inside strategy.scope()
 with strategy.scope():
