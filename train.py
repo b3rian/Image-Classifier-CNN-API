@@ -17,7 +17,7 @@ set_seed(config["seed"])
 train_ds, val_ds = get_datasets(config)
 
 # Adapt normalization layer
-preprocess = get_model_preprocessing_layer(config)
+preprocess = get_model_preprocessing_layer()
 for layer in preprocess.layers:
     if isinstance(layer, tf.keras.layers.Normalization):
         print("[INFO] Adapting normalization layer...")
