@@ -25,7 +25,7 @@ for layer in preprocess.layers:
 
 def model_fn():
     """Function to create the ResNet model with preprocessing."""
-    inputs = tf.keras.Input(shape=(None, None, 3))
+    inputs = tf.keras.Input(shape=(None, None, 3)) # Input layer for images
     x = preprocess(inputs)  # Apply preprocessing
     backbone = ResNet18(num_classes=config["model"]["num_classes"])
     outputs = backbone(x)
@@ -34,7 +34,7 @@ def model_fn():
 
 # Initialize the Trainer with the model function and datasets
 trainer = Trainer(
-    model_fn=build_resnet,
+    model_fn=model_fn,
     train_ds=train_ds,
     val_ds=val_ds,
     config=config,
