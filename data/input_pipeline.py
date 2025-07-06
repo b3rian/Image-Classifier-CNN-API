@@ -82,48 +82,54 @@ def process_test_image(file_path, label):
 
     return img, tf.one_hot(label, NUM_CLASSES)
 
-
-
 def get_label_map(train_dir):
     class_names = sorted(os.listdir(train_dir))
     label_map = {name: idx for idx, name in enumerate(class_names)}
     return label_map
 
-def load_dataset(image_dir, label_map=None, is_training=True):
+def load_dataset(image_dir, label_map=None, split="train"):
     image_paths = []
     labels = []
 
-    if is_training:
+    if split == "train":
         for class_name, class_index in label_map.items():
             class_dir = os.path.join(image_dir, class_name, "images")
             for fname in os.listdir(class_dir):
                 image_paths.append(os.path.join(class_dir, fname))
                 labels.append(class_index)
-    else:
-        val_img_dir = os.path.join(image_dir, "images")
-        val_annotations = os.path.join(image_dir, "val_annotations.txt")
 
-        with open(val_annotations, 'r') as f:
+    elif split in ["val", "test"]:
+        img_dir = os.path.join(image_dir, "images")
+        annotation_file = os.path.join(image_dir, f"{split}_annotations.txt")
+
+        with open(annotation_file, 'r') as f:
             for line in f:
                 fname, class_name, *_ = line.strip().split()
                 if class_name in label_map:
-                    image_paths.append(os.path.join(val_img_dir, fname))
+                    image_paths.append(os.path.join(img_dir, fname))
                     labels.append(label_map[class_name])
+    else:
+        raise ValueError(f"Unsupported split: {split}")
 
     return image_paths, labels
 
-def create_dataset(image_paths, labels, batch_size=64, is_training=True):
+def create_dataset(image_paths, labels, batch_size=64, split="train"):
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
 
-    if is_training:
+    if split == "train":
         dataset = dataset.shuffle(buffer_size=len(image_paths))
         dataset = dataset.map(process_train_image, num_parallel_calls=AUTOTUNE)
-    else:
+    elif split == "val":
         dataset = dataset.map(process_val_image, num_parallel_calls=AUTOTUNE)
+    elif split == "test":
+        dataset = dataset.map(process_test_image, num_parallel_calls=AUTOTUNE)
+    else:
+        raise ValueError(f"Unsupported split: {split}")
 
     dataset = dataset.batch(batch_size, drop_remainder=True)
     dataset = dataset.prefetch(AUTOTUNE)
     return dataset
+
 
 def get_datasets(data_dir, batch_size=64):
     train_dir = os.path.join(data_dir, "train")
