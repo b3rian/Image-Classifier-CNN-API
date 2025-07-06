@@ -23,3 +23,15 @@ model:
   attention_dropout: 0.0
   classifier: token
   pretrained: false # train from scratch
+
+training:
+  optimizer: Adam
+  adam_betas: [0.9, 0.999]
+  batch_size: 4096
+  learning_rate:
+    warmup: linear
+    schedule: linear_decay
+  weight_decay: 0.1
+  max_epochs: 100  # or adjust depending on your setup
+  gradient_clipping: null
+  label_smoothing: 0.1
