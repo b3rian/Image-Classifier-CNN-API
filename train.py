@@ -23,6 +23,7 @@ for layer in preprocess.layers:
         print("[INFO] Adapting normalization layer...")
         layer.adapt(train_ds.map(lambda x, y: x))
 
+# Model with preprocessing function
 def model_fn():
     """Function to create the ResNet model with preprocessing."""
     inputs = tf.keras.Input(shape=(None, None, 3)) # Input layer for images
