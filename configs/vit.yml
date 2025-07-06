@@ -1,4 +1,4 @@
-# Vision Transformer (ViT) configuration for training and fine-tuning
+# Vision Transformer (ViT) configuration for training
 
 dataset:
   name: ImageNet-200
