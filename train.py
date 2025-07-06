@@ -7,9 +7,13 @@ from models.build_resnet import ResNet18
 from data.preprocessing import get_model_preprocessing_layer
 import tensorflow as tf
 
+# Load configurations
 config = yaml.safe_load(open("configs/resnet.yml"))
+
+# Set random seed for reproducibility
 set_seed(config["seed"])
 
+# Get datasets
 train_ds, val_ds = get_datasets(config)
 
 # Adapt normalization layer
