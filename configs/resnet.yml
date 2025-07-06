@@ -7,8 +7,16 @@ dataset:
     crop_size: 224
     random_horizontal_flip: true
     subtract_mean: true
-    color_augmentation: true  # As per [21]
+    color_augmentation: true  # Color jittering
   test_augmentation:
     mode: 10-crop
     fully_convolutional_eval: true
     multi_scale_eval: [224, 256, 384, 480, 640]
+
+model:
+  name: ResNet
+  batch_norm:
+    enabled: true
+    position: after_conv_before_activation
+  weight_init: HeNormal  # He initialization for ReLU activations
+  dropout: false
