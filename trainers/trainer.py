@@ -3,6 +3,10 @@ import os
 from data.input_pipeline import get_datasets
 from data.preprocessing import build_model
 from utils.logger import get_callbacks
+from utils.seed import set_seed
+
+set_seed(1234)
+
 
 # Initialize TPU strategy
 try:
