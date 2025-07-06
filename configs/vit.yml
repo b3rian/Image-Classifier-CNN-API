@@ -32,6 +32,6 @@ training:
     warmup: linear
     schedule: linear_decay
   weight_decay: 0.1
-  max_epochs: 100  # or adjust depending on your setup
+  max_epochs: 100 # Total number of epochs for training
   gradient_clipping: null
   label_smoothing: 0.1
