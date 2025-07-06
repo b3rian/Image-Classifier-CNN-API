@@ -24,8 +24,7 @@ for layer in preprocess.layers:
         layer.adapt(train_ds.map(lambda x, y: x))
 
 def model_fn():
-    preprocess = get_model_preprocessing_layer(config)
-    
+    """Function to create the ResNet model with preprocessing."""
     inputs = tf.keras.Input(shape=(None, None, 3))
     x = preprocess(inputs)  # Apply preprocessing
     backbone = ResNet18(num_classes=config["model"]["num_classes"])
@@ -33,6 +32,7 @@ def model_fn():
 
     return tf.keras.Model(inputs, outputs, name="resnet18_with_preprocessing")
 
+# Initialize the Trainer with the model function and datasets
 trainer = Trainer(
     model_fn=build_resnet,
     train_ds=train_ds,
@@ -41,4 +41,5 @@ trainer = Trainer(
     callbacks=get_callbacks(config)
 )
 
+# Start training
 trainer.train()
