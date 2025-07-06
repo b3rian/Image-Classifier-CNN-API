@@ -140,10 +140,11 @@ def get_datasets(data_dir, batch_size=64):
     train_paths, train_labels = load_dataset(train_dir, label_map, is_training=True)
     val_paths, val_labels = load_dataset(val_dir, label_map, is_training=False)
 
-    train_ds = create_dataset(train_paths, train_labels, batch_size=batch_size, is_training=True)
-    val_ds = create_dataset(val_paths, val_labels, batch_size=batch_size, is_training=False)
+    train_ds = create_dataset(train_paths, train_labels, batch_size=batch_size, split="train")
+    val_ds = create_dataset(val_paths, val_labels, batch_size=batch_size, split="val")
 
     return train_ds, val_ds
+
 
 def get_test_dataset(test_dir, label_map, batch_size=64):
     test_paths, test_labels = load_dataset(test_dir, label_map, is_training=False)
