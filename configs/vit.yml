@@ -1,6 +1,10 @@
 # Vision Transformer (ViT) configurations for training
 seed: 42
 
+dataset:
+  data_dir: "/content/drive/MyDrive/datasets/tiny-imagenet-200"
+  batch_size: 1024
+
 model:
   name: VisionTransformer
   input_shape: [224, 224, 3]

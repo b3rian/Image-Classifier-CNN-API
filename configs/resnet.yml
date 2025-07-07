@@ -1,4 +1,8 @@
 # ResNet configuration for ImageNet training and evaluation
+dataset:
+  data_dir: "/content/drive/MyDrive/datasets/tiny-imagenet-200"
+  batch_size: 1024
+
 model:
   name: ResNet
   input_shape: [224, 224, 3]
@@ -13,7 +17,6 @@ seed: 42
 
 training:
   optimizer: SGD
-  batch_size: 1024
   learning_rate:
     initial: 0.1
     schedule:
