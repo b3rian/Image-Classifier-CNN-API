@@ -136,6 +136,6 @@ def get_datasets(data_dir, batch_size=64):
 
 
 def get_test_dataset(test_dir, label_map, batch_size=64):
-    test_paths, test_labels = load_dataset(test_dir, label_map, split='test')
+    test_paths, test_labels = load_dataset(test_dir, label_map, split="test")
     test_ds = create_dataset(test_paths, test_labels, batch_size=batch_size, split="test")
     return test_ds
