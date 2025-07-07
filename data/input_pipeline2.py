@@ -2,7 +2,7 @@ import tensorflow as tf
 import os
 
 AUTOTUNE = tf.data.AUTOTUNE
-IMAGE_SIZE = (64, 64)
+IMAGE_SIZE = (224,224)
 NUM_CLASSES = 200
 # ImageNet mean (RGB)
 IMAGENET_MEAN = tf.constant([123.675, 116.28, 103.53], dtype=tf.float32)  # [R, G, B]

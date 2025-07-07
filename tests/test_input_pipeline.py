@@ -2,12 +2,12 @@ import pytest
 import tensorflow as tf
 import os
 
-from input_pipeline import get_label_map, load_dataset, create_dataset
+from data.input_pipeline2 import get_label_map, load_dataset, create_dataset
 
 @pytest.fixture(scope="session")
 def data_root():
     # Set this to your tiny-imagenet-200 root directory
-    return "/path/to/tiny-imagenet-200"
+    return "D:/Downloads/tiny-224" 
 
 @pytest.fixture(scope="session")
 def label_map(data_root):
