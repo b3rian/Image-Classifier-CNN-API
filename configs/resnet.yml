@@ -24,6 +24,6 @@ training:
       factor: 0.1
   weight_decay: 0.0001
   momentum: 0.9
-  epochs: 100 # Total number of iterations for training
+  epochs: 10 # Total number of iterations for training
   pretrained: false  # train from scratch
   label_smoothing: 0.1  

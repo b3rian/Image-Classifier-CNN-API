@@ -3,7 +3,7 @@ from utils.logger import get_callbacks
 from data.input_pipeline2 import get_datasets
 from utils.seed import set_seed
 import yaml
-from models.build_resnet import ResNet18
+from models.build_simple_cnn import SimpleCNN
 from data.preprocessing import get_model_preprocessing_layer
 import tensorflow as tf
 
@@ -31,7 +31,7 @@ def model_fn():
     """Function to create the ResNet model with preprocessing."""
     inputs = tf.keras.Input(shape=(None, None, 3)) # Input layer for images
     x = preprocess(inputs)  # Apply preprocessing
-    backbone = ResNet18(num_classes=config["model"]["num_classes"])
+    backbone = SimpleCNN(num_classes=config["model"]["num_classes"])
     outputs = backbone(x)
 
     return tf.keras.Model(inputs, outputs, name="resnet18_with_preprocessing")
