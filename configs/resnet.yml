@@ -21,6 +21,3 @@ training:
   momentum: 0.9
   max_iterations: 600000 # Total number of iterations for training
   pretrained: false  # train from scratch
-
-testing:
-  strategy: standard_and_multi_scale
