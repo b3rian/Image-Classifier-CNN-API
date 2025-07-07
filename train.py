@@ -7,6 +7,15 @@ from models.build_simple_cnn import SimpleCNN
 from data.preprocessing import get_model_preprocessing_layer
 import tensorflow as tf
 
+gpus = tf.config.list_physical_devices("GPU")
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        print("✅ GPU memory growth enabled.")
+    except RuntimeError as e:
+        print(f"❌ Could not set memory growth: {e}")
+
 # Load configurations
 config = yaml.safe_load(open("configs/resnet.yml"))
 
