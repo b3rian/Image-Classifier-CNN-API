@@ -1,20 +1,20 @@
 import tensorflow as tf
 from utils.metrics import get_classification_metrics
-from data.input_pipeline import get_datasets
+from data.input_pipeline2 import get_datasets, get_test_dataset
 import yaml
 import argparse
 import os
 
 def evaluate(model_path, config):
      # Load test dataset (ignore train_ds and val_ds with `_, _`)
-    _, _, test_ds = get_datasets(config)
+    _, _, test_ds = get_test_dataset()
 
     # load saved model without compiling
     model = tf.keras.models.load_model(model_path, compile=False)
 
     # recompile the model with the correct loss and metrics
     model.compile(
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False),
         metrics=get_classification_metrics()
     )
     # evaluate on the test dataset
