@@ -24,7 +24,11 @@ preprocess = get_model_preprocessing_layer()
 for layer in preprocess.layers:
     if isinstance(layer, tf.keras.layers.Normalization):
         print("[INFO] Adapting normalization layer...")
-        layer.adapt(train_ds.map(lambda x, y: x))
+
+        # Extract only image tensors and take a limited number of batches to adapt
+        image_ds = train_ds.map(lambda x, y: x).unbatch().take(1000)  # unbatch is key
+        image_ds = image_ds.map(lambda x: tf.cast(x, tf.float32))
+        layer.adapt(image_ds)
 
 # Model with preprocessing function
 def model_fn():
