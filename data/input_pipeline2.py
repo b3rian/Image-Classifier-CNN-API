@@ -102,7 +102,7 @@ def load_dataset(image_dir, label_map=None, split="train"):
     return image_paths, labels
 
 
-def create_dataset(image_paths, labels, batch_size=64, split="train"):
+def create_dataset(image_paths, labels, batch_size=1024, split="train"):
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
 
     if split == "train":
