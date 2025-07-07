@@ -37,8 +37,7 @@ trainer = Trainer(
     model_fn=model_fn,
     train_ds=train_ds,
     val_ds=val_ds,
-    config=config,
-    callbacks=get_callbacks()
+    config=config
 )
 
 # Start training
