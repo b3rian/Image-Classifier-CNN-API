@@ -9,6 +9,8 @@ model:
   weight_init: HeNormal  # He initialization for ReLU activations
   dropout: false
 
+seed: 42
+
 training:
   optimizer: SGD
   batch_size: 1024

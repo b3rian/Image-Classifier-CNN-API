@@ -89,5 +89,5 @@ class ResNet(Model):
         return x
 
 # Factory function for ResNet-18
-def ResNet18(num_classes=1000):
+def ResNet18(num_classes):
     return ResNet(BasicBlock, [2, 2, 2, 2], num_classes)

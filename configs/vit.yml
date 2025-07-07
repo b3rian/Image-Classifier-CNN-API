@@ -1,4 +1,6 @@
 # Vision Transformer (ViT) configurations for training
+seed: 42
+
 model:
   name: VisionTransformer
   input_shape: [224, 224, 3]
