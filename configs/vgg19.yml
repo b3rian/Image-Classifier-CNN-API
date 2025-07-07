@@ -13,7 +13,8 @@ dataset:
 
 training:
   epochs: 100
-  optimizer: SGD
+  optimizer: 
+   name: SGD
   learning_rate:
     initial: 0.01
     schedule:
