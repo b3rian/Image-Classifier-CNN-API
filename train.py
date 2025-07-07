@@ -12,6 +12,7 @@ from trainers.trainer import Trainer
 from utils.logger import get_callbacks
 from data.input_pipeline2 import get_datasets
 from utils.seed import set_seed
+import os
 import yaml
 from models.build_vgg_19 import VGG19
 from data.preprocessing import get_model_preprocessing_layer
@@ -52,4 +53,10 @@ trainer = Trainer(
 )
 
 # Start training
-trainer.train()
+model = trainer.train()
+
+# Save the trained model
+os.makedirs("exports", exist_ok=True)
+model.save("exports/my_model.keras")
+print("✅ Final model saved to exports/my_model.keras")
+

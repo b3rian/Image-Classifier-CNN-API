@@ -68,7 +68,7 @@ class Trainer:
             metrics=get_classification_metrics() # Get classification metrics (accuracy & top-5 accuracy)
         )
     
-    # training loop method (to be called externally
+    # training loop method (to be called externally)
     def train(self):
         """Run the training loop."""
         self.model.fit(
@@ -78,3 +78,4 @@ class Trainer:
             verbose=1,
             callbacks=self.callbacks # Callbacks for logging, checkpointing, TensorBoard, etc.
         )
+        return self.model
