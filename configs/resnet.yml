@@ -1,21 +1,7 @@
 # ResNet configuration for ImageNet training and evaluation
-
-dataset:
-  name: ImageNet
-  train_augmentation:
-    resize_shorter_side_range: [256, 480]
-    crop_size: 224
-    random_horizontal_flip: true
-    subtract_mean: true
-    color_augmentation: true  # Color jittering
-  test_augmentation:
-    mode: 10-crop
-    fully_convolutional_eval: true
-    multi_scale_eval: [224, 256, 384, 480, 640]
-
 model:
   name: ResNet
-  input_shape: [64, 64, 3]
+  input_shape: [224, 224, 3]
   num_classes: 200
   batch_norm:
     enabled: true
