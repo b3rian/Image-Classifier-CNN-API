@@ -1,20 +1,7 @@
-# Vision Transformer (ViT) configuration for training
-
-dataset:
-  name: ImageNet-200
-  train_augmentation:
-    resize_shorter_side: 256
-    crop_size: 224
-    random_horizontal_flip: true
-    normalize: true
-  test_augmentation:
-    center_crop: true
-    resize_shorter_side: 256
-    crop_size: 224
-
+# Vision Transformer (ViT) configurations for training
 model:
   name: VisionTransformer
-  input_shape: [64, 64, 3]
+  input_shape: [224, 224, 3]
   num_classes: 200
   patch_size: 16
   hidden_dim: 768
