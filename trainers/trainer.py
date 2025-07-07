@@ -22,7 +22,7 @@ class Trainer:
         
         self.train_ds = train_ds # Training dataset
         self.val_ds = val_ds # Validation dataset
-        self.callbacks = get_callbacks(config) # Callbacks for training
+        self.callbacks = get_callbacks(config=None) # Callbacks for training
 
     def _init_strategy(self):
         """Initialize TPU or default GPU /CPU strategy."""
