@@ -64,7 +64,7 @@ class Trainer:
         # Compile the model with the optimizer, loss function, and metrics
         self.model.compile(
             optimizer=optimizer,
-            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+            loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False, label_smoothing=0.1),
             metrics=get_classification_metrics() # Get classification metrics (accuracy & top-5 accuracy)
         )
     
