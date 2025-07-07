@@ -75,5 +75,6 @@ class Trainer:
             self.train_ds,
             validation_data=self.val_ds,
             epochs=self.config["training"]["epochs"],
+            verbose=1,
             callbacks=self.callbacks # Callbacks for logging, checkpointing, TensorBoard, etc.
         )
