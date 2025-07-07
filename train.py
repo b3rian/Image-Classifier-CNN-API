@@ -13,8 +13,11 @@ config = yaml.safe_load(open("configs/resnet.yml"))
 # Set random seed for reproducibility
 set_seed(config["seed"])
 
+data_dir = config["dataset"]["data_dir"]
+batch_size = config["dataset"]["batch_size"]
+
 # Get datasets
-train_ds, val_ds = get_datasets(config)
+train_ds, val_ds = get_datasets(data_dir, batch_size)
 
 # Adapt normalization layer
 preprocess = get_model_preprocessing_layer()
