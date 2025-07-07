@@ -25,7 +25,7 @@ class Trainer:
         self.callbacks = get_callbacks(config) # Callbacks for training
 
     def _init_strategy(self):
-        """Initialize TPU or default strategy."""
+        """Initialize TPU or default GPU /CPU strategy."""
         try:
             tpu = tf.distribute.cluster_resolver.TPUClusterResolver() # Detect TPU
             tf.config.experimental_connect_to_cluster(tpu)
@@ -37,6 +37,7 @@ class Trainer:
             print("[INFO] Using default strategy (CPU/GPU).")
         return strategy
 
+    # Compiling the model
     def _compile_model(self):
         """Compile the model with optimizer, loss, and metrics."""
         optimizer_cfg = self.config["training"]["optimizer"]
