@@ -16,7 +16,8 @@ model:
 seed: 42
 
 training:
-  optimizer: SGD
+  optimizer: 
+  name: SGD
   learning_rate:
     initial: 0.1
     schedule:
