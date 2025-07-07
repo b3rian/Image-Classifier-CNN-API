@@ -120,7 +120,7 @@ def create_dataset(image_paths, labels, batch_size=1024, split="train"):
     return dataset
 
 
-def get_datasets(data_dir, batch_size=64):
+def get_datasets(data_dir, batch_size=1024):
     train_dir = os.path.join(data_dir, "train")
     val_dir = os.path.join(data_dir, "val")
 
@@ -135,7 +135,7 @@ def get_datasets(data_dir, batch_size=64):
     return train_ds, val_ds
 
 
-def get_test_dataset(test_dir, label_map, batch_size=64):
+def get_test_dataset(test_dir, label_map, batch_size=1024):
     test_paths, test_labels = load_dataset(test_dir, label_map, split="test")
     test_ds = create_dataset(test_paths, test_labels, batch_size=batch_size, split="test")
     return test_ds
