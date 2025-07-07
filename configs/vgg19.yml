@@ -1,0 +1,27 @@
+model:
+  name: "vgg19"
+  num_classes: 200 
+  input_shape: [224, 224, 3]
+  use_batch_norm: false  
+
+dataset:
+  data_dir: "/content/drive/MyDrive/datasets/imagenet"
+  image_size: [224, 224]
+  batch_size: 1024
+  augment: true
+  normalization: true  # ImageNet mean/std normalization
+
+training:
+  epochs: 100
+  optimizer: SGD
+  learning_rate:
+    initial: 0.01
+    schedule:
+      type: plateau
+      factor: 0.1
+  momentum: 0.9
+  weight_decay: 0.0005  # L2 regularization (decay)
+  loss: "categorical_crossentropy"
+  label_smoothing: 0.1  
+
+seed: 42

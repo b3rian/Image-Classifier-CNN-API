@@ -23,8 +23,10 @@ training:
   optimizer: Adam
   adam_betas: [0.9, 0.999]
   learning_rate:
-    warmup: linear
-    schedule: linear_decay
+    initial: 0.1
+    schedule:
+      type: plateau
+      factor: 0.1
   weight_decay: 0.1
   epochs: 100 # Total number of epochs for training
   gradient_clipping: null
