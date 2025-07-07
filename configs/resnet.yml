@@ -21,3 +21,4 @@ training:
   momentum: 0.9
   epochs: 100 # Total number of iterations for training
   pretrained: false  # train from scratch
+  label_smoothing: 0.1  
