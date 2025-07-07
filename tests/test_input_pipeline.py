@@ -2,43 +2,59 @@ import pytest
 import tensorflow as tf
 import os
 
-from data.input_pipeline2 import get_label_map, load_dataset, create_dataset
+from data.input_pipeline2 import (
+    get_label_map,
+    load_dataset,
+    create_dataset,
+    get_datasets,
+    get_test_dataset,
+    IMAGENET_MEAN,
+    NUM_CLASSES
+)
+
+# Replace this with your actual dataset root for testing
+DATA_DIR = "D:/Downloads/tiny-224"
 
 @pytest.fixture(scope="session")
-def data_root():
-    # Set this to your tiny-imagenet-200 root directory
-    return "D:/Downloads/tiny-224" 
+def label_map():
+    train_dir = os.path.join(DATA_DIR, "train")
+    return get_label_map(train_dir)
 
 @pytest.fixture(scope="session")
-def label_map(data_root):
-    return get_label_map(os.path.join(data_root, "train"))
+def train_val_datasets():
+    return get_datasets(DATA_DIR, batch_size=8)  # Small batch for test
 
-def test_train_dataset(data_root, label_map):
-    train_dir = os.path.join(data_root, "train")
-    paths, labels = load_dataset(train_dir, label_map, split="train")
-    ds = create_dataset(paths, labels, batch_size=4, split="train")
+@pytest.fixture(scope="session")
+def test_dataset(label_map):
+    test_dir = os.path.join(DATA_DIR, "test")
+    return get_test_dataset(test_dir, label_map, batch_size=8)
 
-    for images, labels in ds.take(1):
-        assert images.shape == (4, 224, 224, 3)
-        assert labels.shape == (4, 200)
-        assert tf.reduce_all(tf.math.is_finite(images))
+def test_train_dataset_shape(train_val_datasets):
+    train_ds, _ = train_val_datasets
+    for images, labels in train_ds.take(1):
+        assert images.shape == (8, 224, 224, 3)
+        assert labels.shape == (8, NUM_CLASSES)
 
-def test_val_dataset(data_root, label_map):
-    val_dir = os.path.join(data_root, "val")
-    paths, labels = load_dataset(val_dir, label_map, split="val")
-    ds = create_dataset(paths, labels, batch_size=4, split="val")
+def test_val_dataset_shape(train_val_datasets):
+    _, val_ds = train_val_datasets
+    for images, labels in val_ds.take(1):
+        assert images.shape == (8, 224, 224, 3)
+        assert labels.shape == (8, NUM_CLASSES)
 
-    for images, labels in ds.take(1):
-        assert images.shape == (4, 224, 224, 3)
-        assert labels.shape == (4, 200)
-        assert tf.reduce_all(tf.math.is_finite(images))
+def test_test_dataset_shape(test_dataset):
+    for images, labels in test_dataset.take(1):
+        assert images.shape == (8, 224, 224, 3)
+        assert labels.shape == (8, NUM_CLASSES)
 
-def test_test_dataset(data_root, label_map):
-    test_dir = os.path.join(data_root, "test")
-    paths, labels = load_dataset(test_dir, label_map, split="test")
-    ds = create_dataset(paths, labels, batch_size=4, split="test")
+def test_image_pixel_range(train_val_datasets):
+    train_ds, _ = train_val_datasets
+    for images, _ in train_ds.take(1):
+        min_val = tf.reduce_min(images)
+        max_val = tf.reduce_max(images)
+        assert min_val.numpy() >= -150  # After mean subtraction
+        assert max_val.numpy() <= 300
 
-    for images, labels in ds.take(1):
-        assert images.shape == (4, 224, 224, 3)
-        assert labels.shape == (4, 200)
-        assert tf.reduce_all(tf.math.is_finite(images))
+def test_one_hot_labels(train_val_datasets):
+    train_ds, _ = train_val_datasets
+    for _, labels in train_ds.take(1):
+        assert tf.reduce_all(tf.reduce_sum(labels, axis=-1) == 1.0)
