@@ -5,14 +5,14 @@ model:
   use_batch_norm: false  
 
 dataset:
-  data_dir: "/content/drive/MyDrive/datasets/imagenet"
+  data_dir: "/content/tiny-224/tiny-224"
   image_size: [224, 224]
-  batch_size: 1024
+  batch_size: 64
   augment: true
   normalization: true  # ImageNet mean/std normalization
 
 training:
-  epochs: 100
+  epochs: 10
   optimizer: 
    name: SGD
   learning_rate:
