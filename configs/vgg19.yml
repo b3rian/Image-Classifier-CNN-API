@@ -5,7 +5,7 @@ model:
   use_batch_norm: false  
 
 dataset:
-  data_dir: "/content/tiny-224/tiny-224"
+  data_dir: "/kaggle/input/tiny-imagenet-dataset/tiny-224"
   image_size: [224, 224]
   batch_size: 64
   augment: true
