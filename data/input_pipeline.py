@@ -144,7 +144,7 @@ def get_datasets(data_dir, batch_size=64, val_split=0.8):
     # Load validation data (will split into val and test)
     val_paths, val_labels = load_dataset(val_dir, label_map, split="val")
 
-    # Split val data into validation and test (e.g., 80% val, 20% test)
+    # Split val data into validation and test (80% val and 20% test)
     val_paths_split, test_paths_split, val_labels_split, test_labels_split = train_test_split(
         val_paths, val_labels, test_size=(1 - val_split), stratify=val_labels, random_state=42
     )
