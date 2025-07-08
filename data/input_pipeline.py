@@ -1,5 +1,7 @@
 import tensorflow as tf
 import os
+import numpy as np
+from sklearn.model_selection import train_test_split
 
 AUTOTUNE = tf.data.AUTOTUNE
 IMAGE_SIZE = (64, 64)
@@ -129,10 +131,6 @@ def create_dataset(image_paths, labels, batch_size=64, split="train"):
     dataset = dataset.batch(batch_size, drop_remainder=True)
     dataset = dataset.prefetch(AUTOTUNE)
     return dataset
-
-
- import numpy as np
-from sklearn.model_selection import train_test_split
 
 def get_datasets(data_dir, batch_size=64, val_split=0.8):
     train_dir = os.path.join(data_dir, "train")
