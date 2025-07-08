@@ -6,8 +6,6 @@ from sklearn.model_selection import train_test_split
 AUTOTUNE = tf.data.AUTOTUNE
 IMAGE_SIZE = (64, 64)
 NUM_CLASSES = 200
-# ImageNet mean (RGB)
-IMAGENET_MEAN = tf.constant([123.675, 116.28, 103.53], dtype=tf.float32)  # [R, G, B]
 
 # This function decodes JPEG images to RGB format.
 def decode_img(img):
@@ -37,9 +35,6 @@ def process_train_image(file_path, label):
     img = tf.image.random_brightness(img, max_delta=25)  # delta in pixel range
     img = tf.image.random_contrast(img, lower=0.9, upper=1.1)
 
-    # Subtract per-channel ImageNet mean
-    img = img - IMAGENET_MEAN
-
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_val_image(file_path, label):
@@ -57,9 +52,6 @@ def process_val_image(file_path, label):
 
     # Center crop to 224×224
     img = tf.image.resize_with_crop_or_pad(img, 224, 224)
-
-    # Subtract mean
-    img = img - IMAGENET_MEAN
 
     return img, tf.one_hot(label, NUM_CLASSES)
 
