@@ -131,17 +131,31 @@ def create_dataset(image_paths, labels, batch_size=64, split="train"):
     return dataset
 
 
-def get_datasets(data_dir, batch_size=64):
+ import numpy as np
+from sklearn.model_selection import train_test_split
+
+def get_datasets(data_dir, batch_size=64, val_split=0.8):
     train_dir = os.path.join(data_dir, "train")
     val_dir = os.path.join(data_dir, "val")
 
     label_map = get_label_map(train_dir)
 
+    # Load training data
     train_paths, train_labels = load_dataset(train_dir, label_map, split="train")
+
+    # Load validation data (will split into val and test)
     val_paths, val_labels = load_dataset(val_dir, label_map, split="val")
 
-    train_ds = create_dataset(train_paths, train_labels, batch_size=batch_size, split="train")
-    val_ds = create_dataset(val_paths, val_labels, batch_size=batch_size, split="val")
+    # Split val data into validation and test (e.g., 80% val, 20% test)
+    val_paths_split, test_paths_split, val_labels_split, test_labels_split = train_test_split(
+        val_paths, val_labels, test_size=(1 - val_split), stratify=val_labels, random_state=42
+    )
 
-    return train_ds, val_ds
+    # Create datasets
+    train_ds = create_dataset(train_paths, train_labels, batch_size=batch_size, split="train")
+    val_ds = create_dataset(val_paths_split, val_labels_split, batch_size=batch_size, split="val")
+    test_ds = create_dataset(test_paths_split, test_labels_split, batch_size=batch_size, split="test")
+
+    return train_ds, val_ds, test_ds
+
 
