@@ -71,9 +71,6 @@ def process_test_image(file_path, label):
     # Center crop to 224×224
     img = tf.image.resize_with_crop_or_pad(img, 224, 224)
 
-    # Subtract mean
-    img = img - IMAGENET_MEAN
-
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def get_label_map(train_dir):
