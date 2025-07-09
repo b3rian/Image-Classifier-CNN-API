@@ -14,7 +14,7 @@ from data.input_pipeline import get_datasets
 from utils.seed import set_seed
 import os
 import yaml
-from models.build_vgg_19 import VGG19
+from models.build_cnn_model import make_tiny_imagenet_model
 from data.preprocessing import get_model_preprocessing_layer
 
  
@@ -39,7 +39,7 @@ def model_fn():
     """Function to create the ResNet model with preprocessing."""
     inputs = tf.keras.Input(shape=(None, None, 3)) # Input layer for images
     x = preprocess(inputs)  # Apply preprocessing
-    backbone = VGG19(num_classes=config["model"]["num_classes"])
+    backbone = make_tiny_imagenet_model(num_classes=config["model"]["num_classes"])
     outputs = backbone(x)
 
     return tf.keras.Model(inputs, outputs, name="resnet18_with_preprocessing")
