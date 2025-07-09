@@ -1,7 +1,7 @@
 from tensorflow import keras
 from tensorflow.keras import layers, initializers
 
-def make_tiny_imagenet_model(input_shape=(64, 64, 3), num_classes=200):
+def make_tiny_imagenet_model(x, num_classes=200):
     he_init = initializers.HeNormal()
 
     # Entry block
