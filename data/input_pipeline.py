@@ -34,14 +34,11 @@ def process_train_image(file_path, label):
 def process_val_image(file_path, label):
     img = tf.io.read_file(file_path)
     img = decode_img(img)  # Already resized to IMAGE_SIZE (64×64)
-
-
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_test_image(file_path, label):
     img = tf.io.read_file(file_path)
     img = decode_img(img)
-
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def get_label_map(train_dir):
