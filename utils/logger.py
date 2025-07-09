@@ -19,7 +19,7 @@ def get_callbacks(base_dir="experiments", monitor="val_loss"):
 
     # Subdirectories
     log_dir = os.path.join(experiment_dir, "logs")
-    ckpt_path = os.path.join(experiment_dir, "checkpoints", "best_vgg19_model.keras")
+    ckpt_path = os.path.join(experiment_dir, "checkpoints", "best_cnn_model.keras")
     csv_log_path = os.path.join(experiment_dir, "metrics.csv")
 
     # Ensure directories exist
