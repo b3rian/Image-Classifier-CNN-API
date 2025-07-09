@@ -31,13 +31,11 @@ batch_size = config["dataset"]["batch_size"]
 # Get datasets
 train_ds, val_ds, test_ds = get_datasets(data_dir, batch_size)
 
-# Adapt normalization layer
-preprocess = get_model_preprocessing_layer()
-
 # Model with preprocessing function
 def model_fn():
     """Function to create the ResNet model with preprocessing."""
-    inputs = tf.keras.Input(shape=(None, None, 3)) # Input layer for images
+    preprocess = get_model_preprocessing_layer()
+    inputs = tf.keras.Input(shape=(64, 64, 3)) # Input layer for images
     x = preprocess(inputs)
     outputs = make_tiny_imagenet_model(x, num_classes=config["model"]["num_classes"])
     return tf.keras.Model(inputs, outputs, name="cnn_model_with_preprocessing")
