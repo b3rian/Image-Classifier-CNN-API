@@ -1,6 +1,6 @@
 # ResNet configuration for ImageNet training and evaluation
 dataset:
-  data_dir: "/content/tiny-224/tiny-224"
+  data_dir: "/kaggle/input/tiny-imagenett/tiny-imagenet-200"
   batch_size: 256
 
 model:
