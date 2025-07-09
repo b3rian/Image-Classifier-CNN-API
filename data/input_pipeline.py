@@ -80,7 +80,7 @@ def load_dataset(image_dir, label_map=None, split="train"):
 
     return image_paths, labels
 
-def create_dataset(image_paths, labels, batch_size=256, split="train"):
+def create_dataset(image_paths, labels, batch_size=128, split="train"):
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
 
     if split == "train":
@@ -97,7 +97,7 @@ def create_dataset(image_paths, labels, batch_size=256, split="train"):
     dataset = dataset.prefetch(AUTOTUNE)
     return dataset
 
-def get_datasets(data_dir, batch_size=256, val_split=0.8):
+def get_datasets(data_dir, batch_size=128, val_split=0.8):
     train_dir = os.path.join(data_dir, "train")
     val_dir = os.path.join(data_dir, "val")
 
