@@ -18,7 +18,7 @@ def process_train_image(file_path, label):
     # Brightness & contrast (ImageNet-style color augmentation)
     img = tf.image.random_brightness(img, max_delta=25)  # delta in pixel range
     img = tf.image.random_contrast(img, lower=0.9, upper=1.1)
-
+    img = tf.clip_by_value(img, 0.0, 255.0)
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_val_image(file_path, label):
