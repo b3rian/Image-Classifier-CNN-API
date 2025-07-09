@@ -25,35 +25,12 @@ def process_val_image(file_path, label):
     img = tf.io.read_file(file_path)
     img = decode_img(img)  # Already resized to IMAGE_SIZE (64×64)
 
-    # Resize shorter side to 256 (ImageNet-style)
-    target_shorter_side = 256
-    shape = tf.shape(img)[:2]
-    h, w = shape[0], shape[1]
-    scale = tf.cast(target_shorter_side, tf.float32) / tf.cast(tf.minimum(h, w), tf.float32)
-    new_height = tf.cast(tf.round(tf.cast(h, tf.float32) * scale), tf.int32)
-    new_width = tf.cast(tf.round(tf.cast(w, tf.float32) * scale), tf.int32)
-    img = tf.image.resize(img, [new_height, new_width])
-
-    # Center crop to 224×224
-    img = tf.image.resize_with_crop_or_pad(img, 224, 224)
 
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_test_image(file_path, label):
     img = tf.io.read_file(file_path)
     img = decode_img(img)
-
-    # Resize shorter side to 256
-    target_shorter_side = 256
-    shape = tf.shape(img)[:2]
-    h, w = shape[0], shape[1]
-    scale = tf.cast(target_shorter_side, tf.float32) / tf.cast(tf.minimum(h, w), tf.float32)
-    new_height = tf.cast(tf.round(tf.cast(h, tf.float32) * scale), tf.int32)
-    new_width = tf.cast(tf.round(tf.cast(w, tf.float32) * scale), tf.int32)
-    img = tf.image.resize(img, [new_height, new_width])
-
-    # Center crop to 224×224
-    img = tf.image.resize_with_crop_or_pad(img, 224, 224)
 
     return img, tf.one_hot(label, NUM_CLASSES)
 
