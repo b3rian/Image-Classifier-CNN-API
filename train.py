@@ -14,7 +14,7 @@ from data.input_pipeline import get_datasets
 from utils.seed import set_seed
 import os
 import yaml
-from models.build_resnet import ResNet18
+from models.build_resnet import make_simple_cnn 
 
 # Load configurations
 config = yaml.safe_load(open("configs/resnet.yml"))
@@ -29,7 +29,7 @@ batch_size = config["dataset"]["batch_size"]
 train_ds, val_ds, test_ds = get_datasets(data_dir, batch_size)
 
 def model_fn():
-    return  ResNet18(
+    return make_simple_cnn (
         input_shape=(64, 64, 3),
         num_classes=config["model"]["num_classes"]
     )
