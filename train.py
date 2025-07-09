@@ -42,7 +42,7 @@ def model_fn():
     backbone = make_tiny_imagenet_model(num_classes=config["model"]["num_classes"])
     outputs = backbone(x)
 
-    return tf.keras.Model(inputs, outputs, name="resnet18_with_preprocessing")
+    return tf.keras.Model(inputs, outputs, name="cnn_model_with_preprocessing")
 
 # Initialize the Trainer with the model function and datasets
 trainer = Trainer(
