@@ -20,7 +20,7 @@ from data.preprocessing import get_model_preprocessing_layer
  
 
 # Load configurations
-config = yaml.safe_load(open("configs/vgg19.yml"))
+config = yaml.safe_load(open("configs/resnet.yml"))
 
 # Set random seed for reproducibility
 set_seed(config["seed"])
