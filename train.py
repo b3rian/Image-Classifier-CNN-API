@@ -10,7 +10,7 @@ if gpus:
 
 from trainers.trainer import Trainer
 from utils.logger import get_callbacks
-from data.input_pipeline2 import get_datasets
+from data.input_pipeline import get_datasets
 from utils.seed import set_seed
 import os
 import yaml
