@@ -31,7 +31,7 @@ def make_layer(x, filters, blocks, stride):
         x = basic_block(x, filters)
     return x
 
-def ResNet18(input_shape=(224, 224, 3), num_classes=1000):
+def ResNet18(input_shape=(224, 224, 3), num_classes=200):
     inputs = tf.keras.Input(shape=input_shape)
 
     x = layers.Conv2D(64, kernel_size=7, strides=2, padding='same', use_bias=False,
@@ -50,4 +50,7 @@ def ResNet18(input_shape=(224, 224, 3), num_classes=1000):
 
     model = models.Model(inputs, outputs, name="ResNet18")
     return model
+
+model = ResNet18(input_shape=(64, 64, 3), num_classes=200)  # For Tiny ImageNet
+
 
