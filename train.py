@@ -14,10 +14,7 @@ from data.input_pipeline import get_datasets
 from utils.seed import set_seed
 import os
 import yaml
-from models.build_cnn_model import make_tiny_imagenet_model
-from data.preprocessing import get_model_preprocessing_layer
-
- 
+from models.build_resnet import build_resnet50_from_scratch
 
 # Load configurations
 config = yaml.safe_load(open("configs/resnet.yml"))
@@ -31,9 +28,11 @@ batch_size = config["dataset"]["batch_size"]
 # Get datasets
 train_ds, val_ds, test_ds = get_datasets(data_dir, batch_size)
 
-# Model with preprocessing function
 def model_fn():
-    return make_tiny_imagenet_model(input_shape=(64, 64, 3), num_classes=config["model"]["num_classes"])
+    return build_resnet50_from_scratch(
+        input_shape=(64, 64, 3),
+        num_classes=config["model"]["num_classes"]
+    )
 
 # Initialize the Trainer with the model function and datasets
 trainer = Trainer(
@@ -48,6 +47,6 @@ model = trainer.train()
 
 # Save the trained model
 os.makedirs("exports", exist_ok=True)
-model.save("exports/custom_cnn_model.keras")
-print("✅ Final model saved to exports/custom_cnn_model.keras")
+model.save("exports/resnet50_model.keras")
+print("✅ Final model saved to exports/resnet_model.keras")
 
