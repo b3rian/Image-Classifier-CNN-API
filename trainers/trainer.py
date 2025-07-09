@@ -25,17 +25,23 @@ class Trainer:
         self.callbacks = get_callbacks() # Callbacks for training
 
     def _init_strategy(self):
-        """Initialize TPU or default GPU /CPU strategy."""
+        """Initialize multi-GPU, single GPU, or CPU strategy."""
         try:
-            tpu = tf.distribute.cluster_resolver.TPUClusterResolver() # Detect TPU
-            tf.config.experimental_connect_to_cluster(tpu)
-            tf.tpu.experimental.initialize_tpu_system(tpu)
-            strategy = tf.distribute.TPUStrategy(tpu) # Initialize TPU strategy
-            print("[INFO] Using TPU strategy.")
-        except ValueError:
+            gpus = tf.config.list_physical_devices('GPU')
+            if len(gpus) > 1:
+                strategy = tf.distribute.MirroredStrategy()
+                print(f"[INFO] Using MirroredStrategy with {strategy.num_replicas_in_sync} GPUs.")
+            elif len(gpus) == 1:
+                strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
+                print("[INFO] Using single GPU strategy.")
+            else:
+                strategy = tf.distribute.get_strategy()  # Default (CPU or XLA fallback)
+                print("[INFO] Using CPU strategy.")
+        except Exception as e:
+            print("[WARNING] Failed to configure GPU strategy:", e)
             strategy = tf.distribute.get_strategy()
-            print("[INFO] Using default strategy (CPU/GPU).")
         return strategy
+
 
     # Compiling the model
     def _compile_model(self):
