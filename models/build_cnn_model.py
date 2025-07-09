@@ -6,7 +6,6 @@ def make_tiny_imagenet_model(input_shape=(64, 64, 3), num_classes=200):
     inputs = keras.Input(shape=input_shape)
 
     # Entry block
-    x = layers.Rescaling(1.0 / 255)(inputs)
     x = layers.Conv2D(128, 3, strides=2, padding="same", kernel_initializer=he_init)(x)
     x = layers.BatchNormalization()(x)
     x = layers.Activation("relu")(x)
