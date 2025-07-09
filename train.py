@@ -57,6 +57,6 @@ model = trainer.train()
 
 # Save the trained model
 os.makedirs("exports", exist_ok=True)
-model.save("exports/vgg19_model.keras")
-print("✅ Final model saved to exports/vgg19_model.keras")
+model.save("exports/custom_cnn_model.keras")
+print("✅ Final model saved to exports/custom_cnn_model.keras")
 
