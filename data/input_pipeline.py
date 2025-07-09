@@ -7,43 +7,45 @@ AUTOTUNE = tf.data.AUTOTUNE
 IMAGE_SIZE = (64, 64)
 NUM_CLASSES = 200
 
-# This function decodes JPEG images to RGB format.
 def decode_img(img):
     img = tf.image.decode_jpeg(img, channels=3)
     return img
 
 def process_train_image(file_path, label):
     img = tf.io.read_file(file_path)
-    img = decode_img(img)  # float32 in [0, 255]
-    # Brightness & contrast (ImageNet-style color augmentation)
-    img = tf.image.convert_image_dtype(img, dtype=tf.float32)  # in [0,1]
-    img *= 255.0 
-    img = tf.image.resize_with_crop_or_pad(img, 72, 72)  # Add padding
-    img = tf.image.random_crop(img, size=[64, 64, 3])    # Random crop
-    # Flip horizontally
+    img = decode_img(img)
+    
+    # Convert to float32 in [0.0, 1.0]
+    img = tf.image.convert_image_dtype(img, dtype=tf.float32)
+
+    # Add padding and crop
+    img = tf.image.resize_with_crop_or_pad(img, 72, 72)
+    img = tf.image.random_crop(img, size=[64, 64, 3])
+
+    # Augmentations
     img = tf.image.random_flip_left_right(img)
-    # Random brightness
-    img = tf.image.random_brightness(img, max_delta=20)  # ±20 pixel values
-    # Random contrast
+    img = tf.image.random_brightness(img, max_delta=0.1)  # in [0.0, 1.0]
     img = tf.image.random_contrast(img, lower=0.8, upper=1.2)
-    # Random saturation
     img = tf.image.random_saturation(img, lower=0.8, upper=1.2)
-    # Random hue
-    img = tf.image.random_hue(img, max_delta=0.02)  # small hue shift
-    img = tf.clip_by_value(img, 0.0, 255.0)
+    img = tf.image.random_hue(img, max_delta=0.02)
+    
+    img = tf.clip_by_value(img, 0.0, 1.0)
     img = tf.image.resize(img, IMAGE_SIZE)
+
     tf.debugging.assert_all_finite(img, message="Image has NaN or Inf!")
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_val_image(file_path, label):
     img = tf.io.read_file(file_path)
-    img = decode_img(img)  # Already resized to IMAGE_SIZE (64×64)
+    img = decode_img(img)
+    img = tf.image.convert_image_dtype(img, dtype=tf.float32)
     img = tf.image.resize(img, IMAGE_SIZE)
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_test_image(file_path, label):
     img = tf.io.read_file(file_path)
     img = decode_img(img)
+    img = tf.image.convert_image_dtype(img, dtype=tf.float32)
     img = tf.image.resize(img, IMAGE_SIZE)
     return img, tf.one_hot(label, NUM_CLASSES)
 
@@ -104,19 +106,15 @@ def get_datasets(data_dir, batch_size=256, val_split=0.8):
     # Load training data
     train_paths, train_labels = load_dataset(train_dir, label_map, split="train")
 
-    # Load validation data (will split into val and test)
+    # Load val data (we’ll split it into val/test)
     val_paths, val_labels = load_dataset(val_dir, label_map, split="val")
 
-    # Split val data into validation and test (80% val and 20% test)
     val_paths_split, test_paths_split, val_labels_split, test_labels_split = train_test_split(
         val_paths, val_labels, test_size=(1 - val_split), stratify=val_labels, random_state=42
     )
 
-    # Create datasets
     train_ds = create_dataset(train_paths, train_labels, batch_size=batch_size, split="train")
     val_ds = create_dataset(val_paths_split, val_labels_split, batch_size=batch_size, split="val")
     test_ds = create_dataset(test_paths_split, test_labels_split, batch_size=batch_size, split="test")
 
     return train_ds, val_ds, test_ds
-
-
