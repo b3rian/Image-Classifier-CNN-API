@@ -5,7 +5,7 @@ dataset:
 
 model:
   name: ResNet
-  input_shape: [224, 224, 3]
+  input_shape: [64, 64, 3]
   num_classes: 200
   batch_norm:
     enabled: true
@@ -19,12 +19,12 @@ training:
   optimizer: 
    name: SGD
   learning_rate:
-    initial: 0.1
+    initial: 0.01
     schedule:
       type: plateau
       factor: 0.1
   weight_decay: 0.0001
   momentum: 0.9
-  epochs: 10 # Total number of iterations for training
+  epochs: 50 # Total number of iterations for training
   pretrained: false  # train from scratch
   label_smoothing: 0.1  
