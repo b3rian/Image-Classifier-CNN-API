@@ -42,7 +42,6 @@ class Trainer:
             strategy = tf.distribute.get_strategy()
         return strategy
 
-
     # Compiling the model
     def _compile_model(self):
         """Compile the model with optimizer, loss, and metrics."""
