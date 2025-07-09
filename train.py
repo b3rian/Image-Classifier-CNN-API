@@ -33,12 +33,7 @@ train_ds, val_ds, test_ds = get_datasets(data_dir, batch_size)
 
 # Model with preprocessing function
 def model_fn():
-    """Function to create the ResNet model with preprocessing."""
-    preprocess = get_model_preprocessing_layer()
-    inputs = tf.keras.Input(shape=(64, 64, 3)) # Input layer for images
-    x = preprocess(inputs)
-    outputs = make_tiny_imagenet_model(x, num_classes=config["model"]["num_classes"])
-    return tf.keras.Model(inputs, outputs, name="cnn_model_with_preprocessing")
+    return make_tiny_imagenet_model(input_shape=(64, 64, 3), num_classes=config["model"]["num_classes"])
 
 # Initialize the Trainer with the model function and datasets
 trainer = Trainer(
