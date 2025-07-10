@@ -1,22 +1,41 @@
 import tensorflow as tf
-from tensorflow.keras.applications import ResNet50
 from tensorflow.keras import layers, models
 
-def build_resnet50_from_scratch(input_shape=(64, 64, 3), num_classes=200):
-    base_model = ResNet50(
-        include_top=False,
-        weights=None,  # <--- Train from scratch
-        input_shape=input_shape,
-        pooling='avg'
-    )
+def SimpleCNN(input_shape=(32, 32, 3), num_classes=10):
+    """
+    A simple CNN model for image classification.
+    
+    Args:
+        input_shape: Shape of input images (height, width, channels)
+        num_classes: Number of output classes
+    
+    Returns:
+        A Keras Model instance
+    """
+    model = models.Sequential([
+        # Convolutional Base
+        layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
+        layers.MaxPooling2D((2, 2)),
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.MaxPooling2D((2, 2)),
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        
+        # Classifier Head
+        layers.Flatten(),
+        layers.Dense(64, activation='relu'),
+        layers.Dense(num_classes, activation='softmax')
+    ])
+    
+    return model
 
-    # Wrap with classification head
-    inputs = tf.keras.Input(shape=input_shape)
-    x = base_model(inputs, training=True)
-    x = layers.Dense(256, activation='relu')(x)
-    x = layers.Dropout(0.5)(x)
-    outputs = layers.Dense(num_classes, activation='softmax')(x)
-
-    model = models.Model(inputs=inputs, outputs=outputs)
+# Optional: Add a function to compile the model
+def create_and_compile_cnn(input_shape=(32, 32, 3), num_classes=10):
+    """
+    Creates and compiles the SimpleCNN model with default settings
+    """
+    model = SimpleCNN(input_shape, num_classes)
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
     return model
      
