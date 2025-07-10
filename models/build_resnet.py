@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
-def SimpleCNN(input_shape=(32, 32, 3), num_classes=10):
+def SimpleCNN(input_shape=(64, 64, 3), num_classes=200):
     """
     A simple CNN model for image classification.
     
@@ -28,14 +28,5 @@ def SimpleCNN(input_shape=(32, 32, 3), num_classes=10):
     
     return model
 
-# Optional: Add a function to compile the model
-def create_and_compile_cnn(input_shape=(32, 32, 3), num_classes=10):
-    """
-    Creates and compiles the SimpleCNN model with default settings
-    """
-    model = SimpleCNN(input_shape, num_classes)
-    model.compile(optimizer='adam',
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
-    return model
+ 
      
