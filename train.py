@@ -47,6 +47,6 @@ model = trainer.train()
 
 # Save the trained model
 os.makedirs("exports", exist_ok=True)
-model.save("exports/resnet50_model.keras")
-print("✅ Final model saved to exports/resnet_model.keras")
+model.save("exports/resnet18_model.keras")
+print("✅ Final model saved to exports/resnet18_model.keras")
 
