@@ -13,34 +13,11 @@ class Trainer:
             config (dict): Configuration dictionary from YAML.
         """
         self.config = config
-        self.strategy = self._init_strategy()
-
-        # Wrap data loading and model creation inside strategy scope
-        with self.strategy.scope():
-            self.model = model_fn() # Create the model using the provided function
-            self._compile_model() # Compile the model with optimizer, loss, and metrics
-        
-        self.train_ds = train_ds # Training dataset
-        self.val_ds = val_ds # Validation dataset
-        self.callbacks = get_callbacks() # Callbacks for training
-
-    def _init_strategy(self):
-        """Initialize multi-GPU, single GPU, or CPU strategy."""
-        try:
-            gpus = tf.config.list_physical_devices('GPU')
-            if len(gpus) > 1:
-                strategy = tf.distribute.MirroredStrategy()
-                print(f"[INFO] Using MirroredStrategy with {strategy.num_replicas_in_sync} GPUs.")
-            elif len(gpus) == 1:
-                strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
-                print("[INFO] Using single GPU strategy.")
-            else:
-                strategy = tf.distribute.get_strategy()  # Default (CPU or XLA fallback)
-                print("[INFO] Using CPU strategy.")
-        except Exception as e:
-            print("[WARNING] Failed to configure GPU strategy:", e)
-            strategy = tf.distribute.get_strategy()
-        return strategy
+        self.model = model_fn()  # Create model directly (no strategy.scope)
+        self._compile_model()    # Compile the model
+        self.train_ds = train_ds
+        self.val_ds = val_ds
+        self.callbacks = get_callbacks()
 
     # Compiling the model
     def _compile_model(self):
@@ -49,31 +26,28 @@ class Trainer:
         opt_name = optimizer_cfg["name"].lower()
         lr = self.config["training"]["learning_rate"]["initial"]
 
-        # configure optimizer based on the name
         if opt_name == "adam":
             optimizer = tf.keras.optimizers.Adam(
                 learning_rate=lr,
-                beta_1=optimizer_cfg.get("beta1", 0.9), # default beta1
-                beta_2=optimizer_cfg.get("beta2", 0.999), # default beta2
-                weight_decay=self.config["training"].get("weight_decay", 0.0) # default weight decay
+                beta_1=optimizer_cfg.get("beta1", 0.9),
+                beta_2=optimizer_cfg.get("beta2", 0.999),
+                weight_decay=self.config["training"].get("weight_decay", 0.0)
             )
         elif opt_name == "sgd":
             optimizer = tf.keras.optimizers.SGD(
                 learning_rate=lr,
-                momentum=optimizer_cfg.get("momentum", 0.9), # default momentum
-                weight_decay=self.config["training"].get("weight_decay", 0.0) # default weight decay
+                momentum=optimizer_cfg.get("momentum", 0.9),
+                weight_decay=self.config["training"].get("weight_decay", 0.0)
             )
         else:
             raise ValueError(f"Unsupported optimizer: {opt_name}")
 
-        # Compile the model with the optimizer, loss function, and metrics
         self.model.compile(
             optimizer=optimizer,
             loss=tf.keras.losses.CategoricalCrossentropy(from_logits=False, label_smoothing=0.1),
-            metrics=get_classification_metrics() # Get classification metrics (accuracy & top-5 accuracy)
+            metrics=get_classification_metrics()
         )
-    
-    # training loop method (to be called externally)
+
     def train(self):
         """Run the training loop."""
         self.model.fit(
@@ -81,6 +55,6 @@ class Trainer:
             validation_data=self.val_ds,
             epochs=self.config["training"]["epochs"],
             verbose=1,
-            callbacks=self.callbacks # Callbacks for logging, checkpointing, TensorBoard, etc.
+            callbacks=self.callbacks
         )
         return self.model
