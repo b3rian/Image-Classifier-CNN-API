@@ -1,13 +1,4 @@
 import tensorflow as tf
-gpus = tf.config.list_physical_devices("GPU")
-if gpus:
-    try:
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-        print("✅ GPU memory growth enabled.")
-    except RuntimeError as e:
-        print(f"❌ Could not set memory growth: {e}")
-
 from trainers.trainer import Trainer
 from utils.logger import get_callbacks
 from data.input_pipeline import get_datasets
