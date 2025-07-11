@@ -17,29 +17,6 @@ def VGG19(input_shape=(224, 224, 3), num_classes=200):
     # Block 3
     model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
     model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(256, (3, 3), activation='relu', padding='same'))
-    model.add(layers.MaxPooling2D((2, 2), strides=2))
-
-    # Block 4
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.MaxPooling2D((2, 2), strides=2))
-
-    # Block 5
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.Conv2D(512, (3, 3), activation='relu', padding='same'))
-    model.add(layers.MaxPooling2D((2, 2), strides=2))
-
-    
-    # Fully connected layers
-    model.add(layers.Flatten())
-    model.add(layers.Dense(4096, activation='relu'))
-    model.add(layers.Dense(4096, activation='relu'))
-    model.add(layers.Dense(num_classes, activation='softmax'))  # softmax for classification
+    mod 
 
     return model
