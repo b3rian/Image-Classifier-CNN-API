@@ -8,7 +8,13 @@ def make_tiny_imagenet_model(input_shape=(None, None, 3), num_classes=200):
     inputs = tf.keras.Input(shape=input_shape)
 
     # ✅ Preprocessing block inside the model
-    x = get_model_preprocessing_layer()(inputs)
+    x = tf.keras.layers.Resizing(64, 64)(inputs)  # Ensure size is consistent
+    x = tf.keras.layers.Rescaling(1. / 255)(x)     # [0, 255] → [0, 1]
+    x = tf.keras.layers.Normalization(
+        mean=[0.485, 0.456, 0.406],
+        variance=[0.229**2, 0.224**2, 0.225**2],
+        name="imagenet_norm"
+    )(x)
 
     # Entry block
     x = layers.Conv2D(128, 3, strides=2, padding="same", kernel_initializer=he_init)(x)
