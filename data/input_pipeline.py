@@ -30,8 +30,8 @@ def process_train_image(file_path, label):
     img = tf.image.random_saturation(img, lower=0.8, upper=1.2)
     # Random hue
     img = tf.image.random_hue(img, max_delta=0.02)  # small hue shift
-    img = tf.clip_by_value(img, 0.0, 255.0)
     img = tf.image.resize(img, IMAGE_SIZE)
+    img = tf.clip_by_value(img, 0.0, 255.0)
     tf.debugging.assert_all_finite(img, message="Image has NaN or Inf!")
     return img, tf.one_hot(label, NUM_CLASSES)
 
