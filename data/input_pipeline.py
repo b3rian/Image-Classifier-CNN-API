@@ -15,6 +15,8 @@ def decode_img(img):
 def process_train_image(file_path, label):
     img = tf.io.read_file(file_path)
     img = decode_img(img)  # float32 in [0, 255]
+    tf.image.convert_image_dtype(img, dtype=tf.float32)  # in [0,1]
+    img *= 255.0
     # Brightness & contrast (ImageNet-style color augmentation) 
     img = tf.image.resize_with_crop_or_pad(img, 72, 72)  # Add padding
     img = tf.image.random_crop(img, size=[64, 64, 3])    # Random crop
@@ -29,6 +31,7 @@ def process_train_image(file_path, label):
     # Random hue
     img = tf.image.random_hue(img, max_delta=0.02)  # small hue shift
     img = tf.clip_by_value(img, 0.0, 255.0)
+    img = tf.image.resize(img, IMAGE_SIZE)
     tf.debugging.assert_all_finite(img, message="Image has NaN or Inf!")
     return img, tf.one_hot(label, NUM_CLASSES)
 
