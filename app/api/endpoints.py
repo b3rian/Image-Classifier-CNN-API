@@ -44,7 +44,7 @@ class PredictionResponse(BaseModel):
     description="Accepts an image file and returns top predictions with confidence scores.",
 )
 
- async def predict_image(
+async def predict_image(
     request: Request,
     file: UploadFile = File(...),
 ):
@@ -97,3 +97,31 @@ class PredictionResponse(BaseModel):
             )
 
 
+        # 4. Run prediction
+        logger.info(f"Processing image: {file.filename}")
+        top_preds = predict(image)
+
+        # 5. Prepare response
+        processing_time = (datetime.now() - start_time).total_seconds()
+        
+        response_data = {
+            "predictions": top_preds,
+            "processing_time": processing_time,
+            "timestamp": datetime.now().isoformat(),
+        }
+        
+        logger.info(
+            f"Prediction completed for {file.filename}. "
+            f"Processing time: {processing_time:.2f}s"
+        )
+        
+        return JSONResponse(content=response_data)
+        
+    except HTTPException:
+        raise  # Re-raise FastAPI HTTP exceptions
+    except Exception as e:
+        logger.error(f"Prediction error: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error processing image",
+        )
