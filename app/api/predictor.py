@@ -69,7 +69,7 @@ def load_model() -> tf.keras.Model:
 @PREDICTION_LATENCY.time()
 def predict(image_pil: PILImage, top_k: int = 3) -> List[Dict[str, float]]:
     """
-    Production-grade prediction with error handling and metrics.
+    Prediction with error handling and metrics.
     
     Args:
         image_pil: Input image in PIL format
