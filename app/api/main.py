@@ -23,13 +23,12 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Convolutional Neural Network(CNN) based Image Classification API",
         description=(
-            "A FastAPI service for general image classification "
-            "using custom_cnn_model_1000_classes model"
+            "A FastAPI service that accepts image uploads "
+            "and returns the top-3 predicted classes using a custom CNN model with 1000 classes."
         ),
-        version=1.0.0,
-        docs_url="/docs", # Use default docs URL
-        redoc_url="/redoc",  # Typically just use one docs UI
-        openapi_url="/openapi.json"  # OpenAPI schema URL
+        version="1.0.0",
+        docs_url="/docs",  # Swagger UI
+        redoc_url="/redoc"  # ReDoc UI
     )
 
     # Register routes
