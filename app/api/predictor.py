@@ -179,7 +179,7 @@ def predict(image_pil: PILImage, top_k: int = 3) -> List[Dict[str, float]]:
                 "label": labels.get(int(idx), f"class_{idx}"),
                 "confidence": float(score),
                 "class_id": int(idx),
-                "model": "EfficientNetV2L",
+                "model": "custom_cnn_model_1000_classes",
                 "timestamp": time.time(),
                 "processing_ms": (time.time() - start_time) * 1000
             }
