@@ -1,0 +1,2 @@
+requests>=2.25.0  # For label downloading
+prometheus-client>=0.11.0  # For metrics
