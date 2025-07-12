@@ -21,6 +21,16 @@ router = APIRouter()
 # Constants
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/jpg"]
+
+# Response model
+class PredictionResult(BaseModel):
+    class_label: str
+    confidence: float
+
+class PredictionResponse(BaseModel):
+    predictions: List[PredictionResult]
+    processing_time: float
+    timestamp: str
  
 
  
