@@ -23,8 +23,8 @@ def create_app() -> FastAPI:
             "A FastAPI service for general image classification "
             "using custom_cnn_model_1000_classes model"
         ),
-        version=1.0.0,  # From config
-        docs_url="/docs" if settings.DOCS_ENABLED else None,  # Disable in prod if needed
+        version=1.0.0,
+        docs_url="/docs"  # Use default docs URL
         redoc_url="/redoc",  # Typically just use one docs UI
         openapi_url="/openapi.json" if settings.DOCS_ENABLED else None
     )
@@ -32,6 +32,6 @@ def create_app() -> FastAPI:
     # Register routes
     app.include_router(
         prediction_router,
-        prefix=settings.API_PREFIX,  # From config
+        prefix="/api",  # From config
         tags=["Prediction"]
     )
