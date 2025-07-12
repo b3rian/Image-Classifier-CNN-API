@@ -10,11 +10,12 @@ Features:
 
 import numpy as np
 from PIL import Image, UnidentifiedImageError
-from typing import Tuple, Optional, Union
+from typing import Tuple, Optional, Union, List
 import logging
 from dataclasses import dataclass
 import time
 from functools import wraps
+import io
 
 # Configure logging
 logger = logging.getLogger(__name__)
