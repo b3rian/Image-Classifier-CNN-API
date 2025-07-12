@@ -4,4 +4,4 @@ from PIL import Image
 import numpy as np
 import io
 
-from app.predictor import predict
+ 
