@@ -57,8 +57,8 @@ def create_app() -> FastAPI:
 
 def configure_middlewares(app: FastAPI) -> None:
     """
-    Configures global middlewares for the FastAPI application.
-
+    Configures global middlewares for the FastAPI application.  
+ 
     Args:
         app (FastAPI): The FastAPI app instance.
     """
