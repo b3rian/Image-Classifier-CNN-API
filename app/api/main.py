@@ -52,3 +52,23 @@ def create_app() -> FastAPI:
         # Clean up resources
         
     return app
+
+def configure_middlewares(app: FastAPI) -> None:
+    """
+    Configures global middlewares for the FastAPI application.
+
+    Args:
+        app (FastAPI): The FastAPI app instance.
+    """
+    # Allow all origins during development; restrict in production
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Use specific domains in production
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
+# Instantiate the app
+app = create_app()
