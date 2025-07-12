@@ -11,6 +11,16 @@ from datetime import datetime
 import os
 
 from app.predictor import predict
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+router = APIRouter()
+
+# Constants
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/jpg"]
  
 
  
