@@ -35,3 +35,20 @@ def create_app() -> FastAPI:
         prefix="/api",  # From config
         tags=["Prediction"]
     )
+
+    # Configure middlewares
+    configure_middlewares(app)
+    
+    # Add startup/shutdown events
+    @app.on_event("startup")
+    async def startup_event():
+        logger.info("Starting application...")
+        # Initialize connections, warm up models, etc.
+        Instrumentator().instrument(app).expose(app)  # Metrics endpoint
+        
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        logger.info("Shutting down application...")
+        # Clean up resources
+        
+    return app
