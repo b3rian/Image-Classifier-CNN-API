@@ -1,5 +1,5 @@
 """
-Enhanced image preprocessing utilities for EfficientNetV2L inference.
+Enhanced image preprocessing utilities for custom_cnn_model_1000_classes inference.
 
 Features:
 - Comprehensive input validation
