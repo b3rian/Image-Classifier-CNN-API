@@ -80,7 +80,7 @@ def load_labels() -> Dict[int, str]:
     return _class_labels
 
 def load_model() -> tf.keras.Model:
-     """
+    """
     Loads the model from disk in a thread-safe singleton pattern.
 
     Returns:
