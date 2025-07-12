@@ -35,3 +35,50 @@ def timing_decorator(func):
         logger.debug(f"{func.__name__} executed in {elapsed:.4f} seconds")
         return result
     return wrapper
+
+def validate_image_format(image: Image.Image) -> None:
+    """Validates image meets processing requirements."""
+    if not isinstance(image, Image.Image):
+        raise TypeError(f"Expected PIL.Image, got {type(image)}")
+    if image.mode != "RGB":
+        raise ValueError(f"Image must be RGB. Got '{image.mode}'")
+    if not image.size[0] or not image.size[1]:
+        raise ValueError("Image has invalid dimensions")
+
+@timing_decorator
+def preprocess_image(
+    image: Union[Image.Image, np.ndarray],
+    config: PreprocessConfig = PreprocessConfig()
+) -> np.ndarray:
+    """
+    Enhanced image preprocessing with:
+    - Configurable normalization
+    - Advanced validation
+    - Performance tracking
+    """
+    try:
+        # Convert input if needed
+        if isinstance(image, np.ndarray):
+            image = Image.fromarray(image.astype('uint8'))
+        
+        # Validate and convert
+        validate_image_format(image.convert("RGB"))  # Test conversion first
+        image = image.convert("RGB")
+        
+        # Resize with anti-aliasing
+        image_resized = image.resize(config.target_size, Image.Resampling.LANCZOS)
+        
+        # Convert to array
+        image_array = np.asarray(image_resized, dtype=np.float32)
+        
+        # Advanced normalization
+        if config.normalize:
+            image_array /= 255.0
+            if config.mean and config.std:
+                image_array = (image_array - config.mean) / config.std
+                
+        return image_array
+    
+    except Exception as e:
+        logger.error(f"Preprocessing failed: {str(e)}")
+        raise ValueError(f"Image preprocessing error: {str(e)}") from e
