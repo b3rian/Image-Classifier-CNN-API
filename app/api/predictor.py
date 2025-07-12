@@ -28,7 +28,7 @@ PREDICTION_ERRORS = Counter('model_prediction_errors_total', 'Total prediction f
 PREDICTION_LATENCY = Histogram('model_prediction_latency_seconds', 'Prediction latency')
 
 # Configuration
-MODEL_PATH = os.getenv('MODEL_PATH', 'exports/efficientnetv2l_model.keras')
+MODEL_PATH = os.getenv('MODEL_PATH', "D:\Telegram Desktop\custom_cnn_model_1000_classes.keras")
 LABELS_URL = os.getenv('LABELS_URL', 'https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json')
 MAX_RETRIES = 3
 
@@ -80,7 +80,12 @@ def load_labels() -> Dict[int, str]:
     return _class_labels
 
 def load_model() -> tf.keras.Model:
-    """Thread-safe model loader with label pre-loading."""
+     """
+    Loads the model from disk in a thread-safe singleton pattern.
+
+    Returns:
+        tf.keras.Model: Loaded Keras model ready for inference.
+    """
     global _model
     
     with _model_lock:
