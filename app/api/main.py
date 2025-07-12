@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from app.endpoints import router as prediction_router
+from api.endpoints import router as prediction_router
 import logging
 from prometheus_fastapi_instrumentator import Instrumentator  # For metrics
 
