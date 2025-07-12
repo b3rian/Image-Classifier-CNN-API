@@ -82,3 +82,28 @@ def preprocess_image(
     except Exception as e:
         logger.error(f"Preprocessing failed: {str(e)}")
         raise ValueError(f"Image preprocessing error: {str(e)}") from e
+
+@timing_decorator
+def load_image_from_bytes(
+    image_bytes: bytes,
+    validate: bool = True
+) -> Image.Image:
+    """Robust image loading with validation."""
+    try:
+        image = Image.open(io.BytesIO(image_bytes))
+        if validate:
+            validate_image_format(image.convert("RGB"))
+        return image
+    except UnidentifiedImageError:
+        logger.error("Failed to identify image from bytes")
+        raise ValueError("Invalid image format")
+    except Exception as e:
+        logger.error(f"Image loading failed: {str(e)}")
+        raise ValueError(f"Image loading error: {str(e)}") from e
+
+def batch_preprocess(
+    images: List[Union[Image.Image, np.ndarray]],
+    config: PreprocessConfig = PreprocessConfig()
+) -> np.ndarray:
+    """Process multiple images efficiently."""
+    return np.stack([preprocess_image(img, config) for img in images])
