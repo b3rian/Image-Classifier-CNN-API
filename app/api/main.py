@@ -5,14 +5,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from app.config import settings  # Config module
 from app.endpoints import router as prediction_router
-from app.middleware import LoggingMiddleware  # Custom middleware
 import logging
 from prometheus_fastapi_instrumentator import Instrumentator  # For metrics
 
 def create_app() -> FastAPI:
-    """Factory function to create and configure the FastAPI application."""
+    """
+    Factory function to create and configure the FastAPI application.
+
+    Returns:
+        FastAPI: Configured FastAPI app instance.
+    """
     # Configure logging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
