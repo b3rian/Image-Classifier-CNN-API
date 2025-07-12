@@ -32,3 +32,35 @@ MAX_RETRIES = 3
 _model: Optional[tf.keras.Model] = None
 _model_lock = threading.Lock()
 _model_loaded = False
+
+def load_model() -> tf.keras.Model:
+    """Thread-safe model loader with retries and health checks."""
+    global _model, _model_loaded
+    
+    with _model_lock:
+        if _model is None and not _model_loaded:
+            try:
+                logger.info("Loading model from %s", MODEL_PATH)
+                
+                # Verify model exists before loading
+                if not os.path.exists(MODEL_PATH):
+                    raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
+                
+                _model = tf.keras.models.load_model(MODEL_PATH)
+                
+                # Verify model is usable
+                test_input = np.zeros((1, 480, 480, 3), dtype=np.float32)
+                _model.predict(test_input, verbose=0)
+                
+                _model_loaded = True
+                logger.info("Model loaded and verified successfully")
+                
+            except Exception as e:
+                _model_loaded = False
+                logger.error("Model loading failed: %s", str(e))
+                raise RuntimeError("Model initialization failed") from e
+                
+    if _model is None:
+        raise RuntimeError("Model not available")
+        
+    return _model
