@@ -12,6 +12,7 @@ from typing import List, Dict, Optional
 from PIL.Image import Image as PILImage
 from app.utils import preprocess_image
 import threading
+import time
 import os
 from prometheus_client import Counter, Histogram
 
@@ -104,4 +105,39 @@ def predict(image_pil: PILImage, top_k: int = 3) -> List[Dict[str, float]]:
                     raise
                 logger.warning("Model loading attempt %d failed, retrying...", attempt + 1)
                 time.sleep(1)
+                # Preprocess with validation
+        try:
+            image_array = preprocess_image(image_pil, target_size=(480, 480))
+            input_tensor = np.expand_dims(image_array, axis=0)
+        except Exception as e:
+            raise ValueError("Image preprocessing failed") from e
+            
+        # Inference
+        try:
+            predictions = model.predict(input_tensor, verbose=0)[0]
+        except Exception as e:
+            PREDICTION_ERRORS.inc()
+            logger.error("Prediction failed: %s", str(e))
+            raise RuntimeError("Prediction failed") from e
+            
+        # Process results
+        top_indices = predictions.argsort()[-top_k:][::-1]
+        top_scores = predictions[top_indices]
+        
+        # Use actual class labels instead of placeholders
+        top_labels = [CLASS_LABELS[idx] for idx in top_indices]
+        
+        return [
+            {
+                "label": label,
+                "confidence": float(score),
+                "class_id": int(idx)  # Additional metadata
+            }
+            for label, score, idx in zip(top_labels, top_scores, top_indices)
+        ]
+        
+    except Exception as e:
+        PREDICTION_ERRORS.inc()
+        logger.error("Prediction error: %s", str(e), exc_info=True)
+        raise
                 
