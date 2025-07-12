@@ -35,7 +35,12 @@ _model_lock = threading.Lock()
 _model_loaded = False
 
 def load_model() -> tf.keras.Model:
-    """Thread-safe model loader with retries and health checks."""
+    """
+    Loads the model from disk in a thread-safe singleton pattern.
+
+    Returns:
+        tf.keras.Model: Loaded Keras model ready for inference.
+    """
     global _model, _model_loaded
     
     with _model_lock:
