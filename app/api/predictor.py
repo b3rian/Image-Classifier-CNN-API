@@ -64,3 +64,44 @@ def load_model() -> tf.keras.Model:
         raise RuntimeError("Model not available")
         
     return _model
+
+@PREDICTION_LATENCY.time()
+def predict(image_pil: PILImage, top_k: int = 3) -> List[Dict[str, float]]:
+    """
+    Production-grade prediction with error handling and metrics.
+    
+    Args:
+        image_pil: Input image in PIL format
+        top_k: Number of top predictions to return
+        
+    Returns:
+        List of prediction dicts with keys 'label' and 'confidence'
+        
+    Raises:
+        RuntimeError: For prediction failures
+        ValueError: For invalid inputs
+    """
+    PREDICTION_COUNTER.inc()
+    
+    try:
+        # Input validation
+        if not isinstance(image_pil, PILImage):
+            raise ValueError("Invalid image type")
+            
+        if top_k <= 0:
+            raise ValueError("top_k must be positive")
+            
+        # Load model with retries
+        model = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                model = load_model()
+                break
+            except Exception as e:
+                if attempt == MAX_RETRIES - 1:
+                    PREDICTION_ERRORS.inc()
+                    logger.error("Model loading failed after %d attempts", MAX_RETRIES)
+                    raise
+                logger.warning("Model loading attempt %d failed, retrying...", attempt + 1)
+                time.sleep(1)
+                
