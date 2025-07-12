@@ -31,6 +31,18 @@ class PredictionResponse(BaseModel):
     predictions: List[PredictionResult]
     processing_time: float
     timestamp: str
+
+@router.post(
+    "/predict",
+    response_model=PredictionResponse,
+    responses={
+        400: {"description": "Invalid input file"},
+        413: {"description": "File too large"},
+        500: {"description": "Internal processing error"},
+    },
+    summary="Classify an image",
+    description="Accepts an image file and returns top predictions with confidence scores.",
+)
  
 
  
