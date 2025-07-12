@@ -43,6 +43,57 @@ class PredictionResponse(BaseModel):
     summary="Classify an image",
     description="Accepts an image file and returns top predictions with confidence scores.",
 )
- 
 
- 
+ async def predict_image(
+    request: Request,
+    file: UploadFile = File(...),
+):
+    """
+    Endpoint to receive image file, preprocess, and return top predictions.
+    
+    Args:
+        file: Uploaded image file (JPG/PNG)
+        
+    Returns:
+        JSON with top predictions and metadata
+    """
+    start_time = datetime.now()
+    
+    try:
+        # 1. Validate file size
+        file_size = request.headers.get("content-length", 0)
+        if int(file_size) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail=f"File too large. Max size: {MAX_FILE_SIZE/1024/1024}MB",
+            )
+
+        # 2. Validate content type
+        if file.content_type not in ALLOWED_CONTENT_TYPES:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid file type. Allowed: {', '.join(ALLOWED_CONTENT_TYPES)}",
+            )
+
+        # 3. Read and validate image
+        image_bytes = await file.read()
+        
+        # Additional check for actual file size
+        if len(image_bytes) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail=f"File too large. Max size: {MAX_FILE_SIZE/1024/1024}MB",
+            )
+
+        try:
+            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+            image.verify()  # Verify it's actually an image
+            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")  # Need to reopen after verify
+        except (UnidentifiedImageError, IOError) as e:
+            logger.error(f"Invalid image file: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid image file",
+            )
+
+
