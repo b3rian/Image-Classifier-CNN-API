@@ -24,9 +24,9 @@ def create_app() -> FastAPI:
             "using custom_cnn_model_1000_classes model"
         ),
         version=1.0.0,
-        docs_url="/docs"  # Use default docs URL
+        docs_url="/docs", # Use default docs URL
         redoc_url="/redoc",  # Typically just use one docs UI
-        openapi_url="/openapi.json" if settings.DOCS_ENABLED else None
+        openapi_url="/openapi.json"  # OpenAPI schema URL
     )
 
     # Register routes
