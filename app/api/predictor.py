@@ -106,7 +106,7 @@ def load_model() -> tf.keras.Model:
                         len(_class_labels), _model.output_shape[1]
                     )
                 
-                logger.info("Model loaded successfully with %d classes", len(_class_labels)))
+                logger.info("Model loaded successfully with %d classes", len(_class_labels))
                 
             except Exception as e:
                 _model = None
