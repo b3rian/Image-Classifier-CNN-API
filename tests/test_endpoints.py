@@ -178,3 +178,25 @@ def test_predict_endpoint_multiple_files():
         
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["predictions"][0]["class_label"] == "test"
+
+def test_predict_endpoint_logging(tmp_path, caplog):
+    """Test that appropriate logging occurs"""
+    # Set up a temporary log file
+    log_file = tmp_path / "test.log"
+    logging.basicConfig(filename=log_file, level=logging.INFO)
+    
+    mock_predictions = [{"class_label": "test", "confidence": 1.0}]
+    
+    with patch("api.endpoints.predict", return_value=mock_predictions):
+        files = {"file": open(TEST_IMAGE_PATH, "rb")}
+        response = client.post("/predict", files=files)
+        
+        assert response.status_code == status.HTTP_200_OK
+        
+        # Check logs were written
+        with open(log_file, "r") as f:
+            logs = f.read()
+            
+        assert "Processing image" in logs
+        assert "Prediction completed" in logs
+        assert "test_image.jpg" in logs
