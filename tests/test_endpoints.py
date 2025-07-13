@@ -95,3 +95,24 @@ def test_predict_endpoint_file_too_large():
     
     assert response.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
     assert "File too large" in response.json()["detail"]
+
+def test_predict_endpoint_corrupted_image():
+    """Test with corrupted image file"""
+    # Create a file that looks like an image but is corrupted
+    corrupted_image = BytesIO(b'\x89PNG\x1a\n\x00\x00\x00IHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\nIDATx\xdac\x00\x01\x00\x00\x05\x00\x01\x0f\xa5\xe7\x10\x00\x00\x00\x00IEND\xaeB`\x82')
+    files = {"file": ("corrupted.png", corrupted_image, "image/png")}
+    
+    response = client.post("/predict", files=files)
+    
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Invalid image file" in response.json()["detail"]
+
+def test_predict_endpoint_empty_file():
+    """Test with empty file"""
+    empty_file = BytesIO(b"")
+    files = {"file": ("empty.jpg", empty_file, "image/jpeg")}
+    
+    response = client.post("/predict", files=files)
+    
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Invalid image file" in response.json()["detail"]
