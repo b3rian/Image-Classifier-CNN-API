@@ -8,7 +8,7 @@ class Config:
     
     # UI Configuration
     ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"]
-    DEFAULT_IMAGE_SIZE = (224, 224)
+    DEFAULT_IMAGE_SIZE = (480, 480)
     
     # Cache Configuration
     CACHE_TTL = 3600  # 1 hour
