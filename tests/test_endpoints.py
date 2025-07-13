@@ -7,7 +7,10 @@ import numpy as np
 import os
 from datetime import datetime
 from unittest.mock import patch, MagicMock
-from api.endpoints import router
+import logging
+
+# Import your router directly without relative import
+from app.api.endpoints import router
 from fastapi import FastAPI
 
 # Create a FastAPI app and include the router
