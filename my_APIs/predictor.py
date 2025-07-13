@@ -1,18 +1,13 @@
-"""
-predictor.py
-
-Handles model loading and image prediction logic using EfficientNetV2L.
-This module ensures efficient, thread-safe inference optimized for limited compute environments,
-such as Hugging Face Spaces (2 vCPU, 16GB RAM).
-"""
+"""Production-ready EfficientNetV2L predictor with dynamic label loading."""
 
 import tensorflow as tf
 import numpy as np
 import logging
 from typing import List, Dict, Optional
 from PIL.Image import Image as PILImage
-from api.utils import preprocess_image
+from my_APIs.utils import preprocess_image
 import threading
+import io
 import os
 import json
 import requests
@@ -28,7 +23,7 @@ PREDICTION_ERRORS = Counter('model_prediction_errors_total', 'Total prediction f
 PREDICTION_LATENCY = Histogram('model_prediction_latency_seconds', 'Prediction latency')
 
 # Configuration
-MODEL_PATH = os.getenv('MODEL_PATH', "D:\Telegram Desktop\custom_cnn_model_1000_classes.keras")
+MODEL_PATH = os.getenv('MODEL_PATH', "D:/Telegram Desktop/custom_cnn_model_1000_classes.keras" )
 LABELS_URL = os.getenv('LABELS_URL', 'https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json')
 MAX_RETRIES = 3
 
@@ -80,12 +75,7 @@ def load_labels() -> Dict[int, str]:
     return _class_labels
 
 def load_model() -> tf.keras.Model:
-    """
-    Loads the model from disk in a thread-safe singleton pattern.
-
-    Returns:
-        tf.keras.Model: Loaded Keras model ready for inference.
-    """
+    """Thread-safe model loader with label pre-loading."""
     global _model
     
     with _model_lock:
@@ -179,7 +169,7 @@ def predict(image_pil: PILImage, top_k: int = 3) -> List[Dict[str, float]]:
                 "label": labels.get(int(idx), f"class_{idx}"),
                 "confidence": float(score),
                 "class_id": int(idx),
-                "model": "custom_cnn_model_1000_classes",
+                "model": "EfficientNetV2L",
                 "timestamp": time.time(),
                 "processing_ms": (time.time() - start_time) * 1000
             }

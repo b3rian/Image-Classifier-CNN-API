@@ -6,3 +6,4 @@ pillow
 numpy
 tensorflow
 uvicorn
+python-multipart

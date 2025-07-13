@@ -1,5 +1,5 @@
 """
-Enhanced image preprocessing utilities for custom_cnn_model_1000_classes inference.
+Enhanced image preprocessing utilities for EfficientNetV2L inference.
 
 Features:
 - Comprehensive input validation
@@ -7,7 +7,7 @@ Features:
 - Performance optimizations
 - Support for batch processing
 """
-
+import io
 import numpy as np
 from PIL import Image, UnidentifiedImageError
 from typing import Tuple, Optional, Union, List
@@ -15,7 +15,6 @@ import logging
 from dataclasses import dataclass
 import time
 from functools import wraps
-import io
 
 # Configure logging
 logger = logging.getLogger(__name__)

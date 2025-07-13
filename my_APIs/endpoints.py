@@ -9,7 +9,8 @@ from typing import List, Dict
 from pydantic import BaseModel
 from datetime import datetime
 import os
-from .predictor import predict
+
+from my_APIs.predictor import predict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,7 +20,7 @@ router = APIRouter()
 
 # Constants
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-ALLOWED_CONTENT_TYPES =["image/jpeg", "image/png", "image/jpg"]
+ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/jpg"]
 
 # Response model
 class PredictionResult(BaseModel):
@@ -42,7 +43,6 @@ class PredictionResponse(BaseModel):
     summary="Classify an image",
     description="Accepts an image file and returns top predictions with confidence scores.",
 )
-
 async def predict_image(
     request: Request,
     file: UploadFile = File(...),
@@ -94,7 +94,6 @@ async def predict_image(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid image file",
             )
-
 
         # 4. Run prediction
         logger.info(f"Processing image: {file.filename}")
