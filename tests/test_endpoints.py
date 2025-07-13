@@ -75,3 +75,23 @@ def test_predict_endpoint_success():
         
         # Verify mock was called
         mock_predict.assert_called_once()
+
+def test_predict_endpoint_invalid_file_type():
+    """Test with invalid file type"""
+    # Create a test text file
+    test_file = BytesIO(b"This is not an image")
+    files = {"file": ("test.txt", test_file, "text/plain")}
+    
+    response = client.post("/predict", files=files)
+    
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Invalid file type" in response.json()["detail"]
+
+def test_predict_endpoint_file_too_large():
+    """Test with file exceeding size limit"""
+    files = {"file": open(TEST_LARGE_IMAGE_PATH, "rb")}
+    
+    response = client.post("/predict", files=files)
+    
+    assert response.status_code == status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+    assert "File too large" in response.json()["detail"]
