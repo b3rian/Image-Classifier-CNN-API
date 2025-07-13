@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import os
 
-from my_APIs.predictor import predict
+from my_api.predictor import predict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

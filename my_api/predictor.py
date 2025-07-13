@@ -5,7 +5,7 @@ import numpy as np
 import logging
 from typing import List, Dict, Optional
 from PIL.Image import Image as PILImage
-from my_APIs.utils import preprocess_image
+from my_api.utils import preprocess_image
 import threading
 import io
 import os
