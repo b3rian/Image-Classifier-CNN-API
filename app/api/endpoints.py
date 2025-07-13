@@ -19,7 +19,7 @@ router = APIRouter()
 
 # Constants
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/jpg"]
+ALLOWED_CONTENT_TYPES =["image/jpeg", "image/png", "image/jpg"]
 
 # Response model
 class PredictionResult(BaseModel):
