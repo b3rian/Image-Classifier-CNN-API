@@ -8,3 +8,4 @@ tensorflow
 uvicorn
 python-multipart
 streamlit
+pandas
