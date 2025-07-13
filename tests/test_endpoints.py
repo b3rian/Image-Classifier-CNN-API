@@ -116,3 +116,20 @@ def test_predict_endpoint_empty_file():
     
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "Invalid image file" in response.json()["detail"]
+
+def test_predict_endpoint_missing_file():
+    """Test with missing file parameter"""
+    response = client.post("/predict")
+    
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "field required" in response.json()["detail"][0]["msg"]
+
+def test_predict_endpoint_server_error():
+    """Test handling of internal server errors"""
+    # Mock the predict function to raise an exception
+    with patch("api.endpoints.predict", side_effect=Exception("Test error")):
+        files = {"file": open(TEST_IMAGE_PATH, "rb")}
+        response = client.post("/predict", files=files)
+        
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert "Error processing image" in response.json()["detail"]
