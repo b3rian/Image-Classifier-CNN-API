@@ -12,3 +12,14 @@ class ImageProcessor:
             st.error(f"File too large (max {config.MAX_FILE_SIZE//1024//1024}MB)")
             return False
         return True
+
+    @staticmethod
+    def preprocess_image(file) -> bytes:
+        """Convert image to optimized format"""
+        img = Image.open(io.BytesIO(file.getvalue()))
+        img = img.resize(config.DEFAULT_IMAGE_SIZE)
+        
+        # Convert to bytes with optimized quality
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='JPEG', quality=85)
+        return img_byte_arr.getvalue()
