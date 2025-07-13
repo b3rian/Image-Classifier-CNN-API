@@ -7,3 +7,4 @@ numpy
 tensorflow
 uvicorn
 python-multipart
+streamlit
