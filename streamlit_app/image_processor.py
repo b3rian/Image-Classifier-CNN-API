@@ -23,3 +23,10 @@ class ImageProcessor:
         img_byte_arr = io.BytesIO()
         img.save(img_byte_arr, format='JPEG', quality=85)
         return img_byte_arr.getvalue()
+    
+    @staticmethod
+    def display_with_overlay(image_bytes, predictions):
+        """Generate image with annotation overlay"""
+        img = Image.open(io.BytesIO(image_bytes))
+        # visualization logic here
+        return img
