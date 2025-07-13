@@ -9,7 +9,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 from datetime import datetime
 import os
-from api.predictor import predict
+from .predictor import predict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
