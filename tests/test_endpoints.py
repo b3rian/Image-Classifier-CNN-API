@@ -133,3 +133,48 @@ def test_predict_endpoint_server_error():
         
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert "Error processing image" in response.json()["detail"]
+
+def test_predict_response_model():
+    """Test the response model structure"""
+    # Mock prediction results
+    mock_predictions = [
+        {"class_label": "bird", "confidence": 0.8},
+        {"class_label": "plane", "confidence": 0.2}
+    ]
+    
+    with patch("api.endpoints.predict", return_value=mock_predictions):
+        files = {"file": open(TEST_IMAGE_PATH, "rb")}
+        response = client.post("/predict", files=files)
+        
+        data = response.json()
+        
+        # Check all required fields are present
+        assert all(key in data for key in ["predictions", "processing_time", "timestamp"])
+        
+        # Check predictions structure
+        assert isinstance(data["predictions"], list)
+        assert all("class_label" in pred and "confidence" in pred for pred in data["predictions"])
+        
+        # Check processing_time is float
+        assert isinstance(data["processing_time"], float)
+        
+        # Check timestamp is valid ISO format
+        try:
+            datetime.fromisoformat(data["timestamp"])
+        except ValueError:
+            pytest.fail("Timestamp is not in valid ISO format")
+
+def test_predict_endpoint_multiple_files():
+    """Test that endpoint handles multiple files gracefully (should still work with first file)"""
+    files = [
+        ("file", open(TEST_IMAGE_PATH, "rb")),
+        ("file", open(TEST_IMAGE_PATH, "rb"))
+    ]
+    
+    mock_predictions = [{"class_label": "test", "confidence": 1.0}]
+    
+    with patch("api.endpoints.predict", return_value=mock_predictions):
+        response = client.post("/predict", files=files)
+        
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["predictions"][0]["class_label"] == "test"
