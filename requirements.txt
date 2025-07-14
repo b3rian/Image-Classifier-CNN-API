@@ -10,3 +10,4 @@ python-multipart
 streamlit
 pandas
 plotly
+pydantic
