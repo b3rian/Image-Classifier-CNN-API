@@ -25,3 +25,18 @@ class UIComponents:
                 color='confidence'
             )
             st.plotly_chart(fig, use_container_width=True)
+
+    @staticmethod
+    def feedback_system():
+        """User accuracy feedback interface"""
+        if 'predictions' in st.session_state:
+            with st.expander("Provide Feedback"):
+                cols = st.columns(3)
+                with cols[1]:
+                    if st.button("👍 Correct"):
+                        log_feedback(positive=True)
+                        st.toast("Thanks for your feedback!")
+                with cols[2]:
+                    if st.button("👎 Incorrect"):
+                        log_feedback(positive=False)
+                        st.toast("We'll improve!")
