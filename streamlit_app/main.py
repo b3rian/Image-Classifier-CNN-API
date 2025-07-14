@@ -46,6 +46,55 @@ def process_image_upload(uploaded_file):
         except Exception as e:
             st.error(f"Classification failed: {str(e)}")
             return False
+
+def main():
+    """Main application entry point"""
+    # Page configuration
+    st.set_page_config(
+        page_title="Image Classifier Pro",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
+    
+    # Initialize session
+    initialize_session()
+    
+    # Main UI
+    st.title("EfficientNetV2L Image Classifier")
+    
+    # File upload section
+    uploaded_file = st.file_uploader(
+        "Upload Image",
+        type=["jpg", "jpeg", "png"],
+        help="Max 10MB, 224x224 resolution recommended"
+    )
+    
+    # Processing pipeline
+    if uploaded_file:
+        if process_image_upload(uploaded_file):
+            # Display results if successful
+            UIComponents.results_view(st.session_state.predictions)
+            
+            # Feedback system (only show if we have new results)
+            if st.session_state.last_upload == hashlib.md5(uploaded_file.getvalue()).hexdigest():
+                UIComponents.feedback_system(st.session_state.predictions)
+                UIComponents.feedback_summary()
+    
+    # Sidebar with additional options
+    with st.sidebar:
+        st.header("Options")
+        if st.button("Clear Cache"):
+            CacheManager.clear_cache()
+            st.session_state.predictions = None
+            st.rerun()
+        
+        if st.session_state.get('predictions'):
+            st.download_button(
+                label="Download Results",
+                data=convert_to_csv(st.session_state.predictions),
+                file_name="classification_results.csv",
+                mime="text/csv"
+            )
         
             
              
