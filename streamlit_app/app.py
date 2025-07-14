@@ -16,3 +16,40 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# Main UI
+def main():
+    st.title("EfficientNetV2L Image Classifier")
+    
+    # File Upload Section
+    uploaded_file = st.file_uploader(
+        "Upload Image",
+        type=["jpg", "jpeg", "png"],
+        help="Max 10MB, 224x224 resolution recommended"
+    )
+    
+    if uploaded_file:
+        if ImageProcessor.validate_image(uploaded_file):
+            # Generate unique hash for caching
+            file_hash = hashlib.md5(uploaded_file.getvalue()).hexdigest()
+            
+            # Check cache first
+            cached_result = CacheManager.check_cache(file_hash)
+            if cached_result:
+                st.session_state.predictions = cached_result
+            else:
+                # Process and classify
+                with st.spinner("Classifying image..."):
+                    start_time = time.time()
+                    processed_img = ImageProcessor.preprocess_image(uploaded_file)
+                    predictions = await APIClient.classify_image(processed_img)
+                    st.session_state.predictions = predictions
+                    CacheManager.cache_prediction(file_hash, predictions)
+                    st.success(f"Done in {time.time()-start_time:.2f}s")
+            
+            # Display results
+            UIComponents.results_view(st.session_state.predictions)
+            UIComponents.feedback_system()
+
+if __name__ == "__main__":
+    main()
