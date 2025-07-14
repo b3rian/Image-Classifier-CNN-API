@@ -1,4 +1,4 @@
-
+import io
 import tempfile
 import requests
 import numpy as np
@@ -72,7 +72,7 @@ def load_image_from_url(url: str) -> Image.Image:
         st.error(f"Failed to load image from URL: {e}")
     return None
 
-MAX_DIM = 512  # Max width/height for resizing
+MAX_DIM = 480  # Max width/height for resizing
 
 def resize_image(image: Image.Image, max_dim: int = MAX_DIM) -> Image.Image:
     """

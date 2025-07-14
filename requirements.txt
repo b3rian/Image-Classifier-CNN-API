@@ -11,3 +11,4 @@ streamlit
 pandas
 plotly
 pydantic
+streamlit_cropper

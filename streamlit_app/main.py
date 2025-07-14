@@ -1,89 +1,164 @@
 import streamlit as st
-from streamlit_app.image_utils import (
-    load_images_from_upload,
-    load_image_from_url,
-)
+import requests
+import tempfile
+import cv2
+import numpy as np
+from PIL import Image, ImageOps
+import io
+import base64
+import os
+import json
+from typing import List
 
+# Constants
+API_URL = "http://localhost:8000/predict"  # Replace with your FastAPI endpoint
+SUPPORTED_FORMATS = ["png", "jpg", "jpeg", "bmp"]
+MODEL_OPTIONS = ["ResNet50", "ViT", "MobileNet"]  # Example models
+
+def compress_image(image: Image.Image, quality: int = 85) -> bytes:
+    buf = io.BytesIO()
+    image.save(buf, format="JPEG", quality=quality)
+    return buf.getvalue()
+
+def validate_image(file) -> bool:
+    try:
+        Image.open(file).verify()
+        return True
+    except:
+        return False
+
+def resize_image(image: Image.Image, max_dim: int = 512) -> Image.Image:
+    image.thumbnail((max_dim, max_dim))
+    return image
+
+def fetch_image_from_url(url: str) -> Image.Image:
+    response = requests.get(url)
+    return Image.open(io.BytesIO(response.content))
+
+def display_predictions(predictions):
+    top = predictions[0]
+    st.success (f"Top Prediction: {top['label']} ({top['confidence']}%)")
+    st.progress(int(top['confidence']))
+
+    with st.expander("See Top-5 Predictions"):
+        for p in predictions:
+            st.write(f"{p['label']}: {p['confidence']}%")
+
+def call_api(image_bytes, model_name):
+    try:
+        response = requests.post(
+            API_URL,
+            files={"file": image_bytes},
+            params={"model": model_name},
+            timeout=10
+        )
+        return response.json()
+    except requests.exceptions.Timeout:
+        st.warning("API call timed out. Please try again.")
+        return None
+    except Exception as e:
+        st.error(f"API call failed: {e}")
+        return None
+
+def save_to_session(img_name, prediction):
+    if "history" not in st.session_state:
+        st.session_state.history = []
+    st.session_state.history.append({"image": img_name, "prediction": prediction})
+
+def download_link(data, filename, label):
+    b64 = base64.b64encode(data.encode()).decode()
+    return f'<a href="data:file/txt;base64,{b64}" download="{filename}">{label}</a>'
+
+# Main App
 st.set_page_config(page_title="Image Classifier", layout="wide")
+st.title("🖼️ Smart Image Classifier Web App")
 
-st.title("🧠 Image Classifier Pro")
-st.subheader("Upload or Capture Images")
+# Theme toggle
+st.sidebar.title("Settings")
+mode = st.sidebar.radio("Choose Mode", ["Upload", "Webcam", "URL"])
+model = st.sidebar.selectbox("Select Model", MODEL_OPTIONS)
+dark_mode = st.sidebar.checkbox("Dark Mode")
 
-# --- File Upload ---
-st.markdown("### 📂 Upload Images")
-uploaded_files = st.file_uploader(
-    label="Upload one or more images (JPEG, PNG, WEBP)",
-    type=["jpg", "jpeg", "png", "webp"],
-    accept_multiple_files=True
-)
+if dark_mode:
+    st.markdown("""
+        <style>
+        .main { background-color: #1e1e1e; color: white; }
+        </style>
+    """, unsafe_allow_html=True)
 
-uploaded_images = load_images_from_upload(uploaded_files) if uploaded_files else []
-
-# --- Webcam Capture ---
-st.markdown("---")
-st.markdown("### 📸 Capture from Webcam")
-if st.button("Capture Image"):
-    webcam_image = capture_webcam_image()
-    if webcam_image:
-        st.image(webcam_image, caption="Webcam Capture", use_column_width=True)
-        uploaded_images.append(webcam_image)
-
-# --- URL Input ---
-st.markdown("---")
-st.markdown("### 🌐 Load from URL")
-url = st.text_input("Paste image URL here")
-if url:
-    url_image = load_image_from_url(url)
-    if url_image:
-        st.image(url_image, caption="Image from URL", use_container_width=True)
-        uploaded_images.append(url_image)
-
-# --- Display Uploaded Images ---
-st.markdown("---")
-if uploaded_images:
-    st.markdown("### 🖼️ Preview Uploaded Images")
-    cols = st.columns(min(4, len(uploaded_images)))
-    for i, img in enumerate(uploaded_images):
-        with cols[i % len(cols)]:
-            st.image(img, use_container_width=True)
-else:
-    st.info("No images to display yet.")
-
-# --- Rotate option ---
-rotate_angle = st.slider("🔄 Rotate image (degrees)", -180, 180, 0)
-
-if uploaded_files:
-    st.markdown("### 🖼️ Image Preview & Preprocessing")
-
+# Upload Section
+images = []
+if mode == "Upload":
+    uploaded_files = st.file_uploader(
+        "Upload Images", type=SUPPORTED_FORMATS, accept_multiple_files=True
+    )
     for file in uploaded_files:
-        image = safe_load_image(file)
-        if not image:
-            continue
+        if validate_image(file):
+            image = Image.open(file).convert("RGB")
+            image = resize_image(image)
+            images.append((file.name, image))
+        else:
+            st.error(f"File {file.name} is invalid or corrupted.")
 
-        # Resize large images
-        resized = resize_image(image)
+elif mode == "Webcam":
+    picture = st.camera_input("Take a Picture")
+    if picture:
+        image = Image.open(picture).convert("RGB")
+        image = resize_image(image)
+        images.append(("webcam.jpg", image))
 
-        # Rotate image
-        if rotate_angle != 0:
-            resized = resized.rotate(rotate_angle)
+elif mode == "URL":
+    url = st.text_input("Enter Image URL")
+    if url:
+        try:
+            image = fetch_image_from_url(url).convert("RGB")
+            image = resize_image(image)
+            images.append(("url_image.jpg", image))
+        except:
+            st.error("Could not load image from URL.")
 
-        # Show original vs resized
+if images:
+    st.subheader("Preview & Adjust Images")
+    for idx, (name, img) in enumerate(images):
         col1, col2 = st.columns(2)
         with col1:
-            st.image(image, caption="Original", use_column_width=True)
-            st.write(f"📐 Dimensions: {image.size[0]}x{image.size[1]}")
-            st.write(f"💾 Size: {get_file_size(image)}")
-
+            st.image(img, caption=f"{name} ({img.size[0]}x{img.size[1]})")
         with col2:
-            # Cropper
-            st.write("✂️ Crop (optional)")
-            cropped_img = st_cropper(resized, box_color="#FF4B4B", aspect_ratio=None)
+            rotate_angle = st.slider(f"Rotate {name}", 0, 360, 0, key=name)
+            if rotate_angle:
+                img = img.rotate(rotate_angle)
+                images[idx] = (name, img)
 
-            if cropped_img:
-                st.image(cropped_img, caption="Cropped & Resized", use_column_width=True)
-                st.write(f"📐 Dimensions: {cropped_img.size[0]}x{cropped_img.size[1]}")
-                st.write(f"💾 Size: {get_file_size(cropped_img)}")
+    if st.button("Classify Images"):
+        for name, img in images:
+            with st.spinner(f"Classifying {name}..."):
+                compressed = compress_image(img)
+                results = call_api(compressed, model)
+                if results:
+                    display_predictions(results["predictions"])
+                    save_to_session(name, results["predictions"])
 
-        st.markdown("---")
-else:
-    st.info("Upload image(s) to continue.")
+# Session History
+st.sidebar.subheader("Session History")
+if "history" in st.session_state and st.session_state.history:
+    for entry in st.session_state.history[-5:][::-1]:
+        st.sidebar.markdown(f"**{entry['image']}**")
+        st.sidebar.markdown(f"Top: {entry['prediction'][0]['label']} ({entry['prediction'][0]['confidence']}%)")
+    history_json = json.dumps(st.session_state.history)
+    st.sidebar.markdown(download_link(history_json, "history.json", "🔍 Download History"), unsafe_allow_html=True)
+
+# Feedback
+st.subheader("📊 Feedback")
+if st.session_state.get("history"):
+    latest = st.session_state.history[-1]
+    feedback_col1, feedback_col2 = st.columns([1, 3])
+    with feedback_col1:
+        st.write("Was this prediction accurate?")
+        feedback = st.radio("Feedback", ["👍", "👎"], horizontal=True, key="feedback")
+    with feedback_col2:
+        comment = st.text_area("Comments or corrections? (optional)", key="comment")
+        if st.button("Submit Feedback"):
+            st.success("Thanks for your feedback!")
+
+st.markdown("---")
+st.caption("Image Classifier Web App | Built with 🚀 by OpenAI")
