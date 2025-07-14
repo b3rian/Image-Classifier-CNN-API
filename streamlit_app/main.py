@@ -294,7 +294,7 @@ def main():
                         st.caption(f"⏱️ {entry['timestamp']}")
         
     # ===== MAIN CONTENT =====
-    st.title("🖼️ AI Image Classifier")
+    st.title("🖼️ Smart Image Classifier Web App")
     st.caption("Upload images to classify using state-of-the-art deep learning models")
     
     # Image Input Section
