@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import pandas as pd
-from .feedback_logger import FeedbackLogger
+from streamlit_app.feedback_logger import FeedbackLogger
 
 class UIComponents:
     @staticmethod
