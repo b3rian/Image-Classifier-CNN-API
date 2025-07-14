@@ -1,6 +1,7 @@
 import streamlit as st
 import hashlib
 import time
+import pandas as pd
 import uuid
 from .api_client import APIClient
 from .image_processor import ImageProcessor
@@ -96,7 +97,13 @@ def main():
                 mime="text/csv"
             )
         
-            
+def convert_to_csv(predictions):
+    """Convert predictions to CSV format"""
+    df = pd.DataFrame(predictions)
+    return df.to_csv(index=False)
+
+if __name__ == "__main__":
+    main()            
              
 
  
