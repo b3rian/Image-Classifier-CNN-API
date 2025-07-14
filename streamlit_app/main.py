@@ -9,11 +9,11 @@ from threading import Thread
 import time
 
 # ====================== CONSTANTS & CONFIG ======================
-API_URL = "http://localhost:8000/predict"
+API_URL = "http://localhost:8000/predict"  # FastAPI endpoint
 SUPPORTED_FORMATS = ["png", "jpg", "jpeg", "bmp"]
 MODEL_OPTIONS = ["ResNet50", "ViT", "MobileNet"]
-MAX_IMAGE_DIM = 512
-DEFAULT_COMPRESSION = 85
+MAX_IMAGE_DIM = 512  # For resizing
+DEFAULT_COMPRESSION = 85  # JPEG quality
 
 class Prediction(TypedDict):
     label: str
@@ -27,22 +27,26 @@ class ApiResponse(TypedDict):
 # ====================== SESSION INITIALIZATION ======================
 def init_session():
     """Initialize all session state variables"""
-    if "history" not in st.session_state:
-        st.session_state.history = []
-    if "dark_mode" not in st.session_state:
-        st.session_state.dark_mode = False
-    if "api_results" not in st.session_state:
-        st.session_state.api_results = {}
-    if "feedback" not in st.session_state:
-        st.session_state.feedback = {}
-    if "input_mode" not in st.session_state:
-        st.session_state.input_mode = "Upload"
-    if "api_done" not in st.session_state:
-        st.session_state.api_done = False
+    session_defaults = {
+        "history": [],
+        "dark_mode": False,
+        "api_results": {},
+        "feedback": {},
+        "input_mode": "Upload",
+        "api_done": False,
+        "min_confidence": 30,
+        "compression": DEFAULT_COMPRESSION
+    }
+    
+    for key, value in session_defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
 
 # ====================== CORE FUNCTIONS ======================
-def compress_image(image: Image.Image, quality: int = DEFAULT_COMPRESSION) -> bytes:
+def compress_image(image: Image.Image, quality: int = None) -> bytes:
     """Compress image with adjustable quality"""
+    if quality is None:
+        quality = st.session_state.get("compression", DEFAULT_COMPRESSION)
     buf = io.BytesIO()
     image.save(buf, format="JPEG", quality=quality)
     return buf.getvalue()
@@ -55,7 +59,7 @@ def validate_image(file) -> bool:
     except Exception as e:
         st.error(f"Invalid image: {str(e)}")
         return False
-   
+
 def resize_image(image: Image.Image, max_dim: int = MAX_IMAGE_DIM) -> Image.Image:
     """Maintain aspect ratio while resizing"""
     image.thumbnail((max_dim, max_dim))
@@ -116,13 +120,20 @@ def call_api_async(images: List[bytes], model_name: str):
     Thread(target=worker).start()
 
 # ====================== UI COMPONENTS ======================
-def display_predictions(predictions: List[Prediction], min_confidence: int = 0):
+def display_predictions(predictions: List[Prediction]):
     """Interactive results display with confidence filter"""
     if not predictions:
         st.warning("No predictions met confidence threshold")
         return
     
-    top = predictions[0]
+    min_confidence = st.session_state.get("min_confidence", 30)
+    filtered = [p for p in predictions if p['confidence'] >= min_confidence]
+    
+    if not filtered:
+        st.warning(f"No predictions above {min_confidence}% confidence")
+        return
+    
+    top = filtered[0]
     with st.container(border=True):
         col1, col2 = st.columns([1, 3])
         with col1:
@@ -134,18 +145,17 @@ def display_predictions(predictions: List[Prediction], min_confidence: int = 0):
                        text=f"Confidence: {top['confidence']:.1f}%")
     
     with st.expander("🔍 Detailed Predictions"):
-        for p in predictions:
-            if p['confidence'] >= min_confidence:
-                st.markdown(
-                    f"`{p['label']:30s}` | "
-                    f"`{p['confidence']:5.1f}%` | "
-                    f"{'█' * int(p['confidence']/10)}"
-                )
+        for p in filtered:
+            st.markdown(
+                f"`{p['label']:30s}` | "
+                f"`{p['confidence']:5.1f}%` | "
+                f"{'█' * int(p['confidence']/10)}"
+            )
 
 def image_uploader() -> List[tuple]:
     """Handles all image input methods"""
     images = []
-    mode = st.session_state.get("input_mode", "Upload")
+    mode = st.session_state.input_mode
     
     if mode == "Upload":
         files = st.file_uploader(
@@ -178,17 +188,6 @@ def image_uploader() -> List[tuple]:
     return images
 
 # ====================== SESSION MANAGEMENT ======================
-def init_session():
-    """Initialize all session state variables"""
-    if "history" not in st.session_state:
-        st.session_state.history = []
-    if "dark_mode" not in st.session_state:
-        st.session_state.dark_mode = False
-    if "api_results" not in st.session_state:
-        st.session_state.api_results = {}
-    if "feedback" not in st.session_state:
-        st.session_state.feedback = {}
-
 def save_to_history(name: str, prediction: List[Prediction], img_bytes: bytes):
     """Store results with thumbnail"""
     thumb = Image.open(io.BytesIO(img_bytes))
@@ -204,15 +203,41 @@ def save_to_history(name: str, prediction: List[Prediction], img_bytes: bytes):
     }
     st.session_state.history.append(entry)
 
+# ====================== THEME MANAGEMENT ======================
+def apply_theme():
+    """Apply dark/light theme based on session state"""
+    if st.session_state.get("dark_mode", False):
+        st.markdown("""
+            <style>
+            .stApp { background-color: #0e1117; }
+            .stTextInput>div>div>input, .stTextArea>textarea,
+            .stSelectbox>div>div>select {
+                background-color: #333 !important;
+                color: white !important;
+            }
+            .stSlider>div>div>div>div {
+                background-color: #555 !important;
+            }
+            .st-bb { background-color: transparent; }
+            .st-at { background-color: #333; }
+            .css-1d391kg { background-color: #0e1117; }
+            </style>
+        """, unsafe_allow_html=True)
+
 # ====================== MAIN APP ======================
 def main():
-    # Initialize session and page config
+    # Initialize session first
     init_session()
+    
+    # Then set page config
     st.set_page_config(
         page_title="AI Image Classifier", 
         layout="wide",
         page_icon="🖼️"
     )
+    
+    # Apply theme
+    apply_theme()
     
     # ===== SIDEBAR =====
     with st.sidebar:
@@ -222,7 +247,7 @@ def main():
         st.session_state.input_mode = st.radio(
             "Input Method",
             ["Upload", "Webcam", "URL"],
-            index=0,
+            index=["Upload", "Webcam", "URL"].index(st.session_state.input_mode),
             key="input_mode_selector"
         )
         
@@ -235,22 +260,23 @@ def main():
         )
         
         # Confidence Threshold
-        min_confidence = st.slider(
+        st.session_state.min_confidence = st.slider(
             "🎚️ Minimum Confidence (%)",
-            0, 100, 30,
+            0, 100, st.session_state.min_confidence,
             help="Filter out low-confidence predictions"
         )
         
         # Compression Control
-        compression = st.slider(
+        st.session_state.compression = st.slider(
             "🗜️ Image Compression (%)",
-            50, 100, DEFAULT_COMPRESSION,
+            50, 100, st.session_state.compression,
             help="Higher quality = larger files = slower processing"
         )
         
         # Dark Mode Toggle
         if st.button("🌙 Toggle Dark Mode"):
             st.session_state.dark_mode = not st.session_state.dark_mode
+            st.rerun()
         
         # History Section
         st.divider()
@@ -258,11 +284,14 @@ def main():
         if st.session_state.history:
             for entry in reversed(st.session_state.history[-3:]):
                 with st.container(border=True):
-                    st.image(io.BytesIO(base64.b64decode(entry["thumbnail"])), 
-                            width=60)
-                    st.caption(f"{entry['name']}")
-                    st.write(f"Top: {entry['predictions'][0]['label']}")
-                    st.write(f"⏱️ {entry['timestamp']}")
+                    col1, col2 = st.columns([1, 2])
+                    with col1:
+                        st.image(io.BytesIO(base64.b64decode(entry["thumbnail"])), 
+                                width=60)
+                    with col2:
+                        st.caption(f"{entry['name']}")
+                        st.write(f"Top: {entry['predictions'][0]['label']}")
+                        st.caption(f"⏱️ {entry['timestamp']}")
         
     # ===== MAIN CONTENT =====
     st.title("🖼️ AI Image Classifier")
@@ -289,8 +318,10 @@ def main():
     
         # Classification Button
         if st.button("🚀 Classify Images", type="primary"):
-            compressed_images = [compress_image(img, compression) for _, img in images]
+            st.session_state.api_done = False
+            compressed_images = [compress_image(img) for _, img in images]
             call_api_async(compressed_images, model)
+            st.rerun()
     
     # Display Results
     if st.session_state.get("api_done", False):
@@ -305,7 +336,7 @@ def main():
                         with col1:
                             st.image(img, use_column_width=True)
                         with col2:
-                            display_predictions(result["predictions"], min_confidence)
+                            display_predictions(result["predictions"])
                             save_to_history(name, result["predictions"], 
                                           compress_image(img, 70))  # Save thumbnail
     
@@ -334,22 +365,9 @@ def main():
                 }
                 st.toast("Feedback saved!", icon="✅")
 
-# ====================== THEME & RUN ======================
-def apply_theme():
-    """Dynamic dark/light mode styling"""
-    if st.session_state.dark_mode:
-        st.markdown("""
-            <style>
-            .stApp { background-color: #0e1117; }
-            .stTextInput>div>div>input, .stTextArea>textarea {
-                background-color: #333 !important;
-                color: white !important;
-            }
-            .st-bb { background-color: transparent; }
-            .st-at { background-color: #333; }
-            </style>
-        """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
-    apply_theme()
     main()
+
+st.markdown("---")
+st.caption("Image Classifier Web App | Built with 🚀 by B3rian")   
