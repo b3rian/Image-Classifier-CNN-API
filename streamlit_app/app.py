@@ -42,7 +42,7 @@ def main():
                 with st.spinner("Classifying image..."):
                     start_time = time.time()
                     processed_img = ImageProcessor.preprocess_image(uploaded_file)
-                    predictions = await APIClient.classify_image(processed_img)
+                    predictions = APIClient.classify_image(processed_img)
                     st.session_state.predictions = predictions
                     CacheManager.cache_prediction(file_hash, predictions)
                     st.success(f"Done in {time.time()-start_time:.2f}s")
