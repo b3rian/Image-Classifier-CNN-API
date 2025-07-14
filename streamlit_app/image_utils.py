@@ -71,3 +71,62 @@ def load_image_from_url(url: str) -> Image.Image:
     except Exception as e:
         st.error(f"Failed to load image from URL: {e}")
     return None
+
+MAX_DIM = 512  # Max width/height for resizing
+
+def resize_image(image: Image.Image, max_dim: int = MAX_DIM) -> Image.Image:
+    """
+    Resize image to a maximum dimension while keeping aspect ratio.
+
+    Args:
+        image (PIL.Image): Input image
+        max_dim (int): Maximum width/height
+
+    Returns:
+        PIL.Image: Resized image
+    """
+    w, h = image.size
+    if max(w, h) <= max_dim:
+        return image
+
+    scale = max_dim / float(max(w, h))
+    new_size = (int(w * scale), int(h * scale))
+    return image.resize(new_size, Image.ANTIALIAS)
+
+def get_file_size(image: Image.Image) -> str:
+    """
+    Estimate file size of an image in memory.
+
+    Args:
+        image (PIL.Image): Input image
+
+    Returns:
+        str: Size in KB/MB
+    """
+    with io.BytesIO() as output:
+        image.save(output, format="JPEG")
+        size_kb = len(output.getvalue()) / 1024
+        return f"{size_kb:.2f} KB" if size_kb < 1024 else f"{size_kb/1024:.2f} MB"
+
+def safe_load_image(file) -> Image.Image:
+    """
+    Attempts to open and validate image file.
+
+    Args:
+        file (file-like): Uploaded file
+
+    Returns:
+        PIL.Image or None
+    """
+    try:
+        image = Image.open(file)
+        img_format = image.format
+        if not validate_image_format(img_format):
+            st.warning(f"Unsupported format: {img_format}")
+            return None
+        image = image.convert("RGB")
+        return image
+    except Exception as e:
+        st.error(f"Corrupt or unreadable image: {file.name}")
+        return None
+
