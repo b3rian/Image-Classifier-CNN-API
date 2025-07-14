@@ -48,3 +48,42 @@ if uploaded_images:
             st.image(img, use_container_width=True)
 else:
     st.info("No images to display yet.")
+
+# --- Rotate option ---
+rotate_angle = st.slider("🔄 Rotate image (degrees)", -180, 180, 0)
+
+if uploaded_files:
+    st.markdown("### 🖼️ Image Preview & Preprocessing")
+
+    for file in uploaded_files:
+        image = safe_load_image(file)
+        if not image:
+            continue
+
+        # Resize large images
+        resized = resize_image(image)
+
+        # Rotate image
+        if rotate_angle != 0:
+            resized = resized.rotate(rotate_angle)
+
+        # Show original vs resized
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(image, caption="Original", use_column_width=True)
+            st.write(f"📐 Dimensions: {image.size[0]}x{image.size[1]}")
+            st.write(f"💾 Size: {get_file_size(image)}")
+
+        with col2:
+            # Cropper
+            st.write("✂️ Crop (optional)")
+            cropped_img = st_cropper(resized, box_color="#FF4B4B", aspect_ratio=None)
+
+            if cropped_img:
+                st.image(cropped_img, caption="Cropped & Resized", use_column_width=True)
+                st.write(f"📐 Dimensions: {cropped_img.size[0]}x{cropped_img.size[1]}")
+                st.write(f"💾 Size: {get_file_size(cropped_img)}")
+
+        st.markdown("---")
+else:
+    st.info("Upload image(s) to continue.")
