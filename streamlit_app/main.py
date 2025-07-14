@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import tempfile
-import cv2
 import numpy as np
 from PIL import Image, ImageOps
 import io
