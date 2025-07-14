@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 from datetime import datetime
 import streamlit as st
-from config import config
+from streamlit_app.config import config
 
 class FeedbackLogger:
     FEEDBACK_FILE = Path("feedback/classification_feedback.csv")

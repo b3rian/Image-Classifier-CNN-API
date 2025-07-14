@@ -1,6 +1,6 @@
 import httpx
 import logging
-from config import config
+from streamlit_app.config import config
 
 logger = logging.getLogger(__name__)
 

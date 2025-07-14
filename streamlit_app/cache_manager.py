@@ -1,6 +1,6 @@
 from functools import lru_cache
 import pandas as pd
-from config import config
+from streamlit_app.config import config
 import streamlit as st
 
 class CacheManager:

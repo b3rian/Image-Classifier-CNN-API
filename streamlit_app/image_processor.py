@@ -2,7 +2,7 @@ from PIL import Image
 import io
 import numpy as np
 import streamlit as st
-from config import config
+from streamlit_app.config import config
 
 class ImageProcessor:
     @staticmethod

@@ -3,11 +3,11 @@ import hashlib
 import time
 import pandas as pd
 import uuid
-from .api_client import APIClient
-from .image_processor import ImageProcessor
-from .ui_components import UIComponents
-from .cache_manager import CacheManager
-from .feedback_logger import FeedbackLogger
+from streamlit_app.api_client import APIClient
+from streamlit_app.image_processor import ImageProcessor
+from streamlit_app.ui_components import UIComponents
+from streamlit_app.cache_manager import CacheManager
+from streamlit_app.feedback_logger import FeedbackLogger
 
 def initialize_session():
     """Initialize all required session state variables"""
