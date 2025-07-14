@@ -26,3 +26,39 @@ class FeedbackLogger:
                     "user_feedback",
                     "user_correction"
                 ])
+
+    @classmethod
+    def log_feedback(cls, predictions: list, positive: bool, correction: str = None):
+        """
+        Log user feedback to CSV and session state
+        
+        Args:
+            predictions: List of prediction dicts from API
+            positive: Whether feedback was positive
+            correction: User-provided correct label (if negative feedback)
+        """
+        cls.init_feedback_file()
+        
+        # Get current prediction context
+        top_pred = predictions[0]
+        
+        # Prepare data
+        feedback_data = {
+            "timestamp": datetime.now().isoformat(),
+            "session_id": st.session_state.get('session_id', 'anonymous'),
+            "model_version": cls.MODEL_VERSION,
+            "predicted_class": top_pred['class_label'],
+            "confidence": top_pred['confidence'],
+            "user_feedback": "positive" if positive else "negative",
+            "user_correction": correction
+        }
+        
+        # Append to CSV
+        with open(cls.FEEDBACK_FILE, mode='a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(feedback_data.values())
+        
+        # Also store in session for UI
+        if 'feedback_history' not in st.session_state:
+            st.session_state.feedback_history = []
+        st.session_state.feedback_history.append(feedback_data)
