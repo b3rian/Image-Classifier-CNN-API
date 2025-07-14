@@ -58,14 +58,16 @@ def load_image_from_url(url: str) -> Image.Image:
         Image.Image or None: Loaded image or None on error
     """
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, stream=True, timeout=5)
         response.raise_for_status()
-        image = Image.open(tempfile.NamedTemporaryFile(delete=False))
-        image = Image.open(requests.get(url, stream=True).raw)
+        
+        # Open image directly from byte stream
+        image = Image.open(response.raw)
         img_format = image.format
         if validate_image_format(img_format):
             return image.convert("RGB")
-        st.warning(f"Unsupported image format from URL: {img_format}")
+        else:
+            st.warning(f"Unsupported image format from URL: {img_format}")
     except Exception as e:
         st.error(f"Failed to load image from URL: {e}")
     return None
