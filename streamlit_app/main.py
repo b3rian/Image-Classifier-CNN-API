@@ -19,19 +19,23 @@ def initialize_session():
         st.session_state.predictions = None
     if 'last_upload' not in st.session_state:
         st.session_state.last_upload = None
+    if 'cache_cleared' not in st.session_state:
+        st.session_state.cache_cleared = False
 
 def process_image_upload(uploaded_file):
     """Handle image processing and classification pipeline"""
     if not ImageProcessor.validate_image(uploaded_file):
         return False
     
-    file_hash = hashlib.md5(uploaded_file.getvalue()).hexdigest()
+    # Use CacheManager's key generation
+    file_hash = CacheManager._generate_cache_key(uploaded_file.getvalue())
     st.session_state.last_upload = file_hash
     
-    # Check cache
+    # Check cache (now returns None if expired)
     cached_result = CacheManager.check_cache(file_hash)
     if cached_result:
         st.session_state.predictions = cached_result
+        st.info("Loaded from cache")
         return True
     
     # New classification
@@ -41,7 +45,10 @@ def process_image_upload(uploaded_file):
             processed_img = ImageProcessor.preprocess_image(uploaded_file)
             predictions = APIClient.classify_image(processed_img)
             st.session_state.predictions = predictions
+            
+            # Store with timestamp
             CacheManager.cache_prediction(file_hash, predictions)
+            
             st.success(f"Done in {time.time()-start_time:.2f}s")
             return True
         except Exception as e:
@@ -76,19 +83,29 @@ def main():
             # Display results if successful
             UIComponents.results_view(st.session_state.predictions)
             
-            # Feedback system (only show if we have new results)
-            if st.session_state.last_upload == hashlib.md5(uploaded_file.getvalue()).hexdigest():
+            # Feedback system
+            if st.session_state.last_upload == CacheManager._generate_cache_key(uploaded_file.getvalue()):
                 UIComponents.feedback_system(st.session_state.predictions)
                 UIComponents.feedback_summary()
     
     # Sidebar with additional options
     with st.sidebar:
         st.header("Options")
-        if st.button("Clear Cache"):
-            CacheManager.clear_cache()
-            st.session_state.predictions = None
-            st.rerun()
         
+        # Cache control
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Clear Cache"):
+                CacheManager.clear_cache()
+                st.session_state.predictions = None
+                st.session_state.cache_cleared = True
+                st.rerun()
+        
+        if st.session_state.cache_cleared:
+            st.success("Cache cleared at: " + st.session_state.get('cache_cleared_time', 'Just now'))
+            st.session_state.cache_cleared = False
+        
+        # Results download
         if st.session_state.get('predictions'):
             st.download_button(
                 label="Download Results",
@@ -97,13 +114,15 @@ def main():
                 mime="text/csv"
             )
         
+        # Cache info
+        if 'prediction_cache' in st.session_state:
+            st.caption(f"Cache size: {len(st.session_state.prediction_cache)}/{CacheManager.MAX_CACHE_SIZE}")
+            st.caption(f"TTL: {CacheManager.CACHE_TTL//3600}h")
+
 def convert_to_csv(predictions):
     """Convert predictions to CSV format"""
     df = pd.DataFrame(predictions)
     return df.to_csv(index=False)
 
 if __name__ == "__main__":
-    main()            
-             
-
- 
+    main()
