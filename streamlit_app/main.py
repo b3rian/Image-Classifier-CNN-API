@@ -160,4 +160,4 @@ if st.session_state.get("history"):
             st.success("Thanks for your feedback!")
 
 st.markdown("---")
-st.caption("Image Classifier Web App | Built with 🚀 by OpenAI")
+st.caption("Image Classifier Web App | Built with 🚀 by B3rian")
