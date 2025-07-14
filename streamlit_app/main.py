@@ -1,26 +1,23 @@
 import streamlit as st
+import hashlib
+import time
+import uuid
 from .api_client import APIClient
 from .image_processor import ImageProcessor
 from .ui_components import UIComponents
 from .cache_manager import CacheManager
-import hashlib
-import time
 from .feedback_logger import FeedbackLogger
 
-# Initialize session
-if 'session_id' not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())  # Unique session ID
-if 'show_correction' not in st.session_state:
-    st.session_state.show_correction = False
-
-# After showing predictions
-if st.session_state.get('predictions'):
-    UIComponents.feedback_system(st.session_state.predictions)
-    UIComponents.feedback_summary()
-
-# Initialize session state
-if 'predictions' not in st.session_state:
-    st.session_state.predictions = None
+def initialize_session():
+    """Initialize all required session state variables"""
+    if 'session_id' not in st.session_state:
+        st.session_state.session_id = str(uuid.uuid4())
+    if 'show_correction' not in st.session_state:
+        st.session_state.show_correction = False
+    if 'predictions' not in st.session_state:
+        st.session_state.predictions = None
+    if 'last_upload' not in st.session_state:
+        st.session_state.last_upload = None
 
 # Page Config
 st.set_page_config(
