@@ -42,27 +42,6 @@ def load_images_from_upload(files: List) -> List[Image.Image]:
             st.error(f"Could not load image: {file.name}")
     return images
 
-def capture_webcam_image() -> Image.Image:
-    """
-    Captures a single image from the webcam.
-
-    Returns:
-        Image.Image: Captured image or None
-    """
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        st.error("Webcam not accessible.")
-        return None
-
-    ret, frame = cap.read()
-    cap.release()
-    if not ret:
-        st.error("Failed to capture image.")
-        return None
-
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    return Image.fromarray(rgb)
-
 def load_image_from_url(url: str) -> Image.Image:
     """
     Loads and validates image from a URL.
