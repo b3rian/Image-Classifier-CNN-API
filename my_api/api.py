@@ -58,3 +58,23 @@ def predict_image(image_tensor: np.ndarray):
         for i in sorted_indices
     ]
     return results
+
+# =================== API Endpoints ===================
+@app.post("/predict")
+async def predict(request: Request, file: UploadFile = File(...), model: str = "Custom ResNet"):
+    start_time = time.time()
+
+    if not file.filename.lower().endswith((".jpg", ".jpeg", ".png", ".bmp")):
+        raise HTTPException(status_code=400, detail="Unsupported image format.")
+
+    contents = await file.read()
+    image_tensor = read_image_as_tensor(contents)
+    predictions = predict_image(image_tensor)
+
+    response = {
+        "predictions": predictions,
+        "model_version": MODEL_PATH,
+        "inference_time": round((time.time() - start_time) * 1000, 2)  # ms
+    }
+
+    return JSONResponse(content=response)
