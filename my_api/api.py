@@ -9,10 +9,17 @@ from PIL import Image
 import io
 import time
 import uvicorn
+import json
+import urllib.request
+
+# Download the ImageNet labels file
+url = "https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json"
+with urllib.request.urlopen(url) as response:
+    imagenet_class_index = json.load(response)
 
 # =================== Config ===================
 MODEL_PATH = "cnn_model.keras"
-CLASS_NAMES = ["cat", "dog", "bird", "other"]  # Class labels
+CLASS_NAMES = [imagenet_class_index[str(k)][1].replace('_', ' ') for k in range(1000)]  # Class labels
 IMAGE_SIZE = (480, 480)  # Match model input size
 
 # =================== Load Model ===================
