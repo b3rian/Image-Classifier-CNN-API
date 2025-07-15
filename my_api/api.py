@@ -11,13 +11,16 @@ import tensorflow as tf
 import json
 import uvicorn
 
+from tensorflow.keras.applications.efficientnet_v2 import preprocess_input, decode_predictions
+
+
 # Load ImageNet class names
 with open("imagenet_class_index.json", "r") as f:
     class_idx = json.load(f)
     CLASS_NAMES = [class_idx[str(k)][1].replace("_", " ") for k in range(1000)]
 
 # Load Keras model
-MODEL_PATH = "D:\Telegram Desktop\custom_cnn_model_1000_classes.keras" 
+MODEL_PATH = "D:/Telegram Desktop/custom_cnn_model_1000_classes.keras" 
 model = tf.keras.models.load_model(MODEL_PATH)
 
 # FastAPI app
@@ -49,14 +52,16 @@ class ApiResponse(BaseModel):
 def preprocess_image(image_bytes: bytes, target_size=(480, 480)) -> np.ndarray:
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     image = image.resize(target_size)
-    image_array = np.array(image).astype("float32") / 255.0
+    image_array = np.array(image).astype("float32")
+    image_array = preprocess_input(image_array)  # <-- This is crucial
     return np.expand_dims(image_array, axis=0)
+
 
 # Inference route
 @app.post("/predict", response_model=ApiResponse)
 async def predict(
     file: UploadFile = File(...),
-    model: str = Query(default="Custom ResNet", description="Model name from frontend")
+    model_name: str = Query(default="Custom ResNet", description="Model name from frontend")
 ):
     try:
         contents = await file.read()
@@ -76,7 +81,7 @@ async def predict(
             status_code=200,
             content={
                 "predictions": results,
-                "model_version": model,
+                "model_version": model_name,
                 "inference_time": round(end - start, 4)
             }
         )
