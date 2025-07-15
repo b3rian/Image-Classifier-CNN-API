@@ -46,3 +46,15 @@ def read_image_as_tensor(file: bytes) -> np.ndarray:
         return np.expand_dims(image_array, axis=0)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Invalid image: {str(e)}")
+    
+def predict_image(image_tensor: np.ndarray):
+    preds = inference_model(image_tensor).numpy()[0]
+    sorted_indices = preds.argsort()[::-1]
+    results = [
+        {
+            "label": CLASS_NAMES[i],
+            "confidence": round(float(preds[i]) * 100, 2)
+        }
+        for i in sorted_indices
+    ]
+    return results
