@@ -19,3 +19,19 @@ from tensorflow.keras.applications.resnet50 import (
     preprocess_input as resnet_preprocess,
     decode_predictions as resnet_decode
 )
+
+# =================== Model Registry ===================
+MODEL_REGISTRY = {
+    "efficientnet": {
+        "path": "D:/Telegram Desktop/efficientnet_model.keras",
+        "preprocess": efficientnet_preprocess,
+        "decode": efficientnet_decode,
+        "input_size": (480, 480)
+    },
+    "resnet": {
+        "path": "D:/Telegram Desktop/custom_cnn_model_1000_classes.keras",
+        "preprocess": resnet_preprocess,
+        "decode": resnet_decode,
+        "input_size": (224, 224)
+    }
+}
