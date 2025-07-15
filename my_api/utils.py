@@ -121,3 +121,12 @@ async def predict(
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
+    
+# =================== Health Check ===================
+@app.get("/")
+def root():
+    return {"message": "Image Classifier API is running."}
+
+# =================== Run Server ===================
+if __name__ == "__main__":
+    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
