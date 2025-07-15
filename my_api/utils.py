@@ -35,3 +35,16 @@ MODEL_REGISTRY = {
         "input_size": (224, 224)
     }
 }
+
+# Load models into memory
+models = {
+    name: tf.keras.models.load_model(config["path"])
+    for name, config in MODEL_REGISTRY.items()
+}
+
+# =================== FastAPI Setup ===================
+app = FastAPI(
+    title="Image Classifier API",
+    description="FastAPI backend for AI Image Classifier with multiple Keras models",
+    version="1.1"
+)
