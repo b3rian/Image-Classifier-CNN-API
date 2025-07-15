@@ -66,3 +66,15 @@ class ApiResponse(BaseModel):
     predictions: List[Prediction]
     model_version: str
     inference_time: float
+
+# =================== Image Preprocessing ===================
+def preprocess_image(
+    image_bytes: bytes,
+    target_size: tuple,
+    preprocess_func: Callable[[np.ndarray], np.ndarray]
+) -> np.ndarray:
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    image = image.resize(target_size)
+    image_array = np.array(image).astype("float32")
+    image_array = preprocess_func(image_array)
+    return np.expand_dims(image_array, axis=0)
