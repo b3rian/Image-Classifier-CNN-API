@@ -10,14 +10,7 @@ import time
 import tensorflow as tf
 import json
 import uvicorn
-
 from tensorflow.keras.applications.efficientnet_v2 import preprocess_input, decode_predictions
-
-
-# Load ImageNet class names
-with open("imagenet_class_index.json", "r") as f:
-    class_idx = json.load(f)
-    CLASS_NAMES = [class_idx[str(k)][1].replace("_", " ") for k in range(1000)]
 
 # Load Keras model
 MODEL_PATH = "D:/Telegram Desktop/custom_cnn_model_1000_classes.keras" 
@@ -68,14 +61,14 @@ async def predict(
         input_tensor = preprocess_image(contents)
 
         start = time.time()
-        predictions = model.predict(input_tensor)[0]
+        predictions = model.predict(input_tensor)
         end = time.time()
 
-        top_indices = predictions.argsort()[-5:][::-1]
+        decoded = decode_predictions(predictions, top=3)[0]
         results = [
-            {"label": CLASS_NAMES[i], "confidence": float(predictions[i] * 100)}
-            for i in top_indices
-        ]
+            {"label": label.replace("_", " "), "confidence": float(score * 100)}
+            for (_, label, score) in decoded
+       ]
 
         return JSONResponse(
             status_code=200,
