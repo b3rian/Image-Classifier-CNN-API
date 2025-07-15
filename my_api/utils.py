@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 # Loading the Keras model
-model = tf.keras.models.load_model("D:\Telegram Desktop\custom_cnn_model_1000_classes.keras")
+model = tf.keras.models.load_model("D:/Telegram Desktop/custom_cnn_model_1000_classes.keras")
 
 # Convert to TFLite with float16 quantization
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
