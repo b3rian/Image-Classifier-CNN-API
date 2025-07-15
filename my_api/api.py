@@ -12,8 +12,8 @@ import uvicorn
 
 # =================== Config ===================
 MODEL_PATH = "cnn_model.keras"
-CLASS_NAMES = ["cat", "dog", "bird", "other"]  # Replace with your actual class names
-IMAGE_SIZE = (224, 224)  # Match model input size
+CLASS_NAMES = ["cat", "dog", "bird", "other"]  # Class labels
+IMAGE_SIZE = (480, 480)  # Match model input size
 
 # =================== Load Model ===================
 print("🔄 Loading model...")
