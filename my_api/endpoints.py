@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 from typing import List, Callable, Optional
 from enum import Enum
@@ -65,11 +65,11 @@ class InvalidImageError(Exception):
 
 # =================== Model Loading ===================
 @lru_cache(maxsize=None)
-def load_model(model_path: str) -> tf.keras.Model:
+def load_model(model_path: str, input_size: tuple) -> tf.keras.Model:
     try:
         model = tf.keras.models.load_model(model_path)
         # Warm up the model
-        dummy_input = np.zeros((1, *next(iter(MODEL_REGISTRY.values()))["input_size"], 3))
+        dummy_input = np.zeros((1, *input_size, 3))
         _ = model.predict(dummy_input)
         logger.info(f"Successfully loaded model from {model_path}")
         return model
@@ -81,7 +81,7 @@ def load_model(model_path: str) -> tf.keras.Model:
 models = {}
 for name, config in MODEL_REGISTRY.items():
     try:
-        models[name] = load_model(config["path"])
+        models[name] = load_model(config["path"], config["input_size"])
     except Exception as e:
         logger.error(f"Could not load model {name}: {str(e)}")
 
@@ -145,7 +145,7 @@ async def invalid_image_handler(request, exc):
 # =================== Response Schemas ===================
 class Prediction(BaseModel):
     label: str
-    confidence: float
+    confidence: float = Field(..., ge=0.0, le=100.0)  
 
 class ApiResponse(BaseModel):
     predictions: List[Prediction]
@@ -215,7 +215,7 @@ async def predict(
         # Decode predictions
         decoded = config["decode"](predictions, top=3)[0]
         results = [
-            {"label": label.replace("_", " "), "confidence": float(score * 100)}
+            {"label": label.replace("_", " "), "confidence": round(float(score * 100), 2)}
             for (_, label, score) in decoded
         ]
 
