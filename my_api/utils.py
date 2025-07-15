@@ -23,13 +23,13 @@ from tensorflow.keras.applications.resnet50 import (
 # =================== Model Registry ===================
 MODEL_REGISTRY = {
     "efficientnet": {
-        "path": "D:/Telegram Desktop/efficientnet_model.keras",
+        "path": "D:/Documents/models/efficientnet.keras",
         "preprocess": efficientnet_preprocess,
         "decode": efficientnet_decode,
         "input_size": (480, 480)
     },
     "resnet": {
-        "path": "D:/Telegram Desktop/custom_cnn_model_1000_classes.keras",
+        "path": "D:/Documents/models/resnet50_imagenet.keras",
         "preprocess": resnet_preprocess,
         "decode": resnet_decode,
         "input_size": (224, 224)
@@ -46,7 +46,7 @@ models = {
 app = FastAPI(
     title="Image Classifier API",
     description="FastAPI backend for AI Image Classifier with multiple Keras models",
-    version="1.1"
+    version="1.1.0"
 )
 
 # Enable CORS for local testing
