@@ -78,3 +78,46 @@ def preprocess_image(
     image_array = np.array(image).astype("float32")
     image_array = preprocess_func(image_array)
     return np.expand_dims(image_array, axis=0)
+
+# =================== Inference Endpoint ===================
+@app.post("/predict", response_model=ApiResponse)
+async def predict(
+    file: UploadFile = File(...),
+    model_name: str = Query(..., description="Choose 'efficientnet' or 'resnet'")
+):
+    if model_name not in MODEL_REGISTRY:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Model '{model_name}' not found. Available options: {list(MODEL_REGISTRY.keys())}"
+        )
+
+    try:
+        model = models[model_name]
+        config = MODEL_REGISTRY[model_name]
+        contents = await file.read()
+        
+        # Preprocess
+        input_tensor = preprocess_image(contents, config["input_size"], config["preprocess"])
+
+        # Inference
+        start = time.time()
+        predictions = model.predict(input_tensor)
+        end = time.time()
+
+        # Decode predictions
+        decoded = config["decode"](predictions, top=3)[0]
+        results = [
+            {"label": label.replace("_", " "), "confidence": float(score * 100)}
+            for (_, label, score) in decoded
+        ]
+
+        return JSONResponse(
+            status_code=200,
+            content={
+                "predictions": results,
+                "model_version": model_name,
+                "inference_time": round(end - start, 4)
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
