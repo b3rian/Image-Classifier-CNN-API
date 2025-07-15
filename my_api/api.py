@@ -78,3 +78,12 @@ async def predict(request: Request, file: UploadFile = File(...), model: str = "
     }
 
     return JSONResponse(content=response)
+
+# =================== Health Check ===================
+@app.get("/")
+def root():
+    return {"message": "Image Classifier API is running."}
+
+# =================== Run Server ===================
+if __name__ == "__main__":
+    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
