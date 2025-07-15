@@ -1,90 +1,87 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Request
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from starlette.responses import JSONResponse
+from pydantic import BaseModel
 from typing import List
-import tensorflow as tf
-from tensorflow.keras.models import load_model
 import numpy as np
 from PIL import Image
 import io
 import time
-import uvicorn
+import tensorflow as tf
 import json
-import urllib.request
 
-# Json class labels
+# Load ImageNet class names
 with open("imagenet_class_index.json", "r") as f:
-    imagenet_class_index = json.load(f)
-    CLASS_NAMES = [imagenet_class_index[str(k)][1].replace('_', ' ') for k in range(1000)]
-    
-# =================== Config ===================
-MODEL_PATH = "D:\Telegram Desktop\custom_cnn_model_1000_classes.keras" 
-IMAGE_SIZE = (480, 480)  # Match model input size
+    class_idx = json.load(f)
+    CLASS_NAMES = [class_idx[str(k)][1].replace("_", " ") for k in range(1000)]
 
-# =================== Load Model ===================
-print("🔄 Loading model...")
-model = load_model(MODEL_PATH)
-inference_model = tf.function(model)  # Optimized inference
-print("✅ Model loaded successfully.")
+# Load Keras model
+MODEL_PATH = "cnn_model.keras"
+model = tf.keras.models.load_model(MODEL_PATH)
 
-# =================== FastAPI App ===================
+# FastAPI app
 app = FastAPI(
     title="Image Classifier API",
-    description="FastAPI backend for image classification with CNN",
-    version="1.0.0"
+    description="FastAPI backend for AI Image Classifier",
+    version="1.0"
 )
 
-# Enable CORS for frontend communication
+# Enable CORS for local testing
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict this to your frontend domain
-    allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# =================== Helper Functions ===================
-def read_image_as_tensor(file: bytes) -> np.ndarray:
+# Prediction response format
+class Prediction(BaseModel):
+    label: str
+    confidence: float
+
+class ApiResponse(BaseModel):
+    predictions: List[Prediction]
+    model_version: str
+    inference_time: float
+
+# Preprocess function
+def preprocess_image(image_bytes: bytes, target_size=(224, 224)) -> np.ndarray:
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    image = image.resize(target_size)
+    image_array = np.array(image).astype("float32") / 255.0
+    return np.expand_dims(image_array, axis=0)
+
+# Inference route
+@app.post("/predict", response_model=ApiResponse)
+async def predict(
+    file: UploadFile = File(...),
+    model: str = Query(default="Custom ResNet", description="Model name from frontend")
+):
     try:
-        image = Image.open(io.BytesIO(file)).convert("RGB")
-        image = image.resize(IMAGE_SIZE)
-        image_array = np.asarray(image) / 255.0  # Normalize to [0, 1]
-        return np.expand_dims(image_array, axis=0)
+        contents = await file.read()
+        input_tensor = preprocess_image(contents)
+
+        start = time.time()
+        predictions = model.predict(input_tensor)[0]
+        end = time.time()
+
+        top_indices = predictions.argsort()[-5:][::-1]
+        results = [
+            {"label": CLASS_NAMES[i], "confidence": float(predictions[i] * 100)}
+            for i in top_indices
+        ]
+
+        return JSONResponse(
+            status_code=200,
+            content={
+                "predictions": results,
+                "model_version": model,
+                "inference_time": round(end - start, 4)
+            }
+        )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid image: {str(e)}")
-    
-def predict_image(image_tensor: np.ndarray):
-    preds = inference_model(image_tensor).numpy()[0]
-    sorted_indices = preds.argsort()[::-1]
-    results = [
-        {
-            "label": CLASS_NAMES[i],
-            "confidence": round(float(preds[i]) * 100, 2)
-        }
-        for i in sorted_indices
-    ]
-    return results
-
-# =================== API Endpoints ===================
-@app.post("/predict")
-async def predict(request: Request, file: UploadFile = File(...), model: str = "Custom ResNet"):
-    start_time = time.time()
-
-    if not file.filename.lower().endswith((".jpg", ".jpeg", ".png", ".bmp")):
-        raise HTTPException(status_code=400, detail="Unsupported image format.")
-
-    contents = await file.read()
-    image_tensor = read_image_as_tensor(contents)
-    predictions = predict_image(image_tensor)
-
-    response = {
-        "predictions": predictions,
-        "model_version": MODEL_PATH,
-        "inference_time": round((time.time() - start_time) * 1000, 2)  # ms
-    }
-
-    return JSONResponse(content=response)
-
+        raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
+ 
 # =================== Health Check ===================
 @app.get("/")
 def root():
