@@ -20,3 +20,19 @@ print("🔄 Loading model...")
 model = load_model(MODEL_PATH)
 inference_model = tf.function(model)  # Optimized inference
 print("✅ Model loaded successfully.")
+
+# =================== FastAPI App ===================
+app = FastAPI(
+    title="Image Classifier API",
+    description="FastAPI backend for image classification with CNN",
+    version="1.0.0"
+)
+
+# Enable CORS for frontend communication
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this to your frontend domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
