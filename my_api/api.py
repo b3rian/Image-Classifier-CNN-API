@@ -36,3 +36,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# =================== Helper Functions ===================
+def read_image_as_tensor(file: bytes) -> np.ndarray:
+    try:
+        image = Image.open(io.BytesIO(file)).convert("RGB")
+        image = image.resize(IMAGE_SIZE)
+        image_array = np.asarray(image) / 255.0  # Normalize to [0, 1]
+        return np.expand_dims(image_array, axis=0)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid image: {str(e)}")
