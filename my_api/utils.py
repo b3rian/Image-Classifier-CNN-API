@@ -48,3 +48,21 @@ app = FastAPI(
     description="FastAPI backend for AI Image Classifier with multiple Keras models",
     version="1.1"
 )
+
+# Enable CORS for local testing
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# =================== Response Schemas ===================
+class Prediction(BaseModel):
+    label: str
+    confidence: float
+
+class ApiResponse(BaseModel):
+    predictions: List[Prediction]
+    model_version: str
+    inference_time: float
