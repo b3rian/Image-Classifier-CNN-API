@@ -1,12 +1,17 @@
-import urllib.request
+import tensorflow as tf
 
-# URL to the ImageNet class index file
-url = "https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json"
+# Loading the Keras model
+model = tf.keras.models.load_model("custom_model.keras")
 
-# Local filename to save it as
-filename = "imagenet_class_index.json" 
+# Convert to TFLite with float16 quantization
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+converter.target_spec.supported_types = [tf.float16]
 
-# Download the file
-urllib.request.urlretrieve(url, filename)
+# Save to desired path
+output_path = r"D:\Documents\Datasets\custom_model.tflite"
+with open(output_path, "wb") as f:
+    f.write(tflite_model)
 
-print(f"✅ Downloaded: {filename}")
+print("Model converted and saved as custom_model.tflite in D:\\Documents\\Datasets")
+
