@@ -1,18 +1,21 @@
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import JSONResponse
+from pydantic import BaseModel
+from typing import List, Callable
+import numpy as np
+from PIL import Image
+import io
+import time
 import tensorflow as tf
+import uvicorn
 
-# Loading the Keras model
-model = tf.keras.models.load_model("D:/Telegram Desktop/custom_cnn_model_1000_classes.keras")
-
-# Convert to TFLite with float16 quantization
-converter = tf.lite.TFLiteConverter.from_keras_model(model)
-converter.optimizations = [tf.lite.Optimize.DEFAULT]
-converter.target_spec.supported_types = [tf.float16]
-tflite_model = converter.convert()
-
-# Save to desired path
-output_path = r"D:\Documents\Datasets\custom_model.tflite"
-with open(output_path, "wb") as f:
-    f.write(tflite_model)
-
-print("Model converted and saved as custom_model.tflite in D:\\Documents\\Datasets")
-
+# Keras preprocessors and decoders
+from tensorflow.keras.applications.efficientnet_v2 import (
+    preprocess_input as efficientnet_preprocess,
+    decode_predictions as efficientnet_decode
+)
+from tensorflow.keras.applications.resnet50 import (
+    preprocess_input as resnet_preprocess,
+    decode_predictions as resnet_decode
+)
