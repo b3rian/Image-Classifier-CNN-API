@@ -12,10 +12,9 @@ import uvicorn
 import json
 import urllib.request
 
-# Download the ImageNet labels file
-url = "https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json"
-with urllib.request.urlopen(url) as response:
-    imagenet_class_index = json.load(response)
+# Json class labels
+with open("imagenet_class_index.json", "r") as f:
+    imagenet_class_index = json.load(f)
 
 # =================== Config ===================
 MODEL_PATH = "cnn_model.keras"
