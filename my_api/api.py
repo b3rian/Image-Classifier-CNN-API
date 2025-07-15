@@ -15,10 +15,10 @@ import urllib.request
 # Json class labels
 with open("imagenet_class_index.json", "r") as f:
     imagenet_class_index = json.load(f)
-
+    CLASS_NAMES = [imagenet_class_index[str(k)][1].replace('_', ' ') for k in range(1000)]
+    
 # =================== Config ===================
-MODEL_PATH = "cnn_model.keras"
-CLASS_NAMES = [imagenet_class_index[str(k)][1].replace('_', ' ') for k in range(1000)]  # Class labels
+MODEL_PATH = "D:\Telegram Desktop\custom_cnn_model_1000_classes.keras" 
 IMAGE_SIZE = (480, 480)  # Match model input size
 
 # =================== Load Model ===================
