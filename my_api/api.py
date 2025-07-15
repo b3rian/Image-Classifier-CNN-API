@@ -9,6 +9,7 @@ import io
 import time
 import tensorflow as tf
 import json
+import uvicorn
 
 # Load ImageNet class names
 with open("imagenet_class_index.json", "r") as f:
@@ -16,7 +17,7 @@ with open("imagenet_class_index.json", "r") as f:
     CLASS_NAMES = [class_idx[str(k)][1].replace("_", " ") for k in range(1000)]
 
 # Load Keras model
-MODEL_PATH = "cnn_model.keras"
+MODEL_PATH = "D:\Telegram Desktop\custom_cnn_model_1000_classes.keras" 
 model = tf.keras.models.load_model(MODEL_PATH)
 
 # FastAPI app
@@ -45,7 +46,7 @@ class ApiResponse(BaseModel):
     inference_time: float
 
 # Preprocess function
-def preprocess_image(image_bytes: bytes, target_size=(224, 224)) -> np.ndarray:
+def preprocess_image(image_bytes: bytes, target_size=(480, 480)) -> np.ndarray:
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     image = image.resize(target_size)
     image_array = np.array(image).astype("float32") / 255.0
