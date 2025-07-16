@@ -103,3 +103,40 @@ def call_api_async(images: List[bytes], model_name: str):
         st.session_state.api_done = True
     
     Thread(target=worker).start()
+
+# ====================== UI COMPONENTS ======================
+def image_uploader() -> List[tuple]:
+    """Handles all image input methods"""
+    images = []
+    mode = st.session_state.input_mode
+    
+    if mode == "Upload":
+        files = st.file_uploader(
+            "📤 Upload Images", 
+            type=SUPPORTED_FORMATS, 
+            accept_multiple_files=True
+        )
+        for file in files if files else []:
+            try:
+                img = Image.open(file).convert("RGB")
+                images.append((file.name, img))
+            except Exception as e:
+                st.error(f"Invalid image {file.name}: {str(e)}")
+                
+    elif mode == "Webcam":
+        img_file = st.camera_input("📷 Capture Live")
+        if img_file:
+            try:
+                img = Image.open(img_file).convert("RGB")
+                images.append(("webcam_capture.jpg", img))
+            except Exception as e:
+                st.error(f"Camera error: {str(e)}")
+            
+    elif mode == "URL":
+        url = st.text_input("🌐 Image URL", placeholder="https://example.com/image.jpg")
+        if url:
+            img = fetch_image_from_url(url)
+            if img:
+                images.append(("url_image.jpg", img))
+    
+    return images
