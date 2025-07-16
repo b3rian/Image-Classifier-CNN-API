@@ -133,7 +133,7 @@ def main():
                 st.image(img, caption=name,  use_container_width=True)
             with col2:
                 st.markdown(get_image_metadata(img))
-                if st.button(f"Classify image", key=f"btn_{idx}", ):
+                if st.button("🚀 Classify Image", key=f"btn_{idx}", type='primary'):
                     result = classify_image(img, model_name)
                     if result:
                         display_predictions(
