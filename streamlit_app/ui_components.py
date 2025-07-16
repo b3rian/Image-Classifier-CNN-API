@@ -5,6 +5,7 @@ import base64
 from PIL import Image, ImageOps
 import numpy as np
 import json
+import time
 from typing import List
 from datetime import datetime
 
@@ -121,9 +122,12 @@ def main():
             else:
                 st.warning("Could not load image from URL.")
 
-    # Initialize history
-    if 'history' not in st.session_state:
+    # ✅ Initialize session state variables
+    if "history" not in st.session_state:
         st.session_state.history = []
+
+    if "feedback" not in st.session_state:
+        st.session_state.feedback = {}
 
     if images:
         st.subheader("🖌️ Image Preview")
@@ -184,12 +188,30 @@ def main():
             </style>
         """, unsafe_allow_html=True)
 
-    st.sidebar.markdown("### Feedback")
-    if st.sidebar.button("Thumbs Up"):
-        st.sidebar.success("Thanks for your feedback!")
-    if st.sidebar.button("Thumbs Down"):
-        st.sidebar.info("We're working to improve!")
-    st.sidebar.text_area("Comments", placeholder="Any suggestions or issues?")
+    # Feedback System
+    if st.session_state.get("history"):
+        st.divider()
+        st.subheader("💬 Feedback")
+        with st.form("feedback_form"):
+            selected = st.selectbox(
+                "Select image to review",
+                [h["name"] for h in st.session_state.history],
+                index=0
+            )
+            rating = st.radio(
+                "Accuracy",
+                ["👍 Correct", "👎 Incorrect"],
+                horizontal=True
+            )
+            comment = st.text_area("Additional comments")
+            
+            if st.form_submit_button("Submit Feedback"):
+                st.session_state.feedback[selected] = {
+                    "rating": rating,
+                    "comment": comment,
+                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                }
+                st.toast("Feedback saved!", icon="✅")
 
 if __name__ == "__main__":
     main()
