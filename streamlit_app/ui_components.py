@@ -31,13 +31,20 @@ def validate_image(file) -> Image.Image:
         return None
 
 def fetch_image_from_url(url: str) -> Image.Image:
-    """Download image from URL and return PIL image."""
+    """Fetch with URL validation and timeout"""
     try:
-        response = requests.get(url, timeout=5)
-        img = Image.open(io.BytesIO(response.content))
-        return img.convert("RGB")
-    except Exception:
-        return None
+        # Quick HEAD request first to check URL
+        head_response = requests.head(url, timeout=5, allow_redirects=True)
+        if head_response.status_code != 200:
+            raise ValueError(f"URL returned {head_response.status_code}")
+            
+        # Full GET request
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        return Image.open(io.BytesIO(response.content)).convert("RGB")
+    except Exception as e:
+        st.error(f"URL Error: {str(e)}")
+        return None 
 
 def get_image_metadata(img: Image.Image) -> str:
     """Return image metadata for display."""
