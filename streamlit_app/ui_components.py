@@ -70,8 +70,8 @@ def display_predictions(predictions, model_version, inference_time):
 
 # =================== MAIN APP ===================
 def main():
-    st.set_page_config(page_title="Image Classifier", layout="wide")
-    st.title("🌐 AI Image Classifier")
+    st.set_page_config(page_title="Image Classifier", layout="wide", page_icon="🖼️")
+    st.title("🖼️ AI Image Classifier")
     st.markdown("""
     Select or capture an image and choose a model to classify.
 
