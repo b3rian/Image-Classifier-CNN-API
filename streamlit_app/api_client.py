@@ -48,3 +48,21 @@ def compress_image(image: Image.Image, quality: int = None) -> bytes:
     buf = io.BytesIO()
     image.save(buf, format="JPEG", quality=quality)
     return buf.getvalue()
+
+# ====================== SESSION MANAGEMENT ======================
+def init_session():
+    """Initialize all session state variables"""
+    session_defaults = {
+        "history": [],
+        "dark_mode": False,
+        "api_results": {},
+        "feedback": {},
+        "input_mode": "Upload",
+        "api_done": False,
+        "min_confidence": 30,
+        "compression": DEFAULT_COMPRESSION
+    }
+    
+    for key, value in session_defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
