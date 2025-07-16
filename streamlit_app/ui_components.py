@@ -126,14 +126,14 @@ def main():
         st.session_state.history = []
 
     if images:
-        st.subheader("Preview Images")
+        st.subheader("🖌️ Image Preview")
         for idx, (img, name) in enumerate(images):
             col1, col2 = st.columns([1, 2])
             with col1:
                 st.image(img, caption=name,  use_container_width=True)
             with col2:
                 st.markdown(get_image_metadata(img))
-                if st.button(f"Classify {name}", key=f"btn_{idx}"):
+                if st.button(f"Classify image", key=f"btn_{idx}", ):
                     result = classify_image(img, model_name)
                     if result:
                         display_predictions(
