@@ -11,7 +11,7 @@ import time
 # ====================== CONSTANTS & CONFIG ======================
 API_URL = "http://localhost:8000/predict"  # FastAPI endpoint
 SUPPORTED_FORMATS = ["png", "jpg", "jpeg", "bmp"]
-MODEL_OPTIONS = ["Custom ResNet", " Custom ViT"]
+MODEL_OPTIONS = ["ResNet", "Efficientnet"]
 MAX_IMAGE_DIM = 480  # For resizing
 DEFAULT_COMPRESSION = 85  # JPEG quality
 
