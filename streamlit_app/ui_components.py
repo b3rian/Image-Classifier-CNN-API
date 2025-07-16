@@ -87,9 +87,9 @@ def main():
 
     # Model selection
     model_name = st.selectbox(
-        "Select 🧠 AI Model Model", 
+        "Select 🧠 AI Model", 
         ["efficientnet", "resnet"],
-        help="Choose different neural network architectures"
+        help="Choose different convolutional neural network architectures"
     )
 
     # Tabs for multiple input methods
