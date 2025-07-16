@@ -170,3 +170,71 @@ def display_results():
                             display_prediction_details(filtered)
                         else:
                             st.warning(f"No predictions above {min_confidence}% confidence")
+
+# ====================== MAIN APP ======================
+def main():
+    # Initialize session and config
+    init_session()
+    st.set_page_config(
+        page_title="AI Image Classifier", 
+        layout="wide",
+        page_icon="🖼️"
+    )
+    
+    # ===== SIDEBAR CONTROLS =====
+    with st.sidebar:
+        st.title("⚙️ Settings")
+        st.session_state.input_mode = st.radio(
+            "Input Method",
+            ["Upload", "Webcam", "URL"],
+            index=["Upload", "Webcam", "URL"].index(st.session_state.input_mode)
+        )
+        
+        st.session_state.selected_model = st.selectbox(
+            "🧠 AI Model", 
+            MODEL_OPTIONS,
+            index=0
+        )
+        
+        st.session_state.min_confidence = st.slider(
+            "🎚️ Minimum Confidence (%)",
+            0, 100, st.session_state.min_confidence
+        )
+        
+        st.session_state.compression = st.slider(
+            "🗜️ Image Quality (%)",
+            50, 100, st.session_state.compression
+        )
+        
+        if st.button("🌙 Toggle Dark Mode"):
+            st.session_state.dark_mode = not st.session_state.dark_mode
+            st.rerun()
+    
+    # ===== MAIN CONTENT =====
+    st.title("🖼️ AI Image Classifier")
+    
+    # Image Upload Section
+    uploaded_images = image_uploader()
+    if uploaded_images:
+        st.session_state.uploaded_images = uploaded_images
+        st.subheader("🖌️ Image Previews")
+        
+        cols = st.columns(min(3, len(uploaded_images)))
+        for idx, (name, img) in enumerate(uploaded_images):
+            with cols[idx % len(cols)]:
+                with st.container(border=True):
+                    st.image(
+                        prepare_for_display(img),
+                        caption=f"{name} ({img.size[0]}x{img.size[1]})"
+                    )
+        
+        if st.button("🚀 Classify Images", type="primary"):
+            api_images = [prepare_for_api(img) for _, img in uploaded_images]
+            call_api_async(api_images, st.session_state.selected_model)
+            st.rerun()
+    
+    # Results Display
+    display_results()
+
+if __name__ == "__main__":
+    main()
