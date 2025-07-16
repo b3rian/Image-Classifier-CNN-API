@@ -98,7 +98,10 @@ def main():
 
     with tab1:
         uploaded_files = st.file_uploader(
-            "Upload Image(s)", type=SUPPORTED_FORMATS, accept_multiple_files=True
+            "📤 Upload Image(s)", 
+            type=SUPPORTED_FORMATS, 
+            accept_multiple_files=True,
+            key="file_uploader"
         )
         for file in uploaded_files:
             img = validate_image(file)
@@ -109,7 +112,7 @@ def main():
 
     with tab2:
         try:
-            picture = st.camera_input("Capture from webcam")
+            picture = st.camera_input("📷 Capture Live")
             if picture:
                 img = validate_image(picture)
                 if img:
@@ -118,14 +121,14 @@ def main():
             st.error("Webcam not supported on this device/browser.")
 
     with tab3:
-        url = st.text_input("Paste image URL")
+        url = st.text_input("🌐 Image URL", placeholder="https://example.com/image.jpg" )
         if st.button("Fetch Image", type='primary') and url:
             img = fetch_image_from_url(url)
             if img:
                 images.append((img, "url_image.jpg"))
             else:
                 st.warning("Could not load image from URL.")
-
+    
     # ✅ Initialize session state variables
     if "history" not in st.session_state:
         st.session_state.history = []
