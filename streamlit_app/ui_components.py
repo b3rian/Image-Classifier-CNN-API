@@ -86,7 +86,11 @@ def main():
 
 
     # Model selection
-    model_name = st.selectbox("Select Model", ["efficientnet", "resnet"])
+    model_name = st.selectbox(
+        "Select 🧠 AI Model Model", 
+        ["efficientnet", "resnet"],
+        help="Choose different neural network architectures"
+    )
 
     # Tabs for multiple input methods
     tab1, tab2, tab3 = st.tabs(["Upload Image", "Use Webcam", "From URL"])
@@ -209,7 +213,7 @@ def main():
             comment = st.text_area("Additional comments", placeholder="Any suggestions or issues?",
                                 help="Optionally share more details—e.g., what the model got wrong or suggestions for improvement.")
 
-            if st.form_submit_button("Submit Feedback"):
+            if st.form_submit_button("Submit Feedback", type='primary'):
                 st.session_state.feedback[selected] = {
                     "rating": rating,
                     "comment": comment,
