@@ -114,7 +114,7 @@ def main():
 
     with tab3:
         url = st.text_input("Paste image URL")
-        if st.button("Fetch Image") and url:
+        if st.button("Fetch Image", type='primary') and url:
             img = fetch_image_from_url(url)
             if img:
                 images.append((img, "url_image.jpg"))
