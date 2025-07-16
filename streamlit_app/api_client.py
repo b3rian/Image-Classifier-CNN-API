@@ -87,3 +87,19 @@ def call_api(image_bytes: bytes, model_name: str) -> Optional[ApiResponse]:
         if hasattr(e, "response") and e.response:
             st.json(e.response.json())
         return None
+    
+def call_api_async(images: List[bytes], model_name: str):
+    """Non-blocking API call with progress"""
+    st.session_state.api_results = {}
+    st.session_state.api_done = False
+    
+    def worker():
+        for idx, img_bytes in enumerate(images):
+            key = f"img_{idx}_{model_name}"
+            with st.spinner(f"Processing image {idx+1}/{len(images)}..."):
+                result = call_api(img_bytes, model_name)
+                st.session_state.api_results[key] = result
+                time.sleep(0.5)
+        st.session_state.api_done = True
+    
+    Thread(target=worker).start()
