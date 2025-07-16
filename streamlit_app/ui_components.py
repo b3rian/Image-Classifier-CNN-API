@@ -113,6 +113,8 @@ def main():
             else:
                 st.warning("Could not load image from URL.")
 
+    result = None  # ✅ Initialize to avoid UnboundLocalError
+
     if images:
         st.subheader("Preview Images")
         for idx, (img, name) in enumerate(images):
@@ -126,18 +128,22 @@ def main():
                     if result:
                         display_predictions(result['predictions'], result['model_version'], result['inference_time'])
 
+                        # ✅ Store history on classification
+                        if 'history' not in st.session_state:
+                            st.session_state.history = []
+
+                        st.session_state.history.append({
+                            "name": name,
+                            "predictions": result['predictions'],
+                            "model": result['model_version'],
+                            "time": result.get('timestamp', datetime.now().isoformat())
+                        })
+
+
     st.markdown("---")
     st.subheader("Session History")
     if 'history' not in st.session_state:
         st.session_state.history = []
-
-    if images and result:
-        st.session_state.history.append({
-            "name": name,
-            "predictions": result['predictions'],
-            "model": result['model_version'],
-            "time": result['timestamp']
-        })
 
     for record in st.session_state.history[::-1]:
         st.markdown(f"**{record['name']}** | Model: `{record['model']}` | {record['time']}")
