@@ -198,14 +198,16 @@ def main():
             selected = st.selectbox(
                 "Select image to review",
                 [h["name"] for h in st.session_state.history],
-                index=0
+                index=0,
+                help="Choose the image whose prediction you want to give feedback on."
             )
             rating = st.radio(
                 "Accuracy",
                 ["👍 Correct", "👎 Incorrect"],
                 horizontal=True
             )
-            comment = st.text_area("Additional comments", placeholder="Any suggestions or issues?")
+            comment = st.text_area("Additional comments", placeholder="Any suggestions or issues?",
+                                help="Optionally share more details—e.g., what the model got wrong or suggestions for improvement.")
 
             if st.form_submit_button("Submit Feedback"):
                 st.session_state.feedback[selected] = {
