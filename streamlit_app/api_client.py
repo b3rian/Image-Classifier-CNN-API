@@ -140,3 +140,33 @@ def image_uploader() -> List[tuple]:
                 images.append(("url_image.jpg", img))
     
     return images
+
+def display_results():
+    """Show classification results with confidence filtering"""
+    if not st.session_state.get("api_done", False):
+        return
+    
+    model = st.session_state.get("selected_model", MODEL_OPTIONS[0])
+    min_confidence = st.session_state.min_confidence
+    
+    for idx in range(len(st.session_state.get("uploaded_images", []))):
+        key = f"img_{idx}_{model}"
+        if key in st.session_state.api_results:
+            result = st.session_state.api_results[key]
+            if result:
+                with st.expander(f"🔎 Result {idx+1}", expanded=True):
+                    col1, col2 = st.columns([1, 2])
+                    with col1:
+                        st.image(
+                            prepare_for_display(st.session_state.uploaded_images[idx][1]),
+                            use_column_width=True
+                        )
+                    with col2:
+                        filtered = [
+                            p for p in result["predictions"] 
+                            if p['confidence'] >= min_confidence
+                        ]
+                        if filtered:
+                            display_prediction_details(filtered)
+                        else:
+                            st.warning(f"No predictions above {min_confidence}% confidence")
