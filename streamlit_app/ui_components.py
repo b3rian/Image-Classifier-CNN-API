@@ -72,7 +72,17 @@ def display_predictions(predictions, model_version, inference_time):
 def main():
     st.set_page_config(page_title="Image Classifier", layout="wide")
     st.title("🌐 AI Image Classifier")
-    st.markdown("Select or capture an image and choose a model to classify.")
+    st.markdown("""
+    Select or capture an image and choose a model to classify.
+
+    🔍 **How it works**:  
+    Once you upload an image, the selected AI model analyzes it and returns the top 3 most probable classifications.  
+    These predictions are sorted by confidence level — how sure the model is about each label — allowing you to see not only the most likely label but also alternative possibilities.
+
+    📌 *Why top 3?*  
+    AI models often identify features shared across multiple categories. Showing the top 3 helps highlight cases where multiple labels are nearly probable, which can be helpful for fine-grained tasks or ambiguous images.
+    """)
+
 
     # Model selection
     model_name = st.selectbox("Select Model", ["efficientnet", "resnet"])
@@ -172,3 +182,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+st.markdown("---")
+st.caption("Image Classifier Web App | Built with 🚀 by B3rian")  
