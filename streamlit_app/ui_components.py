@@ -2,11 +2,9 @@ import streamlit as st
 import requests
 import io
 import base64
-import tempfile
 from PIL import Image, ImageOps
 import numpy as np
 import json
-import os
 from typing import List
 from datetime import datetime
 
@@ -52,7 +50,7 @@ def classify_image(image: Image.Image, model_name: str):
 
     try:
         with st.spinner("Classifying image..."):
-            res = requests.post(API_URL, files=files, params=params, timeout=10)
+            res = requests.post(API_URL, files=files, params=params, timeout=120)
             res.raise_for_status()
             return res.json()
     except requests.exceptions.RequestException as e:
@@ -101,7 +99,7 @@ def main():
                 img = validate_image(picture)
                 if img:
                     images.append((img, "webcam.jpg"))
-        except Exception as e:
+        except Exception:
             st.error("Webcam not supported on this device/browser.")
 
     with tab3:
@@ -113,25 +111,26 @@ def main():
             else:
                 st.warning("Could not load image from URL.")
 
-    result = None  # ✅ Initialize to avoid UnboundLocalError
+    # Initialize history
+    if 'history' not in st.session_state:
+        st.session_state.history = []
 
     if images:
         st.subheader("Preview Images")
         for idx, (img, name) in enumerate(images):
             col1, col2 = st.columns([1, 2])
             with col1:
-                st.image(img, caption=name, use_column_width=True)
+                st.image(img, caption=name,  use_container_width=True)
             with col2:
                 st.markdown(get_image_metadata(img))
                 if st.button(f"Classify {name}", key=f"btn_{idx}"):
                     result = classify_image(img, model_name)
                     if result:
-                        display_predictions(result['predictions'], result['model_version'], result['inference_time'])
-
-                        # ✅ Store history on classification
-                        if 'history' not in st.session_state:
-                            st.session_state.history = []
-
+                        display_predictions(
+                            result['predictions'],
+                            result['model_version'],
+                            result['inference_time']
+                        )
                         st.session_state.history.append({
                             "name": name,
                             "predictions": result['predictions'],
@@ -139,19 +138,21 @@ def main():
                             "time": result.get('timestamp', datetime.now().isoformat())
                         })
 
-
+    # Display history
     st.markdown("---")
     st.subheader("Session History")
-    if 'history' not in st.session_state:
-        st.session_state.history = []
-
     for record in st.session_state.history[::-1]:
         st.markdown(f"**{record['name']}** | Model: `{record['model']}` | {record['time']}")
         for pred in record['predictions']:
             st.markdown(f"- {pred['label']}: {pred['confidence']}%")
 
-    st.download_button("Download History as JSON", data=json.dumps(st.session_state.history, indent=2), file_name="history.json")
+    st.download_button(
+        "Download History as JSON",
+        data=json.dumps(st.session_state.history, indent=2),
+        file_name="history.json"
+    )
 
+    # Sidebar: Preferences and Feedback
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Preferences")
     theme = st.sidebar.radio("Theme", ["Light", "Dark"])
