@@ -150,16 +150,17 @@ def main():
 
     # Display history
     st.markdown("---")
-    st.subheader("Session History")
+    st.subheader("🕒 Session History")
     for record in st.session_state.history[::-1]:
         st.markdown(f"**{record['name']}** | Model: `{record['model']}` | {record['time']}")
         for pred in record['predictions']:
             st.markdown(f"- {pred['label']}: {pred['confidence']}%")
 
     st.download_button(
-        "Download History as JSON",
+        "📥 Save Results",
         data=json.dumps(st.session_state.history, indent=2),
-        file_name="history.json"
+        file_name="history.json",
+        type='primary'
     )
 
     # Sidebar: Preferences and Feedback
