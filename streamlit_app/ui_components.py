@@ -149,12 +149,22 @@ def main():
                         })
 
     # Display history
-    st.markdown("---")
+    st.divider()
     st.subheader("🕒 Session History")
-    for record in st.session_state.history[::-1]:
-        st.markdown(f"**{record['name']}** | Model: `{record['model']}` | {record['time']}")
-        for pred in record['predictions']:
-            st.markdown(f"- {pred['label']}: {pred['confidence']}%")
+
+    if 'history' in st.session_state and st.session_state.history:
+      for record in reversed(st.session_state.history[-3:]):  # Show only the last 3
+        with st.container(border=True):
+            col1, col2 = st.columns([1, 2])
+            with col1:
+                if "thumbnail" in record:
+                    st.image(io.BytesIO(base64.b64decode(record["thumbnail"])), width=60)
+                else:
+                    st.text("🖼️ No preview")
+            with col2:
+                st.caption(f"{record['name']} | Model: `{record['model']}`")
+                st.write(f"Top: {record['predictions'][0]['label']}")
+                st.caption(f"⏱️ {record['time']}")
 
     st.download_button(
         "📥 Save Results",
