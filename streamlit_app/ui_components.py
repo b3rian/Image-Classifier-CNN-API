@@ -188,11 +188,13 @@ def main():
             </style>
         """, unsafe_allow_html=True)
 
-    # Feedback System
+    # 📝 Sidebar Feedback System
     if st.session_state.get("history"):
-        st.divider()
+     with st.sidebar:
+        st.markdown("---")
         st.subheader("💬 Feedback")
-        with st.form("feedback_form"):
+
+        with st.form("feedback_form_sidebar"):
             selected = st.selectbox(
                 "Select image to review",
                 [h["name"] for h in st.session_state.history],
@@ -203,8 +205,8 @@ def main():
                 ["👍 Correct", "👎 Incorrect"],
                 horizontal=True
             )
-            comment = st.text_area("Additional comments")
-            
+            comment = st.text_area("Additional comments", placeholder="Any suggestions or issues?")
+
             if st.form_submit_button("Submit Feedback"):
                 st.session_state.feedback[selected] = {
                     "rating": rating,
@@ -212,6 +214,7 @@ def main():
                     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
                 }
                 st.toast("Feedback saved!", icon="✅")
+
 
 if __name__ == "__main__":
     main()
