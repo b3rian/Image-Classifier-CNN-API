@@ -9,7 +9,7 @@ from threading import Thread
 import time
 
 # ====================== CONSTANTS & CONFIG ======================
-API_URL = "http://localhost:8000/predict"  # FastAPI endpoint
+API_URL = "http://127.0.0.1:8000/predict"  # FastAPI endpoint
 SUPPORTED_FORMATS = ["png", "jpg", "jpeg", "bmp"]
 MODEL_OPTIONS = ["ResNet", "Efficientnet"]
 MAX_IMAGE_DIM = 480  # For resizing
@@ -104,20 +104,21 @@ def call_api(image_bytes: bytes, model_name: str) -> Optional[ApiResponse]:
 
 def call_api_async(images: List[bytes], model_name: str):
     """Non-blocking API call with progress"""
-    if "api_results" not in st.session_state:
-        st.session_state.api_results = {}
-    
     def worker():
+        # ✅ Thread-safe check
+        if "api_results" not in st.session_state:
+            st.session_state["api_results"] = {}
+
         for idx, img_bytes in enumerate(images):
             key = f"img_{idx}_{model_name}"
             if key not in st.session_state.api_results:  # Skip cached
                 with st.spinner(f"Processing image {idx+1}/{len(images)}..."):
                     result = call_api(img_bytes, model_name)
                     st.session_state.api_results[key] = result
-                    time.sleep(0.5)  # Throttle API calls
+                    time.sleep(0.5)
         st.session_state.api_done = True
-    
-    Thread(target=worker).start()
+
+    Thread(target=worker).start() 
 
 # ====================== UI COMPONENTS ======================
 def display_predictions(predictions: List[Prediction]):
