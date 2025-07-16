@@ -196,9 +196,20 @@ def main():
     st.sidebar.markdown("### Preferences")
     theme = st.sidebar.radio("Theme", ["Light", "Dark"])
     if theme == "Dark":
-        st.markdown("""
+        st.markdown( """
             <style>
-            body { background-color: #1e1e1e; color: white; }
+            .stApp { background-color: #0e1117; }
+            .stTextInput>div>div>input, .stTextArea>textarea,
+            .stSelectbox>div>div>select {
+                background-color: #333 !important;
+                color: white !important;
+            }
+            .stSlider>div>div>div>div {
+                background-color: #555 !important;
+            }
+            .st-bb { background-color: transparent; }
+            .st-at { background-color: #333; }
+            .css-1d391kg { background-color: #0e1117; }
             </style>
         """, unsafe_allow_html=True)
 
