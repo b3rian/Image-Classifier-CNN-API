@@ -66,3 +66,24 @@ def init_session():
     for key, value in session_defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
+
+# ====================== API COMMUNICATION ======================
+def call_api(image_bytes: bytes, model_name: str) -> Optional[ApiResponse]:
+    """Handle API calls with retry logic"""
+    try:
+        response = requests.post(
+            API_URL,
+            files={"file": image_bytes},
+            params={"model": model_name},
+            timeout=15
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.Timeout:
+        st.warning("API timed out. Server may be busy.")
+        return None
+    except Exception as e:
+        st.error(f"API Error: {str(e)}")
+        if hasattr(e, "response") and e.response:
+            st.json(e.response.json())
+        return None
