@@ -110,7 +110,7 @@ def main():
     st.caption("Powered by Convolutional Neural Networks (CNNs)")
 
     st.markdown("""
-    Upload or capture an image and choose a CNN model to classify it.
+    📌 Upload or capture an image and choose a CNN model to classify it.
 
     🔍 **How it works**:  
     The selected AI model analyzes your image and returns its best predictions, sorted by confidence.
