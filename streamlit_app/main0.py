@@ -87,30 +87,19 @@ def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2
                 return None
             time.sleep(1)
 
-def display_predictions(predictions, model_version, inference_time, image=None):
-    # Create two columns: one for image, one for predictions
-    col1, col2 = st.columns([1, 2])  # Adjust the ratio as needed
+def display_predictions(predictions, model_version, inference_time):
+    st.subheader(f"Predictions: {model_version}")
+    if not predictions:
+        st.warning("No predictions above the confidence threshold.")
+        return
+    df = pd.DataFrame(predictions)
+    df = df.set_index("label")
 
-    # Show the image in the first column (if provided)
-    if image is not None:
-        with col1:
-            st.image(image, caption="Uploaded Image", use_column_width=True)
+    for pred in predictions:
+        st.markdown(f"**{pred['label']}**: {pred['confidence']}%")
+        st.progress(pred['confidence'] / 100.0)
 
-    # Show predictions in the second column
-    with col2:
-        st.subheader(f"Predictions: `{model_version}`")
-        if not predictions:
-            st.warning("No predictions above the confidence threshold.")
-            return
-
-        df = pd.DataFrame(predictions).set_index("label")
-        st.bar_chart(df["confidence"], height=300, use_container_width=True)
-
-        for pred in predictions:
-            st.markdown(f"**{pred['label']}**: {pred['confidence']}%")
-            st.progress(pred['confidence'] / 100.0)
-
-        st.caption(f"Inference time: `{inference_time:.2f}s`")
+    st.caption(f"Inference time: {inference_time:.2f}s") 
 
 # =================== MAIN APP ===================
 def main():
@@ -248,6 +237,8 @@ def main():
                 col1, col2 = st.columns([1, 2])
                 with col1:
                     st.image(img, caption=name, use_container_width=True)
+                with col2:
+                    st.markdown(get_image_metadata(img))
                     if st.button("🚀 Classify Image", key=f"classify_{idx}", type='primary'):
                         models_to_run = ["efficientnet", "resnet"] if compare_models else [model_name]
                         for model in models_to_run:
