@@ -107,20 +107,7 @@ def load_model() -> tf.keras.Model:
 
 @PREDICTION_LATENCY.time()
 def predict(image_pil: PILImage, top_k: int = 3) -> List[Dict[str, float]]:
-    """
-    Production-grade prediction with dynamic label mapping.
-    
-    Args:
-        image_pil: Input image in PIL format (RGB)
-        top_k: Number of top predictions to return
-        
-    Returns:
-        List of predictions with 'label', 'confidence', and 'class_id'
-        
-    Raises:
-        RuntimeError: For prediction failures
-        ValueError: For invalid inputs
-    """
+     
     PREDICTION_COUNTER.inc()
     start_time = time.time()
     
