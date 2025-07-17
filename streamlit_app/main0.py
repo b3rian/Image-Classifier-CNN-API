@@ -184,7 +184,7 @@ def main():
                 • Was the mistake understandable?
                 • Any edge cases we should know about?
     
-                (Examples: 'The turtle was partially obscured' or 'Confused labrador with golden retriever')""")
+(Examples: 'The turtle was partially obscured' or 'Confused labrador with golden retriever')""")
             else:
                 st.info("No images classified yet.")
                 selected = rating = correction = comment = None
@@ -223,11 +223,11 @@ def main():
     with tab3:
         url = st.text_input("Image URL", placeholder="https://example.com/image.jpg")
         col1, col2 = st.columns([3, 1])
-        if col1.button("Fetch Image") and url:
+        if col1.button("Fetch Image", type='primary') and url:
             img = fetch_image_from_url(url)
             if img:
                 images.append((img, f"url_{time.strftime('%Y%m%d_%H%M%S')}.jpg"))
-        if col2.button("Clear URL"):
+        if col2.button("Clear URL", type='primary'):
             url = ""
 
     # Classify images
@@ -238,8 +238,8 @@ def main():
                 col1, col2 = st.columns([1, 2])
                 with col1:
                     st.image(img, caption=name, use_container_width=True)
-                    if st.button("🚀 Classify", key=f"classify_{idx}"):
-                        models_to_run = ["efficientnet", "resnet", "vit"] if compare_models else [model_name]
+                    if st.button("🚀 Classify Image", key=f"classify_{idx}", type='primary'):
+                        models_to_run = ["efficientnet", "resnet"] if compare_models else [model_name]
                         for model in models_to_run:
                             cache_key = f"{name}_{model}"
                             result = st.session_state.model_cache.get(cache_key)
@@ -267,7 +267,8 @@ def main():
     if not st.session_state.history:
         st.info("No classification history.")
     else:
-        for record in reversed(st.session_state.history[-5:]):
+      for record in reversed(st.session_state.history[-5:]):
+        with st.container(border=True):
             col1, col2 = st.columns([1, 4])
             with col1:
                 if "thumbnail" in record:
