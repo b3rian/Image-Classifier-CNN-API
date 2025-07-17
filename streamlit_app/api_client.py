@@ -117,30 +117,37 @@ def main():
                 </style>
             """, unsafe_allow_html=True)
 
-        if st.session_state.get("history"):
-            st.markdown("---")
-            st.subheader("💬 Feedback")
+        st.markdown("---")
+        st.subheader("💬 Feedback")
+
+        if st.session_state.history:
             with st.form("feedback_form_sidebar"):
                 selected = st.selectbox(
-                    "Select image to review",
-                    [h["name"] for h in st.session_state.history],
-                    index=0,
-                    help="Choose the image whose prediction you want to give feedback on."
-                )
+                "Select image to review",
+                [h["name"] for h in st.session_state.history],
+                index=0,
+                help="Choose the image whose prediction you want to give feedback on."
+        )
                 rating = st.radio(
-                    "Accuracy",
-                    ["👍 Correct", "👎 Incorrect"],
-                    horizontal=True
-                )
-                comment = st.text_area("Additional comments", placeholder="Any suggestions or issues?",
-                    help="Optionally share more details—e.g., what the model got wrong or suggestions for improvement.")
-                if st.form_submit_button("Submit Feedback", type='primary'):
-                    st.session_state.feedback[selected] = {
-                        "rating": rating,
-                        "comment": comment,
-                        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-                    }
-                    st.toast("Feedback saved!", icon="✅")
+                "Accuracy",
+                ["👍 Correct", "👎 Incorrect"],
+                horizontal=True
+        )
+                comment = st.text_area(
+                "Additional comments", 
+                placeholder="Any suggestions or issues?",
+                help="Optionally share more details—e.g., what the model got wrong or suggestions for improvement."
+        )
+        if st.form_submit_button("Submit Feedback", type='primary'):
+            st.session_state.feedback[selected] = {
+                "rating": rating,
+                "comment": comment,
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+            }
+            st.toast("Feedback saved!", icon="✅")
+        else:
+            st.info("⚠️ No image classified yet. Feedback will be available after your first classification.")
+
 
     # Tabs for input methods
     tab1, tab2, tab3 = st.tabs(["Upload Image", "Use Webcam", "From URL"])
