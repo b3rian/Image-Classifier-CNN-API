@@ -89,6 +89,7 @@ def main():
 
     # Sidebar: Preferences, model selection, and feedback
     with st.sidebar:
+        st.markdown("---")
         st.markdown("### ⚙️ Preferences & Model Selection")
         compare_models = st.checkbox("🔁 Compare EfficientNet vs ResNet", help="Run both models on the image and compare their predictions.")
         model_name = st.selectbox(
