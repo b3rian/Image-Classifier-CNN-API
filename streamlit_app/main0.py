@@ -123,6 +123,7 @@ def main():
 
     # Sidebar controls
     with st.sidebar:
+        st.markdown("---")
         st.markdown("### ⚙️ Preferences & Model Selection")
         with st.expander("Advanced Options"):
             num_predictions = st.slider("Number of predictions", 1, 10, 3)
