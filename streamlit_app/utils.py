@@ -7,7 +7,7 @@ import base64
 from PIL import Image
 import requests
 import streamlit as st
-from config import MAX_SIZE_BYTES
+from streamlit_app.config import MAX_SIZE_BYTES
 
 def compress_image(image: Image.Image, quality: int = 85) -> bytes:
     """Compress an image to JPEG format with specified quality."""
