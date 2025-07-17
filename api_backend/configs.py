@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+import logging
 
 class Settings(BaseSettings):
     """Application configuration settings."""
@@ -12,4 +13,10 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
+# Initialize settings and logging
 settings = Settings()
+logging.basicConfig(
+    level=settings.log_level,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
