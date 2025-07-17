@@ -2,373 +2,258 @@ import streamlit as st
 import requests
 import io
 import base64
+from PIL import Image, ImageOps
+import numpy as np
 import json
-from PIL import Image
-from typing import List, TypedDict, Optional
-from threading import Thread
 import time
+import pandas as pd
+from typing import List
+from datetime import datetime
 
-# ====================== CONSTANTS & CONFIG ======================
-API_URL = "http://127.0.0.1:8000/predict"  # FastAPI endpoint
-SUPPORTED_FORMATS = ["png", "jpg", "jpeg", "bmp"]
-MODEL_OPTIONS = ["ResNet", "Efficientnet"]
-MAX_IMAGE_DIM = 480  # For resizing
-DEFAULT_COMPRESSION = 85  # JPEG quality
+# =================== CONFIG ===================
+API_URL = "http://127.0.0.1:8000/predict"
+SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"]
+MAX_SIZE_MB = 200
+MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
-class Prediction(TypedDict):
-    label: str
-    confidence: float
+# =================== UTILITY FUNCTIONS ===================
+def compress_image(image: Image.Image, quality: int = 85) -> bytes:
+    with io.BytesIO() as output:
+        image.save(output, format='JPEG', quality=quality)
+        return output.getvalue()
 
-class ApiResponse(TypedDict):
-    predictions: List[Prediction]
-    model_version: str
-    inference_time: float
+def create_thumbnail(image: Image.Image, size=(128, 128)) -> str:
+    image.thumbnail(size)
+    with io.BytesIO() as buffer:
+        image.save(buffer, format="JPEG", quality=70)
+        return base64.b64encode(buffer.getvalue()).decode()
 
-# ====================== SESSION INITIALIZATION ======================
-def init_session():
-    """Initialize all session state variables"""
-    session_defaults = {
-        "history": [],
-        "dark_mode": False,
-        "api_results": {},
-        "feedback": {},
-        "input_mode": "Upload",
-        "api_done": False,
-        "min_confidence": 30,
-        "compression": DEFAULT_COMPRESSION
-    }
-    
-    for key, value in session_defaults.items():
-        if key not in st.session_state:
-            st.session_state[key] = value
-
-# ====================== CORE FUNCTIONS ======================
-def compress_image(image: Image.Image, quality: int = None) -> bytes:
-    """Compress image with adjustable quality"""
-    if quality is None:
-        quality = st.session_state.get("compression", DEFAULT_COMPRESSION)
-    buf = io.BytesIO()
-    image.save(buf, format="JPEG", quality=quality)
-    return buf.getvalue()
-
-def validate_image(file) -> bool:
-    """Verify image integrity"""
+def validate_image(file) -> Image.Image:
     try:
-        Image.open(file).verify()
-        return True
+        if hasattr(file, 'size') and file.size > MAX_SIZE_BYTES:
+            st.error(f"File too large (max {MAX_SIZE_MB}MB)")
+            return None
+        image = Image.open(file)
+        image.verify()
+        image = Image.open(file)
+        return image.convert("RGB")
     except Exception as e:
         st.error(f"Invalid image: {str(e)}")
-        return False
+        return None
 
-def resize_image(image: Image.Image, max_dim: int = MAX_IMAGE_DIM) -> Image.Image:
-    """Maintain aspect ratio while resizing"""
-    image.thumbnail((max_dim, max_dim))
-    return image
-
-def fetch_image_from_url(url: str) -> Optional[Image.Image]:
-    """Fetch with URL validation and timeout"""
+def fetch_image_from_url(url: str) -> Image.Image:
     try:
-        # Quick HEAD request first to check URL
-        head_response = requests.head(url, timeout=5, allow_redirects=True)
-        if head_response.status_code != 200:
-            raise ValueError(f"URL returned {head_response.status_code}")
-            
-        # Full GET request
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-        return Image.open(io.BytesIO(response.content)).convert("RGB")
+        with st.spinner("Fetching image from URL..."):
+            head_response = requests.head(url, timeout=5, allow_redirects=True)
+            if head_response.status_code != 200:
+                raise ValueError(f"URL returned {head_response.status_code}")
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            return Image.open(io.BytesIO(response.content)).convert("RGB")
     except Exception as e:
         st.error(f"URL Error: {str(e)}")
-        return None
+        return None 
 
-# ====================== API COMMUNICATION ======================
-def call_api(image_bytes: bytes, model_name: str) -> Optional[ApiResponse]:
-    """Handle API calls with retry logic"""
-    try:
-        response = requests.post(
-            API_URL,
-            files={"file": image_bytes},
-            params={"model": model_name},
-            timeout=15
-        )
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.Timeout:
-        st.warning("API timed out. Server may be busy.")
-        return None
-    except Exception as e:
-        st.error(f"API Error: {str(e)}")
-        if hasattr(e, "response") and e.response:
-            st.json(e.response.json())  # Show API error details
-        return None
+def get_image_metadata(img: Image.Image) -> str:
+    return f"Size: {img.size}, Mode: {img.mode}, Format: {img.format}"
 
-def call_api_async(images: List[bytes], model_name: str):
-    """Non-blocking API call with progress"""
-    def worker():
-        # ✅ Thread-safe check
-        if "api_results" not in st.session_state:
-            st.session_state["api_results"] = {}
+def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2):
+    img_bytes = compress_image(image)
+    files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
+    params = {"model_name": model_name}
+    
+    for attempt in range(max_retries + 1):
+        try:
+            with st.spinner(f"Classifying with {model_name}..."):
+                res = requests.post(API_URL, files=files, params=params, timeout=10)
+                res.raise_for_status()
+                return res.json()
+        except requests.exceptions.ConnectionError:
+            if attempt == max_retries:
+                st.error("⚠️ The model server is currently offline. Please try again later.")
+                return None
+            time.sleep(1)
+        except requests.exceptions.Timeout:
+            if attempt == max_retries:
+                st.error("⏳ The request to the model server timed out. Please try again.")
+                return None
+            time.sleep(1)
+        except requests.exceptions.HTTPError as e:
+            st.error(f"🚫 HTTP error: {e.response.status_code} - {e.response.reason}")
+            return None
+        except requests.exceptions.RequestException:
+            if attempt == max_retries:
+                st.error("🚨 An unexpected error occurred while contacting the model server.")
+                return None
+            time.sleep(1)
 
-        for idx, img_bytes in enumerate(images):
-            key = f"img_{idx}_{model_name}"
-            if key not in st.session_state.api_results:  # Skip cached
-                with st.spinner(f"Processing image {idx+1}/{len(images)}..."):
-                    result = call_api(img_bytes, model_name)
-                    st.session_state.api_results[key] = result
-                    time.sleep(0.5)
-        st.session_state.api_done = True
-
-    Thread(target=worker).start() 
-
-# ====================== UI COMPONENTS ======================
-def display_predictions(predictions: List[Prediction]):
-    """Interactive results display with confidence filter"""
+def display_predictions(predictions, model_version, inference_time):
+    st.subheader(f"Predictions: `{model_version}`")
     if not predictions:
-        st.warning("No predictions met confidence threshold")
+        st.warning("No predictions above the confidence threshold.")
         return
-    
-    min_confidence = st.session_state.get("min_confidence", 30)
-    filtered = [p for p in predictions if p['confidence'] >= min_confidence]
-    
-    if not filtered:
-        st.warning(f"No predictions above {min_confidence}% confidence")
-        return
-    
-    top = filtered[0]
-    with st.container(border=True):
-        col1, col2 = st.columns([1, 3])
-        with col1:
-            st.metric("Top Prediction", 
-                     f"{top['label']}", 
-                     f"{top['confidence']:.1f}%")
-        with col2:
-            st.progress(int(top['confidence']), 
-                       text=f"Confidence: {top['confidence']:.1f}%")
-    
-    with st.expander("🔍 Detailed Predictions"):
-        for p in filtered:
-            st.markdown(
-                f"`{p['label']:30s}` | "
-                f"`{p['confidence']:5.1f}%` | "
-                f"{'█' * int(p['confidence']/10)}"
-            )
+    df = pd.DataFrame(predictions)
+    df = df.set_index("label")
+    st.bar_chart(df["confidence"], height=300, use_container_width=True)
 
-def image_uploader() -> List[tuple]:
-    """Handles all image input methods"""
-    images = []
-    mode = st.session_state.input_mode
-    
-    if mode == "Upload":
-        files = st.file_uploader(
-            "📤 Upload Images", 
-            type=SUPPORTED_FORMATS, 
-            accept_multiple_files=True,
-            key="file_uploader"
-        )
-        for file in files if files else []:
-            if validate_image(file):
-                img = Image.open(file).convert("RGB")
-                img = resize_image(img)
-                images.append((file.name, img))
-                
-    elif mode == "Webcam":
-        img_file = st.camera_input("📷 Capture Live")
-        if img_file:
-            img = Image.open(img_file).convert("RGB")
-            img = resize_image(img)
-            images.append(("webcam_capture.jpg", img))
-            
-    elif mode == "URL":
-        url = st.text_input("🌐 Image URL", placeholder="https://example.com/image.jpg")
-        if url:
-            img = fetch_image_from_url(url)
-            if img:
-                img = resize_image(img)
-                images.append(("url_image.jpg", img))
-    
-    return images
+    for pred in predictions:
+        st.markdown(f"**{pred['label']}**: {pred['confidence']:.1f}%")
+        st.progress(pred['confidence'] / 100.0)
 
-# ====================== SESSION MANAGEMENT ======================
-def save_to_history(name: str, prediction: List[Prediction], img_bytes: bytes):
-    """Store results with thumbnail"""
-    thumb = Image.open(io.BytesIO(img_bytes))
-    thumb.thumbnail((100, 100))
-    buf = io.BytesIO()
-    thumb.save(buf, format="JPEG")
-    
-    entry = {
-        "name": name,
-        "predictions": prediction,
-        "thumbnail": base64.b64encode(buf.getvalue()).decode(),
-        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-    }
-    st.session_state.history.append(entry)
+    st.caption(f"Inference time: `{inference_time:.2f}s`")
 
-# ====================== THEME MANAGEMENT ======================
-def apply_theme():
-    """Apply dark/light theme based on session state"""
-    if st.session_state.get("dark_mode", False):
-        st.markdown("""
-            <style>
-            .stApp { background-color: #0e1117; }
-            .stTextInput>div>div>input, .stTextArea>textarea,
-            .stSelectbox>div>div>select {
-                background-color: #333 !important;
-                color: white !important;
-            }
-            .stSlider>div>div>div>div {
-                background-color: #555 !important;
-            }
-            .st-bb { background-color: transparent; }
-            .st-at { background-color: #333; }
-            .css-1d391kg { background-color: #0e1117; }
-            </style>
-        """, unsafe_allow_html=True)
-
-# ====================== MAIN APP ======================
+# =================== MAIN APP ===================
 def main():
-    # Initialize session first
-    init_session()
-    
-    # Then set page config
-    st.set_page_config(
-        page_title="AI Image Classifier", 
-        layout="wide",
-        page_icon="🖼️"
-    )
-    
-    # Apply theme
-    apply_theme()
-    
-    # ===== SIDEBAR =====
+    st.set_page_config(page_title="Image Classifier", layout="wide", page_icon="🖼️")
+    st.title("🖼️ AI Image Classifier")
+
+    st.markdown("""
+    Upload or capture an image and choose a model to classify it.
+
+    🔍 **How it works**:  
+    The selected AI model analyzes your image and returns its best guesses, sorted by confidence.
+    """)
+
+    # Initialize session state
+    st.session_state.setdefault("history", [])
+    st.session_state.setdefault("feedback", {})
+    st.session_state.setdefault("model_cache", {})
+
+    # Sidebar controls
     with st.sidebar:
-        st.title("⚙️ Settings")
-        
-        # Input Mode Selector
-        st.session_state.input_mode = st.radio(
-            "Input Method",
-            ["Upload", "Webcam", "URL"],
-            index=["Upload", "Webcam", "URL"].index(st.session_state.input_mode),
-            key="input_mode_selector"
-        )
-        
-        # Model Selection
-        model = st.selectbox(
-            "🧠 AI Model", 
-            MODEL_OPTIONS,
-            index=0,
-            help="Choose different neural network architectures"
-        )
-        
-        # Confidence Threshold
-        st.session_state.min_confidence = st.slider(
-            "🎚️ Minimum Confidence (%)",
-            0, 100, st.session_state.min_confidence,
-            help="Filter out low-confidence predictions"
-        )
-        
-        # Compression Control
-        st.session_state.compression = st.slider(
-            "🗜️ Image Compression (%)",
-            50, 100, st.session_state.compression,
-            help="Higher quality = larger files = slower processing"
-        )
-        
-        # Dark Mode Toggle
-        if st.button("🌙 Toggle Dark Mode"):
-            st.session_state.dark_mode = not st.session_state.dark_mode
-            st.rerun()
-        
-        # History Section
-        st.divider()
-        st.subheader("🕒 History")
-        if st.session_state.history:
-            for entry in reversed(st.session_state.history[-3:]):
-                with st.container(border=True):
-                    col1, col2 = st.columns([1, 2])
-                    with col1:
-                        st.image(io.BytesIO(base64.b64decode(entry["thumbnail"])), 
-                                width=60)
-                    with col2:
-                        st.caption(f"{entry['name']}")
-                        st.write(f"Top: {entry['predictions'][0]['label']}")
-                        st.caption(f"⏱️ {entry['timestamp']}")
-        
-    # ===== MAIN CONTENT =====
-    st.title("🖼️ Smart Image Classifier Web App")
-    st.caption("Upload images to classify using state-of-the-art deep learning models")
-    
-    # Image Input Section
-    images = image_uploader()
-    
-    # Image Preview and Adjustment
-    if images:
-        st.subheader("🖌️ Image Preview")
-        cols = st.columns(min(3, len(images)))
-        for idx, (name, img) in enumerate(images):
-            with cols[idx % len(cols)]:
-                with st.container(border=True):
-                    st.image(img, caption=name)
-                    rotate = st.slider(
-                        f"Rotate {name}",
-                        0, 360, 0,
-                        key=f"rotate_{idx}"
-                    )
-                    if rotate:
-                        images[idx] = (name, img.rotate(rotate))
-    
-        # Classification Button
-        if st.button("🚀 Classify Images", type="primary"):
-            st.session_state.api_done = False
-            compressed_images = [compress_image(img) for _, img in images]
-            call_api_async(compressed_images, model)
-            st.rerun()
-    
-    # Display Results
-    if st.session_state.get("api_done", False):
-        st.subheader("📊 Results")
-        for idx, (name, img) in enumerate(images):
-            key = f"img_{idx}_{model}"
-            if key in st.session_state.api_results:
-                result = st.session_state.api_results[key]
-                if result:
-                    with st.expander(f"🔎 {name}", expanded=True):
-                        col1, col2 = st.columns([1, 2])
-                        with col1:
-                            st.image(img, use_column_width=True)
-                        with col2:
-                            display_predictions(result["predictions"])
-                            save_to_history(name, result["predictions"], 
-                                          compress_image(img, 70))  # Save thumbnail
-    
-    # Feedback System
-    if st.session_state.get("history"):
-        st.divider()
+        st.markdown("### ⚙️ Preferences & Model Selection")
+        with st.expander("Advanced Options"):
+            num_predictions = st.slider("Number of predictions", 1, 10, 3)
+            confidence_threshold = st.slider("Confidence threshold (%)", 0, 100, 0)
+            compare_models = st.checkbox("🔁 Compare Models")
+
+        model_name = st.selectbox("Select AI Model", ["efficientnet", "resnet", "vit"], disabled=compare_models)
+
+        st.markdown("---")
         st.subheader("💬 Feedback")
-        with st.form("feedback_form"):
-            selected = st.selectbox(
-                "Select image to review",
-                [h["name"] for h in st.session_state.history],
-                index=0
-            )
-            rating = st.radio(
-                "Accuracy",
-                ["👍 Correct", "👎 Incorrect"],
-                horizontal=True
-            )
-            comment = st.text_area("Additional comments")
-            
-            if st.form_submit_button("Submit Feedback"):
-                st.session_state.feedback[selected] = {
+
+        with st.form("feedback_form_sidebar"):
+            history = st.session_state["history"]
+            if history:
+                selected = st.selectbox("Select image to review", [h["name"] for h in history])
+                rating = st.select_slider("Rating (1-5)", options=[1, 2, 3, 4, 5], value=3)
+                selected_item = next((h for h in history if h["name"] == selected), None)
+                if selected_item:
+                    st.markdown("**Model Predictions:**")
+                    for pred in selected_item["predictions"]:
+                        st.markdown(f"- {pred['label']}: {pred['confidence']:.1f}%")
+                correction = st.text_input("Suggested correction", placeholder="Correct label")
+                comment = st.text_area("Additional comments", placeholder="Anything else?")
+            else:
+                st.info("No images classified yet.")
+                selected = rating = correction = comment = None
+
+            if st.form_submit_button("Submit Feedback") and selected:
+                st.session_state["feedback"][selected] = {
                     "rating": rating,
+                    "predictions": selected_item.get("predictions", []),
+                    "correction": correction,
                     "comment": comment,
                     "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
                 }
                 st.toast("Feedback saved!", icon="✅")
 
+    # Image input methods
+    images = []
+    tab1, tab2, tab3 = st.tabs(["📤 Upload Image", "📷 Use Webcam", "🌐 From URL"])
+    
+    with tab1:
+        uploaded_files = st.file_uploader("Upload Image(s)", type=SUPPORTED_FORMATS, accept_multiple_files=True)
+        for file in uploaded_files:
+            img = validate_image(file)
+            if img:
+                images.append((img, file.name))
+
+    with tab2:
+        try:
+            picture = st.camera_input("Capture Image")
+            if picture:
+                img = validate_image(picture)
+                if img:
+                    images.append((img, f"webcam_{time.strftime('%Y%m%d_%H%M%S')}.jpg"))
+        except Exception:
+            st.error("Webcam not supported on this device.")
+
+    with tab3:
+        url = st.text_input("Image URL", placeholder="https://example.com/image.jpg")
+        col1, col2 = st.columns([3, 1])
+        if col1.button("Fetch Image") and url:
+            img = fetch_image_from_url(url)
+            if img:
+                images.append((img, f"url_{time.strftime('%Y%m%d_%H%M%S')}.jpg"))
+        if col2.button("Clear URL"):
+            url = ""
+
+    # Classify images
+    if images:
+        st.subheader("🖼️ Image Preview")
+        for idx, (img, name) in enumerate(images):
+            with st.expander(f"Image: {name}", expanded=True):
+                col1, col2 = st.columns([1, 2])
+                with col1:
+                    st.image(img, caption=name, use_container_width=True)
+                    if st.button("🚀 Classify", key=f"classify_{idx}"):
+                        models_to_run = ["efficientnet", "resnet", "vit"] if compare_models else [model_name]
+                        for model in models_to_run:
+                            cache_key = f"{name}_{model}"
+                            result = st.session_state.model_cache.get(cache_key)
+                            if result:
+                                st.toast(f"Using cached result for {model}")
+                            else:
+                                result = classify_image_with_retry(img, model)
+                                if result:
+                                    st.session_state.model_cache[cache_key] = result
+
+                            if result:
+                                preds = [p for p in result['predictions'] if p['confidence'] >= confidence_threshold][:num_predictions]
+                                display_predictions(preds, result['model_version'], result['inference_time'])
+                                st.session_state.history.append({
+                                    "name": name,
+                                    "predictions": preds,
+                                    "model": result['model_version'],
+                                    "time": result.get('timestamp', datetime.now().isoformat()),
+                                    "thumbnail": create_thumbnail(img)
+                                })
+
+    # Show history
+    st.divider()
+    st.subheader("📜 Session History")
+    if not st.session_state.history:
+        st.info("No classification history.")
+    else:
+        for record in reversed(st.session_state.history[-5:]):
+            col1, col2 = st.columns([1, 4])
+            with col1:
+                if "thumbnail" in record:
+                    st.image(io.BytesIO(base64.b64decode(record["thumbnail"])))
+            with col2:
+                st.markdown(f"**{record['name']}**")
+                st.caption(f"Model: `{record['model']}` | {record['time']}")
+                if record['predictions']:
+                    top_pred = record['predictions'][0]
+                    st.markdown(f"**Top Prediction**: {top_pred['label']} ({top_pred['confidence']:.1f}%)")
+                if record['name'] in st.session_state.feedback:
+                    fb = st.session_state.feedback[record['name']]
+                    st.markdown(f"Feedback: ⭐{fb['rating']}/5")
+                    if fb['correction']:
+                        st.markdown(f"*Suggested correction: {fb['correction']}*")
+
+    # Download button
+    st.download_button(
+        "📥 Download Results as JSON",
+        data=json.dumps(st.session_state.history, indent=2),
+        file_name="classification_history.json",
+        type='primary',
+        use_container_width=True
+    )
+
+    st.markdown("---")
+    st.caption("Built with ❤️ using Streamlit")
 
 if __name__ == "__main__":
     main()
-
-st.markdown("---")
-st.caption("Image Classifier Web App | Built with 🚀 by B3rian")   
