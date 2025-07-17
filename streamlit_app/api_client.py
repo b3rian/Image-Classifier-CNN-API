@@ -47,13 +47,27 @@ def classify_image(image: Image.Image, model_name: str):
     img_bytes = compress_image(image)
     files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
     params = {"model_name": model_name}
+    
     try:
         with st.spinner(f"Classifying with {model_name}..."):
-            res = requests.post(API_URL, files=files, params=params, timeout=120)
+            res = requests.post(API_URL, files=files, params=params, timeout=10)
             res.raise_for_status()
             return res.json()
-    except requests.exceptions.RequestException as e:
-        st.error(f"API Error: {str(e)}")
+
+    except requests.exceptions.ConnectionError:
+        st.error("⚠️ The model server is currently offline. Please try again later.")
+        return None
+
+    except requests.exceptions.Timeout:
+        st.error("⏳ The request to the model server timed out. Please try again.")
+        return None
+
+    except requests.exceptions.HTTPError as e:
+        st.error(f"🚫 HTTP error: {e.response.status_code} - {e.response.reason}")
+        return None
+
+    except requests.exceptions.RequestException:
+        st.error("🚨 An unexpected error occurred while contacting the model server.")
         return None
 
 def display_predictions(predictions, model_version, inference_time):
