@@ -15,10 +15,7 @@ from tensorflow.keras.applications.efficientnet_v2 import (
     preprocess_input as efficientnet_preprocess,
     decode_predictions as efficientnet_decode
 )
-from tensorflow.keras.applications.resnet50 import (
-    preprocess_input as resnet_preprocess,
-    decode_predictions as resnet_decode
-)
+ 
 
 # =================== Model Registry ===================
 MODEL_REGISTRY = {
