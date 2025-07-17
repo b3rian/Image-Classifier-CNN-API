@@ -132,7 +132,12 @@ def main():
                 help="""Set how many predictions to display (1-10). 
                 Higher values show more alternatives but may include less relevant results."""
         )
-            confidence_threshold = st.slider("Confidence threshold (%)", 0, 100, 0)
+            confidence_threshold = st.slider(
+                "Confidence threshold (%)", 
+                0, 100, 0,
+                help="""Minimum confidence percentage (0-100%) required to show a prediction. 
+                Increase to filter out low-confidence results."""
+        )
             compare_models = st.checkbox(
                 "🔁 Compare Models", 
                 help="Run both models on the image and compare their predictions."
