@@ -1,0 +1,12 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.git/
+.gitignore
+.venv/
+venv/
+*.egg-info/
+*.swp
+.DS_Store
