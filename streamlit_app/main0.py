@@ -143,7 +143,15 @@ def main():
                 help="Run both models on the image and compare their predictions."
         )
 
-        model_name = st.selectbox("Select AI Model", ["efficientnet", "resnet", "vit"], disabled=compare_models)
+        model_name = st.selectbox(
+            "Select 🧠 AI Model", 
+            ["efficientnet", "resnet"], 
+            disabled=compare_models,
+            help="""Choose a deep learning architecture: 
+            • **EfficientNet:** Lightweight and fast (good for mobile/edge devices)
+            • **ResNet:** Powerful general-purpose model (best accuracy/speed balance).
+            Disabled when 'Compare Models' is active - all models will run simultaneously."""
+        )
 
         st.markdown("---")
         st.subheader("💬 Feedback")
@@ -151,20 +159,37 @@ def main():
         with st.form("feedback_form_sidebar"):
             history = st.session_state["history"]
             if history:
-                selected = st.selectbox("Select image to review", [h["name"] for h in history])
-                rating = st.select_slider("Rating (1-5)", options=[1, 2, 3, 4, 5], value=3)
+                selected = st.selectbox("Select image to review", [h["name"] for h in history],
+                help="""Choose a previously classified image to provide feedback on. 
+                The model's predictions for this image will be shown below for reference.
+                Only images with existing classification results appear here.""")
+                rating = st.select_slider("Rating (1-5)", options=[1, 2, 3, 4, 5], value=3,
+                help="""Rate the model's accuracy for this image:
+                1 = Completely wrong • 2 = Mostly incorrect • 3 = Partially correct
+                4 = Mostly accurate • 5 = Perfect prediction """)
                 selected_item = next((h for h in history if h["name"] == selected), None)
                 if selected_item:
                     st.markdown("**Model Predictions:**")
                     for pred in selected_item["predictions"]:
                         st.markdown(f"- {pred['label']}: {pred['confidence']:.1f}%")
-                correction = st.text_input("Suggested correction", placeholder="Correct label")
-                comment = st.text_area("Additional comments", placeholder="Anything else?")
+                correction = st.text_input("Suggested correction", placeholder="Correct label",
+                help="""If the AI's prediction was wrong, please provide:
+                • The accurate label for this image
+                • Be specific (e.g., 'Golden Retriever' instead of just 'Dog')
+                • Use singular nouns where applicable
+                Your input helps train better models!""")
+                comment = st.text_area("Additional comments", placeholder="Anything else?",
+                help="""Share details to improve the model:
+                • What features did the AI miss?
+                • Was the mistake understandable?
+                • Any edge cases we should know about?
+    
+                (Examples: 'The turtle was partially obscured' or 'Confused labrador with golden retriever')""")
             else:
                 st.info("No images classified yet.")
                 selected = rating = correction = comment = None
 
-            if st.form_submit_button("Submit Feedback") and selected:
+            if st.form_submit_button("Submit Feedback", type='primary') and selected:
                 st.session_state["feedback"][selected] = {
                     "rating": rating,
                     "predictions": selected_item.get("predictions", []),
