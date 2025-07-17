@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 import datetime
 import time
-
 from api_backend.configs import settings, logger
 from api_backend.models import models, MODEL_REGISTRY, ModelNotFoundError, InvalidImageError
 from api_backend.schemas import ApiResponse, HealthCheckResponse, ModelName
