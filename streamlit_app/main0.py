@@ -13,7 +13,7 @@ from datetime import datetime
 # =================== CONFIG ===================
 API_URL = "http://127.0.0.1:8000/predict"
 SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"]
-MAX_SIZE_MB = 200
+MAX_SIZE_MB = 10
 MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
 # =================== UTILITY FUNCTIONS ===================
@@ -44,7 +44,7 @@ def validate_image(file) -> Image.Image:
 def fetch_image_from_url(url: str) -> Image.Image:
     try:
         with st.spinner("Fetching image from URL..."):
-            head_response = requests.head(url, timeout=5, allow_redirects=True)
+            head_response = requests.head(url, timeout=20, allow_redirects=True)
             if head_response.status_code != 200:
                 raise ValueError(f"URL returned {head_response.status_code}")
             response = requests.get(url, timeout=10)
@@ -65,7 +65,7 @@ def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2
     for attempt in range(max_retries + 1):
         try:
             with st.spinner(f"Classifying with {model_name}..."):
-                res = requests.post(API_URL, files=files, params=params, timeout=10)
+                res = requests.post(API_URL, files=files, params=params, timeout=120)
                 res.raise_for_status()
                 return res.json()
         except requests.exceptions.ConnectionError:
@@ -97,21 +97,23 @@ def display_predictions(predictions, model_version, inference_time):
     st.bar_chart(df["confidence"], height=300, use_container_width=True)
 
     for pred in predictions:
-        st.markdown(f"**{pred['label']}**: {pred['confidence']:.1f}%")
+        st.markdown(f"**{pred['label']}**: {pred['confidence']}%")
         st.progress(pred['confidence'] / 100.0)
 
     st.caption(f"Inference time: `{inference_time:.2f}s`")
 
 # =================== MAIN APP ===================
 def main():
+    st.markdown("---")
     st.set_page_config(page_title="Image Classifier", layout="wide", page_icon="🖼️")
     st.title("🖼️ AI Image Classifier")
+    st.caption("Powered by Convolutional Neural Networks (CNNs)")
 
     st.markdown("""
-    Upload or capture an image and choose a model to classify it.
+    Upload or capture an image and choose a CNN model to classify it.
 
     🔍 **How it works**:  
-    The selected AI model analyzes your image and returns its best guesses, sorted by confidence.
+    The selected AI model analyzes your image and returns its best predictions, sorted by confidence.
     """)
 
     # Initialize session state
