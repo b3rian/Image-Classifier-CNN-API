@@ -1,12 +1,12 @@
- """
+"""
 API helper functions for communicating with the classification service.
 """
-
+from PIL import Image, ImageOps
 import time
 import requests
 import streamlit as st
-from utils import compress_image
-from config import API_URL
+from streamlit_app.utils import compress_image
+from streamlit_app.config import API_URL
 
 def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2):
     """

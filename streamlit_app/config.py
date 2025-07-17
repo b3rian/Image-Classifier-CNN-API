@@ -1,4 +1,4 @@
- """
+"""
 Configuration constants for the Streamlit image classifier app.
 """
 
