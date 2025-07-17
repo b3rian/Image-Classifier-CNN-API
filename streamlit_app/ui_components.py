@@ -1,9 +1,10 @@
- """
+"""
 UI components and display functions for the Streamlit app.
 """
 
 import pandas as pd
 import streamlit as st
+import time
 
 def display_predictions(predictions, model_version, inference_time):
     """
