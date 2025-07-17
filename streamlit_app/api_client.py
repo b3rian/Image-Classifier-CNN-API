@@ -138,7 +138,9 @@ def main():
                 placeholder="Any suggestions or issues?",
                 help="Optionally share more details—e.g., what the model got wrong or suggestions for improvement."
         )
-        if st.form_submit_button("Submit Feedback", type='primary'):
+                
+        submit = st.form_submit_button("Submit Feedback", type='primary')
+        if submit:
             st.session_state.feedback[selected] = {
                 "rating": rating,
                 "comment": comment,
@@ -147,7 +149,7 @@ def main():
             st.toast("Feedback saved!", icon="✅")
         else:
             st.info("⚠️ No image classified yet. Feedback will be available after your first classification.")
-
+            st.form_submit_button("Submit Feedback", disabled=True)
 
     # Tabs for input methods
     tab1, tab2, tab3 = st.tabs(["Upload Image", "Use Webcam", "From URL"])
