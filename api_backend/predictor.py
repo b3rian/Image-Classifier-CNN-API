@@ -1,11 +1,11 @@
-"""Production-ready EfficientNetV2L predictor with dynamic label loading."""
+"""Production-ready EfficientNetV2L predictor with dynamic label loading. """
 
 import tensorflow as tf
 import numpy as np
 import logging
 from typing import List, Dict, Optional
 from PIL.Image import Image as PILImage
-from my_api.utils import preprocess_image
+from api_backend.utils import preprocess_image
 import threading
 import io
 import os
