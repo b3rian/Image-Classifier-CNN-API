@@ -1,16 +1,11 @@
-import os
+ """
+Configuration constants for the Streamlit image classifier app.
+"""
 
-class Config:
-    # API Configuration
-    API_URL = os.getenv("API_URL", "http://localhost:8000/api/predict")
-    TIMEOUT = 30.0
-    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-    
-    # UI Configuration
-    ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png"]
-    DEFAULT_IMAGE_SIZE = (480, 480)
-    
-    # Cache Configuration
-    CACHE_TTL = 3600  # 1 hour
+# API Configuration
+API_URL = "http://127.0.0.1:8000/predict"
 
-config = Config()
+# Image Processing Configuration
+SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"]
+MAX_SIZE_MB = 10
+MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
