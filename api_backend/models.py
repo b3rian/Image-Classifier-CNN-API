@@ -17,7 +17,7 @@ MODEL_REGISTRY = {
         "input_size": (480, 480)
     },
     "resnet": {
-        "path": "D:/Documents/models/resnet50_imagenet.keras",
+        "path": os.path.join(MODEL_DIR, "resnet50_imagenet.keras"),
         "preprocess": tf.keras.applications.resnet50.preprocess_input,
         "decode": tf.keras.applications.resnet50.decode_predictions,
         "input_size": (224, 224)
