@@ -1,0 +1,54 @@
+# ----------------------------------------
+# Ignore system, cache, and temporary files
+# ----------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.DS_Store
+*.swp
+*.bak
+*.tmp
+*~
+
+# ----------------------------------------
+# Ignore virtual environments
+# ----------------------------------------
+venv/
+.env/
+env/
+.venv/
+
+# ----------------------------------------
+# Ignore Git and version control files
+# ----------------------------------------
+.git/
+.gitignore
+.gitattributes
+
+# ----------------------------------------
+# Ignore notebook checkpoints or dev tools
+# ----------------------------------------
+.ipynb_checkpoints/
+notebooks/
+tests/
+debug/
+dev/
+
+# ----------------------------------------
+# Ignore unnecessary project folders (if applicable)
+# ----------------------------------------
+api_backend/
+data/
+models/
+checkpoints/
+experiments/
+
+# ----------------------------------------
+# Ignore local docker/compose or CI files (optional)
+# ----------------------------------------
+docker-compose.yml
+docker-compose.override.yml
+Dockerfile.dev
+.env.dev
