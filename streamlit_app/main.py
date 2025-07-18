@@ -1,27 +1,108 @@
-"""
-Main Streamlit application for the AI Image Classifier.
-"""
-
-import io
-import json
-import base64
-import time
-from datetime import datetime
 import streamlit as st
-import pandas as pd
-from typing import List
+import requests
+import io
+import base64
 from PIL import Image, ImageOps
 import numpy as np
+import json
+import time
+import pandas as pd
+from typing import List
+from datetime import datetime
 
-# Import from modules
-from streamlit_app.config import SUPPORTED_FORMATS, MAX_SIZE_MB
-from streamlit_app.utils import (validate_image, fetch_image_from_url, 
-                  get_image_metadata, create_thumbnail)
-from streamlit_app.api_helpers import classify_image_with_retry
-from streamlit_app.ui_components import display_predictions, setup_sidebar
+# =================== CONFIG ===================
+API_URL = "http://127.0.0.1:8000/predict"
+SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"]
+MAX_SIZE_MB = 10
+MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
+# =================== UTILITY FUNCTIONS ===================
+def compress_image(image: Image.Image, quality: int = 85) -> bytes:
+    with io.BytesIO() as output:
+        image.save(output, format='JPEG', quality=quality)
+        return output.getvalue()
+
+def create_thumbnail(image: Image.Image, size=(128, 128)) -> str:
+    image.thumbnail(size)
+    with io.BytesIO() as buffer:
+        image.save(buffer, format="JPEG", quality=70)
+        return base64.b64encode(buffer.getvalue()).decode()
+
+def validate_image(file) -> Image.Image:
+    try:
+        if hasattr(file, 'size') and file.size > MAX_SIZE_BYTES:
+            st.error(f"File too large (max {MAX_SIZE_MB}MB)")
+            return None
+        image = Image.open(file)
+        image.verify()
+        image = Image.open(file)
+        return image.convert("RGB")
+    except Exception as e:
+        st.error(f"Invalid image: {str(e)}")
+        return None
+
+def fetch_image_from_url(url: str) -> Image.Image:
+    try:
+        with st.spinner("Fetching image from URL..."):
+            head_response = requests.head(url, timeout=20, allow_redirects=True)
+            if head_response.status_code != 200:
+                raise ValueError(f"URL returned {head_response.status_code}")
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            return Image.open(io.BytesIO(response.content)).convert("RGB")
+    except Exception as e:
+        st.error(f"URL Error: {str(e)}")
+        return None 
+
+def get_image_metadata(img: Image.Image) -> str:
+    return f"Size: {img.size}, Mode: {img.mode}, Format: {img.format}"
+
+def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2):
+    img_bytes = compress_image(image)
+    files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
+    params = {"model_name": model_name}
+    
+    for attempt in range(max_retries + 1):
+        try:
+            with st.spinner(f"Classifying with {model_name}..."):
+                res = requests.post(API_URL, files=files, params=params, timeout=120)
+                res.raise_for_status()
+                return res.json()
+        except requests.exceptions.ConnectionError:
+            if attempt == max_retries:
+                st.error("⚠️ The model server is currently offline. Please try again later.")
+                return None
+            time.sleep(1)
+        except requests.exceptions.Timeout:
+            if attempt == max_retries:
+                st.error("⏳ The request to the model server timed out. Please try again.")
+                return None
+            time.sleep(1)
+        except requests.exceptions.HTTPError as e:
+            st.error(f"🚫 HTTP error: {e.response.status_code} - {e.response.reason}")
+            return None
+        except requests.exceptions.RequestException:
+            if attempt == max_retries:
+                st.error("🚨 An unexpected error occurred while contacting the model server.")
+                return None
+            time.sleep(1)
+
+def display_predictions(predictions, model_version, inference_time):
+    st.subheader(f"Predictions: {model_version}")
+    if not predictions:
+        st.warning("No predictions above the confidence threshold.")
+        return
+    df = pd.DataFrame(predictions)
+    df = df.set_index("label")
+
+    for pred in predictions:
+        st.markdown(f"**{pred['label']}**: {pred['confidence']}%")
+        st.progress(pred['confidence'] / 100.0)
+
+    st.caption(f"Inference time: {inference_time:.2f}s") 
+
+# =================== MAIN APP ===================
 def main():
-    """Main application function."""
     st.markdown("---")
     st.set_page_config(page_title="Image Classifier", layout="wide", page_icon="🖼️")
     st.title("🖼️ AI Image Classifier")
@@ -39,8 +120,83 @@ def main():
     st.session_state.setdefault("feedback", {})
     st.session_state.setdefault("model_cache", {})
 
-    # Setup sidebar and get settings
-    model_name, num_predictions, confidence_threshold, compare_models = setup_sidebar()
+    # Sidebar controls
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown("### ⚙️ Preferences & Model Selection")
+        with st.expander("Advanced Options"):
+            num_predictions = st.slider(
+                "Number of predictions", 
+                1, 10, 3,
+                help="""Set how many predictions to display (1-10). 
+                Higher values show more alternatives but may include less relevant results."""
+        )
+            confidence_threshold = st.slider(
+                "Confidence threshold (%)", 
+                0, 100, 0,
+                help="""Minimum confidence percentage (0-100%) required to show a prediction. 
+                Increase to filter out low-confidence results."""
+        )
+            compare_models = st.checkbox(
+                "🔁 Compare Models", 
+                help="Run both models on the image and compare their predictions."
+        )
+
+        model_name = st.selectbox(
+            "Select 🧠 AI Model", 
+            ["efficientnet", "resnet"], 
+            disabled=compare_models,
+            help="""Choose a deep learning architecture: 
+            • **EfficientNet:** Lightweight and fast (good for mobile/edge devices)
+            • **ResNet:** Powerful general-purpose model (best accuracy/speed balance).
+            Disabled when 'Compare Models' is active - all models will run simultaneously."""
+        )
+
+        st.markdown("---")
+        st.subheader("💬 Feedback")
+
+        with st.form("feedback_form_sidebar"):
+            history = st.session_state["history"]
+            if history:
+                selected = st.selectbox("Select image to review", [h["name"] for h in history],
+                help="""Choose a previously classified image to provide feedback on. 
+                The model's predictions for this image will be shown below for reference.
+                Only images with existing classification results appear here.""")
+                rating = st.select_slider("Rating (1-5)", options=[1, 2, 3, 4, 5], value=3,
+                help="""Rate the model's accuracy for this image:
+                1 = Completely wrong • 2 = Mostly incorrect • 3 = Partially correct
+                4 = Mostly accurate • 5 = Perfect prediction """)
+                selected_item = next((h for h in history if h["name"] == selected), None)
+                if selected_item:
+                    st.markdown("**Model Predictions:**")
+                    for pred in selected_item["predictions"]:
+                        st.markdown(f"- {pred['label']}: {pred['confidence']:.1f}%")
+                correction = st.text_input("Suggested correction", placeholder="Correct label",
+                help="""If the AI's prediction was wrong, please provide:
+                • The accurate label for this image
+                • Be specific (e.g., 'Golden Retriever' instead of just 'Dog')
+                • Use singular nouns where applicable
+                Your input helps train better models!""")
+                comment = st.text_area("Additional comments", placeholder="Anything else?",
+                help="""Share details to improve the model:
+                • What features did the AI miss?
+                • Was the mistake understandable?
+                • Any edge cases we should know about?
+    
+(Examples: 'The turtle was partially obscured' or 'Confused labrador with golden retriever')""")
+            else:
+                st.info("No images classified yet.")
+                selected = rating = correction = comment = None
+
+            if st.form_submit_button("Submit Feedback", type='primary') and selected:
+                st.session_state["feedback"][selected] = {
+                    "rating": rating,
+                    "predictions": selected_item.get("predictions", []),
+                    "correction": correction,
+                    "comment": comment,
+                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                }
+                st.toast("Feedback saved!", icon="✅")
 
     # Image input methods
     images = []
@@ -141,6 +297,3 @@ def main():
 
     st.markdown("---")
     st.caption("Built with ❤️ using Streamlit")
-
-if __name__ == "__main__":
-    main()
