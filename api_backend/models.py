@@ -11,7 +11,7 @@ MODEL_DIR = os.path.join(BASE_DIR, "models")
 # Model Registry
 MODEL_REGISTRY = {
     "efficientnet": {
-        "path": "D:/Documents/models/efficientnet.keras",
+        "path": os.path.join(MODEL_DIR, "efficientnet.keras"),
         "preprocess": tf.keras.applications.efficientnet_v2.preprocess_input,
         "decode": tf.keras.applications.efficientnet_v2.decode_predictions,
         "input_size": (480, 480)
