@@ -2,6 +2,11 @@ from functools import lru_cache
 import numpy as np
 import tensorflow as tf
 from api_backend.configs import logger
+import os
+
+# Get the base directory of the current file
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "models")
 
 # Model Registry
 MODEL_REGISTRY = {
