@@ -63,11 +63,12 @@ def get_image_metadata(img: Image.Image) -> str:
     return f"Size: {img.size}, Mode: {img.mode}, Format: {img.format}"
 
 def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2):
+    """Classify an image using the specified model with retry logic."""
     img_bytes = compress_image(image)
     files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
     params = {"model_name": model_name}
     
-    for attempt in range(max_retries + 1):
+    for attempt in range(max_retries + 1): 
         try:
             with st.spinner(f"Classifying with {model_name}..."):
                 res = requests.post(API_URL, files=files, params=params, timeout=120)
