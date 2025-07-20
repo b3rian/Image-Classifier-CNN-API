@@ -31,6 +31,7 @@ def create_thumbnail(image: Image.Image, size=(128, 128)) -> str:
         return base64.b64encode(buffer.getvalue()).decode()
 
 def validate_image(file) -> Image.Image:
+    """Validate and open an image file."""
     try:
         if hasattr(file, 'size') and file.size > MAX_SIZE_BYTES:
             st.error(f"File too large (max {MAX_SIZE_MB}MB)")
