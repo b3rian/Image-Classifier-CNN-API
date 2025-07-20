@@ -16,11 +16,12 @@ SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"] # Supported image formats
 MAX_SIZE_MB = 10 # Maximum file size in MB
 MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024 # Convert to bytes
 
-# =================== UTILITY FUNCTIONS ===================
+# =================== Utility Functions ===================
 def compress_image(image: Image.Image, quality: int = 85) -> bytes:
+    """Compress image to reduce file size."""
     with io.BytesIO() as output:
         image.save(output, format='JPEG', quality=quality)
-        return output.getvalue()
+        return output.getvalue() 
 
 def create_thumbnail(image: Image.Image, size=(128, 128)) -> str:
     image.thumbnail(size)
