@@ -64,7 +64,7 @@ def get_image_metadata(img: Image.Image) -> str:
 
 def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2):
     """Classify an image using the specified model with retry logic."""
-    img_bytes = compress_image(image)
+    img_bytes = compress_image(image) 
     files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
     params = {"model_name": model_name}
     
@@ -94,6 +94,7 @@ def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2
             time.sleep(1)
 
 def display_predictions(predictions, model_version, inference_time):
+    """Display predictions in a user-friendly format."""
     st.subheader(f"Predictions: {model_version}")
     if not predictions:
         st.warning("No predictions above the confidence threshold.")
