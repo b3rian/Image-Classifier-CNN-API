@@ -1,9 +1,10 @@
 # Dockerfile for Streamlit application
-FROM python:3.10-slim
+FROM python:3.10-slim 
 
 ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 
 
+# Set the working directory in the container
 WORKDIR /app
 
 COPY requirements.txt .
