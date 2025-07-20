@@ -297,3 +297,6 @@ def main():
 
     st.markdown("---")
     st.caption("Built with ❤️ using Streamlit")
+
+if __name__ == "__main__":
+    main()
