@@ -111,10 +111,10 @@ def display_predictions(predictions, model_version, inference_time):
 # =================== Main Application ===================
 def main():
     """Main function to run the Streamlit app."""
-    st.markdown("---")
+    st.markdown("---") 
     st.set_page_config(page_title="Image Classifier", layout="wide", page_icon="🖼️")
-    st.title("🖼️ AI Image Classifier")
-    st.caption("Powered by Convolutional Neural Networks (CNNs)")
+    st.title("🖼️ AI Image Classifier") 
+    st.caption("Powered by Convolutional Neural Networks (CNNs)") 
 
     st.markdown("""
     📌 Upload or capture an image and choose a CNN model to classify it.
@@ -124,7 +124,7 @@ def main():
     """)
 
     # Initialize session state
-    st.session_state.setdefault("history", [])
+    st.session_state.setdefault("history", []) 
     st.session_state.setdefault("feedback", {})
     st.session_state.setdefault("model_cache", {})
 
