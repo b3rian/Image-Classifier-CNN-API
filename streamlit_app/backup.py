@@ -229,7 +229,7 @@ def main():
 
     with tab3:
         url = st.text_input("Image URL", placeholder="https://example.com/image.jpg")
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([3, 1]) # Adjust column widths for better layout
         if col1.button("Fetch Image", type='primary') and url:
             img = fetch_image_from_url(url)
             if img:
