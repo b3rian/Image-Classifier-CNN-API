@@ -307,4 +307,4 @@ def main():
     st.caption("Built with ❤️ using Streamlit")
 
 if __name__ == "__main__":
-    main()
+    main() # Run the main function to start the app
