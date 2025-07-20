@@ -57,7 +57,35 @@ def fetch_image_from_url(url: str) -> Image.Image:
 def get_image_metadata(img: Image.Image) -> str:
     return f"Size: {img.size}, Mode: {img.mode}, Format: {img.format}"
 
-
+def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2):
+    img_bytes = compress_image(image)
+    files = {"file": ("image.jpg", img_bytes, "image/jpeg")}
+    params = {"model_name": model_name}
+    
+    for attempt in range(max_retries + 1):
+        try:
+            with st.spinner(f"Classifying with {model_name}..."):
+                res = requests.post(API_URL, files=files, params=params, timeout=120)
+                res.raise_for_status()
+                return res.json()
+        except requests.exceptions.ConnectionError:
+            if attempt == max_retries:
+                st.error("⚠️ The model server is currently offline. Please try again later.")
+                return None
+            time.sleep(1)
+        except requests.exceptions.Timeout:
+            if attempt == max_retries:
+                st.error("⏳ The request to the model server timed out. Please try again.")
+                return None
+            time.sleep(1)
+        except requests.exceptions.HTTPError as e:
+            st.error(f"🚫 HTTP error: {e.response.status_code} - {e.response.reason}")
+            return None
+        except requests.exceptions.RequestException:
+            if attempt == max_retries:
+                st.error("🚨 An unexpected error occurred while contacting the model server.")
+                return None
+            time.sleep(1)
 
 def display_predictions(predictions, model_version, inference_time):
     st.subheader(f"Predictions: {model_version}")
