@@ -10,11 +10,11 @@ import pandas as pd
 from typing import List
 from datetime import datetime
 
-# =================== CONFIG ===================
-API_URL = "http://127.0.0.1:8000/predict"
-SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"]
-MAX_SIZE_MB = 10
-MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
+# Configs
+API_URL = "http://127.0.0.1:8000/predict" # API endpoint for image classification
+SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"] # Supported image formats
+MAX_SIZE_MB = 10 # Maximum file size in MB
+MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024 # Convert to bytes
 
 # =================== UTILITY FUNCTIONS ===================
 def compress_image(image: Image.Image, quality: int = 85) -> bytes:
