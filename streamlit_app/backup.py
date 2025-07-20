@@ -55,10 +55,11 @@ def fetch_image_from_url(url: str) -> Image.Image:
             response.raise_for_status()
             return Image.open(io.BytesIO(response.content)).convert("RGB")
     except Exception as e:
-        st.error(f"URL Error: {str(e)}")
+        st.error(f"URL Error: {str(e)}") 
         return None 
 
 def get_image_metadata(img: Image.Image) -> str:
+    """Get metadata of the image."""
     return f"Size: {img.size}, Mode: {img.mode}, Format: {img.format}"
 
 def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2):
