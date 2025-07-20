@@ -270,7 +270,7 @@ def main():
                                     "thumbnail": create_thumbnail(img)
                                 })
 
-    # Show history
+    # Show session history 
     st.divider()
     st.subheader("📜 Session History")
     if not st.session_state.history:
