@@ -24,6 +24,7 @@ def compress_image(image: Image.Image, quality: int = 85) -> bytes:
         return output.getvalue() 
 
 def create_thumbnail(image: Image.Image, size=(128, 128)) -> str:
+    """Create a thumbnail of the image and return it as a base64 string."""
     image.thumbnail(size)
     with io.BytesIO() as buffer:
         image.save(buffer, format="JPEG", quality=70)
