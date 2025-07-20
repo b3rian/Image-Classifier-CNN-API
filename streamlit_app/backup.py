@@ -45,6 +45,7 @@ def validate_image(file) -> Image.Image:
         return None
 
 def fetch_image_from_url(url: str) -> Image.Image:
+    """Fetch an image from a URL and return it as a PIL Image."""
     try:
         with st.spinner("Fetching image from URL..."):
             head_response = requests.head(url, timeout=20, allow_redirects=True)
