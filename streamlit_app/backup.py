@@ -104,11 +104,11 @@ def display_predictions(predictions, model_version, inference_time):
 
     for pred in predictions:
         st.markdown(f"**{pred['label']}**: {pred['confidence']}%")
-        st.progress(pred['confidence'] / 100.0)
+        st.progress(pred['confidence'] / 100.0) 
 
     st.caption(f"Inference time: {inference_time:.2f}s") 
 
-# =================== MAIN APP ===================
+# =================== Main Application ===================
 def main():
     st.markdown("---")
     st.set_page_config(page_title="Image Classifier", layout="wide", page_icon="🖼️")
