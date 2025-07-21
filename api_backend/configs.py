@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
-# Initialize settings and logging
+# Initialize settings and logging 
 settings = Settings()
 logging.basicConfig(
     level=settings.log_level,
