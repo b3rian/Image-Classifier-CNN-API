@@ -138,6 +138,7 @@ async def log_requests(request: Request, call_next):
 # =================== Error Handlers ===================
 @app.exception_handler(ModelNotFoundError)
 async def model_not_found_handler(request, exc):
+    """Handle ModelNotFoundError exceptions."""
     return JSONResponse(
         status_code=404,
         content={"message": str(exc)},
