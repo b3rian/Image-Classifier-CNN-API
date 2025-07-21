@@ -5,3 +5,7 @@ pillow>=8.3.1
 numpy>=1.21.0
 python-multipart>=0.0.5
 pydantic-settings>=2.0.0
+transformers>=4.6.0
+huggingface-hub>=0.0.19
+git-lfs>=2.12.0
+hf_xet>=0.1.0
