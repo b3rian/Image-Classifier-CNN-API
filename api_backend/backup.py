@@ -41,13 +41,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# =================== Model Registry ===================
-
+# =================== Model Paths from Docker container ===================
 MODEL_DIR = os.getenv("MODEL_DIR", "models")
 resnet_model = os.path.join(MODEL_DIR, "resnet50_imagenet.keras")
 efficientnet_model = os.path.join(MODEL_DIR, "efficientnet.keras")
 
-
+# =================== Model Registry ===================
 MODEL_REGISTRY = {
     "efficientnet": {
         "path": "D:/Documents/models/efficientnet.keras",
