@@ -41,7 +41,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# =================== Model Paths from Docker container ===================
+# =================== Model paths from Docker container ===================
 MODEL_DIR = os.getenv("MODEL_DIR", "models")
 resnet_model = os.path.join(MODEL_DIR, "resnet50_imagenet.keras")
 efficientnet_model = os.path.join(MODEL_DIR, "efficientnet.keras")
@@ -72,6 +72,7 @@ class InvalidImageError(Exception):
 # =================== Model Loading ===================
 @lru_cache(maxsize=None)
 def load_model(model_path: str, input_size: tuple) -> tf.keras.Model:
+    """Load a Keras model and perform a warm-up inference to ensure it's ready for predictions."""
     try:
         model = tf.keras.models.load_model(model_path)
         # Warm up the model
