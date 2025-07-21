@@ -11,7 +11,7 @@ from typing import List
 from datetime import datetime
 
 # =================== CONFIG ===================
-API_URL = "http://127.0.0.1:8000/predict"
+API_URL = "https://b3rian-image-classifier-api.hf.space"
 SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"]
 MAX_SIZE_MB = 10
 MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
