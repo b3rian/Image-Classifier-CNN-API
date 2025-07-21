@@ -146,6 +146,7 @@ async def model_not_found_handler(request, exc):
 
 @app.exception_handler(InvalidImageError)
 async def invalid_image_handler(request, exc):
+    """Handle InvalidImageError exceptions."""
     return JSONResponse(
         status_code=400,
         content={"message": str(exc)},
