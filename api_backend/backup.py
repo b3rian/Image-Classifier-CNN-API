@@ -9,6 +9,7 @@ from typing import List, Callable, Optional
 from enum import Enum
 import numpy as np
 from PIL import Image
+import os
 import io
 import time
 import tensorflow as tf
@@ -41,15 +42,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # =================== Model Registry ===================
+
+MODEL_DIR = os.getenv("MODEL_DIR", "models")
+resnet_model = os.path.join(MODEL_DIR, "resnet50_imagenet.keras")
+efficientnet_model = os.path.join(MODEL_DIR, "efficientnet.keras")
+
 MODEL_REGISTRY = {
     "efficientnet": {
-        "path": "D:/Documents/models/efficientnet.keras",
+        "path": efficientnet_model,
         "preprocess": tf.keras.applications.efficientnet_v2.preprocess_input,
         "decode": tf.keras.applications.efficientnet_v2.decode_predictions,
         "input_size": (480, 480)
     },
     "resnet": {
-        "path": "D:/Documents/models/resnet50_imagenet.keras",
+        "path": resnet_model,
         "preprocess": tf.keras.applications.resnet50.preprocess_input,
         "decode": tf.keras.applications.resnet50.decode_predictions,
         "input_size": (224, 224)
@@ -243,13 +249,3 @@ async def health_check():
         "models_loaded": list(models.keys()),
         "timestamp": datetime.datetime.utcnow().isoformat()
     }
-
-# =================== Run Server ===================
-if __name__ == "__main__":
-    uvicorn.run(
-        "api:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level=settings.log_level.lower()
-    )
