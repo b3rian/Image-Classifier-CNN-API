@@ -1,3 +1,5 @@
+"Configuration module for the Image Classifier API backend."
+
 from pydantic_settings import BaseSettings
 import logging
 
