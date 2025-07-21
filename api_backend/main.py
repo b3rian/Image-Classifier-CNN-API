@@ -123,10 +123,12 @@ async def predict(
     
 @app.get("/", include_in_schema=False)
 def root():
+    """Root endpoint for the API."""
     return {"message": "Image Classifier API is running."}
 
 @app.get("/health", response_model=HealthCheckResponse, tags=["health"])
 async def health_check():
+    """Health check endpoint to verify API status and loaded models."""
     return {
         "status": "healthy",
         "models_loaded": list(models.keys()),
