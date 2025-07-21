@@ -24,6 +24,7 @@ import datetime
 
 # =================== Configurations ===================
 class Settings(BaseSettings):
+    """Application configuration settings."""
     models_dir: str = "models"
     allowed_origins: list[str] = ["*"]
     app_name: str = "Image Classifier API"

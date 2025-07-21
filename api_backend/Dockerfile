@@ -30,4 +30,4 @@ EXPOSE 7860
 ENV MODEL_DIR=/app/models
 
 # Run the API
-CMD ["uvicorn", "api_backend.backup:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "api_backend.main:app", "--host", "0.0.0.0", "--port", "7860"]
