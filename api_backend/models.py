@@ -1,23 +1,26 @@
+"# This module handles loading and caching of TensorFlow models for image classification."
+
 from functools import lru_cache
 import numpy as np
 import tensorflow as tf
 from api_backend.configs import logger
 import os
 
-# Get the base directory of the current file
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_DIR = os.path.join(BASE_DIR, "models")
+# Get the base directory of the Docker container
+MODEL_DIR = os.getenv("MODEL_DIR", "models")
+resnet_model = os.path.join(MODEL_DIR, "resnet50_imagenet.keras")
+efficientnet_model = os.path.join(MODEL_DIR, "efficientnet.keras")
 
 # Model Registry
 MODEL_REGISTRY = {
     "efficientnet": {
-        "path": os.path.join(MODEL_DIR, "efficientnet.keras"),
+        "path": efficientnet_model,
         "preprocess": tf.keras.applications.efficientnet_v2.preprocess_input,
         "decode": tf.keras.applications.efficientnet_v2.decode_predictions,
         "input_size": (480, 480)
     },
     "resnet": {
-        "path": os.path.join(MODEL_DIR, "resnet50_imagenet.keras"),
+        "path": resnet_model,
         "preprocess": tf.keras.applications.resnet50.preprocess_input,
         "decode": tf.keras.applications.resnet50.decode_predictions,
         "input_size": (224, 224)
@@ -52,6 +55,7 @@ def load_model(model_path: str, input_size: tuple) -> tf.keras.Model:
 models = {}
 for name, config in MODEL_REGISTRY.items():
     try:
+        # Load and warm up the model
         models[name] = load_model(config["path"], config["input_size"])
     except Exception as e:
         logger.error(f"Could not load model {name}: {str(e)}")
