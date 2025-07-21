@@ -154,10 +154,12 @@ async def invalid_image_handler(request, exc):
 
 # =================== Response Schemas ===================
 class Prediction(BaseModel):
+    """Schema for individual prediction results."""
     label: str
     confidence: float = Field(..., ge=0.0, le=100.0)  
 
 class ApiResponse(BaseModel):
+    """Schema for API response containing predictions."""
     predictions: List[Prediction]
     model_version: str
     inference_time: float
