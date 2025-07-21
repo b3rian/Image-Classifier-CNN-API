@@ -3,7 +3,7 @@ Configuration constants for the Streamlit image classifier app.
 """
 
 # API Configuration
-API_URL = "http://127.0.0.1:8000/predict"
+API_URL = "https://b3rian-image-classifier-api.hf.space/predict" 
 
 # Image Processing Configuration
 SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"]
