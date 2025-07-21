@@ -43,7 +43,7 @@ def fetch_image_from_url(url: str) -> Image.Image:
             head_response = requests.head(url, timeout=20, allow_redirects=True)
             if head_response.status_code != 200:
                 raise ValueError(f"URL returned {head_response.status_code}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=20)
             response.raise_for_status()
             return Image.open(io.BytesIO(response.content)).convert("RGB")
     except Exception as e:
