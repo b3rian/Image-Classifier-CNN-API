@@ -92,7 +92,7 @@ for name, config in MODEL_REGISTRY.items():
     except Exception as e:
         logger.error(f"Could not load model {name}: {str(e)}")
 
-# =================== FastAPI Setup ===================
+# =================== FastAPI Application Setup ===================
 middleware = [
     Middleware(
         CORSMiddleware,
@@ -110,8 +110,8 @@ app = FastAPI(
     description="FastAPI backend for AI Image Classifier with multiple Keras models",
     version=settings.app_version,
     contact={
-        "name": "Your Name",
-        "email": "your.email@example.com",
+        "name": "Backend Team",
+        "email": "brayan.8189@gmail.com",
     },
     license_info={
         "name": "MIT",
