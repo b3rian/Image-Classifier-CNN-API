@@ -23,9 +23,10 @@ middleware = [
 ]
 
 if settings.enable_https_redirect:
+    "Enable HTTPS redirect middleware if configured"
     middleware.append(Middleware(HTTPSRedirectMiddleware))
 
-# Create FastAPI app
+# Create FastAPI app with configuration
 app = FastAPI(
     title=settings.app_name,
     description="FastAPI backend for AI Image Classifier with multiple Keras models",
