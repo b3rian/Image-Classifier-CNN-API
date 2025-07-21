@@ -13,7 +13,7 @@ from typing import List
 from PIL import Image, ImageOps
 import numpy as np
 
-# Import from modules
+# Import from modules in the streamlit_app package
 from streamlit_app.config import SUPPORTED_FORMATS, MAX_SIZE_MB
 from streamlit_app.utils import (validate_image, fetch_image_from_url, 
                   get_image_metadata, create_thumbnail)
@@ -143,4 +143,4 @@ def main():
     st.caption("Built with ❤️ using Streamlit")
 
 if __name__ == "__main__":
-    main()
+    main() # Run the main function to start the app
