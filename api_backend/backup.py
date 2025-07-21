@@ -183,6 +183,7 @@ def preprocess_image(
     target_size: tuple,
     preprocess_func: Callable[[np.ndarray], np.ndarray]
 ) -> np.ndarray:
+    """Preprocess image bytes into a tensor suitable for model input."""
     try:
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         image = image.resize(target_size)
@@ -197,6 +198,7 @@ def preprocess_image(
 executor = ThreadPoolExecutor(max_workers=4)
 
 async def async_predict(model: tf.keras.Model, input_tensor: np.ndarray):
+    """Run model prediction in an asynchronous manner using a thread pool."""
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(executor, model.predict, input_tensor)
 
