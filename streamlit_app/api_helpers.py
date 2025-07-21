@@ -25,6 +25,7 @@ def classify_image_with_retry(image: Image.Image, model_name: str, max_retries=2
     params = {"model_name": model_name}
     
     for attempt in range(max_retries + 1):
+        # Ensure the image is in RGB format
         try:
             with st.spinner(f"Classifying with {model_name}..."):
                 res = requests.post(API_URL, files=files, params=params, timeout=120)
