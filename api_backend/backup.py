@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings
 from typing import List, Callable, Optional
 from enum import Enum
 import numpy as np
+import os
 from PIL import Image
 import io
 import time
@@ -41,6 +42,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # =================== Model Registry ===================
+
+MODEL_DIR = os.getenv("MODEL_DIR", "models")
+resnet_model = os.path.join(MODEL_DIR, "resnet50_imagenet.keras")
+efficientnet_model = os.path.join(MODEL_DIR, "efficientnet.keras")
+
+
 MODEL_REGISTRY = {
     "efficientnet": {
         "path": "D:/Documents/models/efficientnet.keras",
