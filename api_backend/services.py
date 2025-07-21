@@ -1,3 +1,5 @@
+"""Service functions for handling model predictions and image preprocessing."""
+
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
@@ -7,7 +9,7 @@ import io
 from api_backend.configs import logger
 from api_backend.models import InvalidImageError
 
-executor = ThreadPoolExecutor(max_workers=4)
+executor = ThreadPoolExecutor(max_workers=4) # Adjust based on expected concurrency
 
 async def async_predict(model, input_tensor):
     """Run model prediction in a separate thread."""
@@ -21,6 +23,7 @@ def preprocess_image(
 ) -> np.ndarray:
     """Preprocess image bytes into model input tensor."""
     try:
+        # Load image from bytes and convert to RGB
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         image = image.resize(target_size)
         image_array = np.array(image).astype("float32")
