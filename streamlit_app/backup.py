@@ -1,3 +1,5 @@
+"""Streamlit Image Classifier App"""
+
 import streamlit as st
 import requests
 import io
@@ -11,7 +13,7 @@ from typing import List
 from datetime import datetime
 
 # Configs
-API_URL = "http://127.0.0.1:8000/predict" # API endpoint for image classification
+API_URL = "https://b3rian-image-classifier-api.hf.space/predict"  # API endpoint for image classification
 SUPPORTED_FORMATS = ["jpg", "jpeg", "png", "webp"] # Supported image formats
 MAX_SIZE_MB = 10 # Maximum file size in MB
 MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024 # Convert to bytes
