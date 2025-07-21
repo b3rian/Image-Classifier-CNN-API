@@ -209,6 +209,7 @@ async def predict(
     file: UploadFile = File(...),
     model_name: ModelName = Query(..., description="Choose model for inference")
 ):
+    """Endpoint to classify an image using the specified model."""
     if model_name.value not in models:
         logger.error(f"Model '{model_name}' not found in loaded models")
         raise ModelNotFoundError(
@@ -216,6 +217,7 @@ async def predict(
         )
 
     try:
+        # Load model and configuration
         model = models[model_name.value]
         config = MODEL_REGISTRY[model_name.value]
         contents = await file.read()
