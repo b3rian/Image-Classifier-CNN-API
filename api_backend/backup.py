@@ -126,6 +126,7 @@ app = FastAPI(
 # =================== Request Logging Middleware ===================
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
+    """Middleware to log incoming requests and their processing time."""
     start_time = time.time()
     response = await call_next(request)
     process_time = (time.time() - start_time) * 1000
