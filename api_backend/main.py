@@ -1,3 +1,5 @@
+"Main entry point for the FastAPI application with multiple Keras models for image classification."
+
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Request
 from fastapi.middleware import Middleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
