@@ -20,7 +20,7 @@ RUN mkdir -p /app/models && \
 curl -fSL -o /app/models/efficientnet.keras https://huggingface.co/b3rian/resnet/resolve/main/efficientnet.keras && \
 curl -fSL -o /app/models/resnet50_imagenet.keras https://huggingface.co/b3rian/resnet/resolve/main/resnet50_imagenet.keras
 
-# Copy API code into the container
+# Copy API code into the container directory
 COPY api_backend/ ./api_backend/
 
 # Expose the port the app runs on
