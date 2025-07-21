@@ -1,3 +1,5 @@
+"FastAPI backend for AI Image Classifier with multiple Keras models"
+
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware import Middleware
@@ -64,13 +66,15 @@ MODEL_REGISTRY = {
 
 # =================== Custom Exceptions ===================
 class ModelNotFoundError(Exception):
+    """Exception raised when a requested model is not found."""
     pass
 
 class InvalidImageError(Exception):
+    """Exception raised for invalid image files."""
     pass
 
 # =================== Model Loading ===================
-@lru_cache(maxsize=None)
+@lru_cache(maxsize=None) # Cache loaded models to avoid reloading
 def load_model(model_path: str, input_size: tuple) -> tf.keras.Model:
     """Load a Keras model and perform a warm-up inference to ensure it's ready for predictions."""
     try:
@@ -103,8 +107,10 @@ middleware = [
 ]
 
 if settings.enable_https_redirect:
+    # Add HTTPS redirect middleware if enabled in settings
     middleware.append(Middleware(HTTPSRedirectMiddleware))
 
+# Create FastAPI app with middleware and settings
 app = FastAPI(
     title=settings.app_name,
     description="FastAPI backend for AI Image Classifier with multiple Keras models",
