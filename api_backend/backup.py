@@ -166,12 +166,14 @@ class ApiResponse(BaseModel):
     timestamp: str
 
 class HealthCheckResponse(BaseModel):
+    """Schema for health check response."""
     status: str
     models_loaded: List[str]
     timestamp: str
 
 # =================== Model Name Enum ===================
 class ModelName(str, Enum):
+    """Enum for available model names."""
     efficientnet = "efficientnet"
     resnet = "resnet"
 
