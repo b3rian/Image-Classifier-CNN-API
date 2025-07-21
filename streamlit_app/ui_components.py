@@ -97,7 +97,7 @@ def setup_sidebar():
                 • Was the mistake understandable?
                 • Any edge cases we should know about?
     
-(Examples: 'The turtle was partially obscured' or 'Confused labrador with golden retriever')""")
+ (Examples: 'The turtle was partially obscured' or 'Confused labrador with golden retriever')""")
             else:
                 st.info("No images classified yet.")
                 selected = rating = correction = comment = None
