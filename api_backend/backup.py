@@ -20,7 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 import datetime
 
-# =================== Configuration ===================
+# =================== Configurations ===================
 class Settings(BaseSettings):
     models_dir: str = "models"
     allowed_origins: list[str] = ["*"]
