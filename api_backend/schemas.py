@@ -1,3 +1,5 @@
+"""This module defines the schemas for API responses and request validation using Pydantic."""
+
 from pydantic import BaseModel, Field
 from enum import Enum
 from typing import List
