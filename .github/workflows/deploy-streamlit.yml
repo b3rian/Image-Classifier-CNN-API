@@ -13,7 +13,7 @@ jobs:
 
     steps:
     # Step 1: Checkout the deploy-streamlit branch code
-    - name: Checkout deploy-api branch
+    - name: Checkout deploy-streamlit branch
       uses: actions/checkout@v4
       with:
         ref: ${{ env.BRANCH_NAME }}
