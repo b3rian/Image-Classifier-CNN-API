@@ -61,7 +61,7 @@ jobs:
           ${{ steps.meta.outputs.FULL_TAG }}
           ${{ steps.meta.outputs.LATEST_TAG }}
 
-    # Step 8: Deploy to Hugging Face
+    # Step 8: Deploy to Hugging Face Spaces
     - name: Deploy to Hugging Face Spaces
       run: |
         huggingface-cli login --token "${{ secrets.HF_TOKEN }}"
