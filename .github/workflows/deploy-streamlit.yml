@@ -10,3 +10,10 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the deploy-streamlit branch code
+    - name: Checkout deploy-api branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.BRANCH_NAME }}
