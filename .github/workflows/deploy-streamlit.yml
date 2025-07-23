@@ -67,4 +67,6 @@ jobs:
         huggingface-cli login --token "${{ secrets.HF_TOKEN }}"
         python deploy.py
 
-    # Step 9: Deploy to Render
+    # Step 9: Trigger Render redeploy
+    - name: Trigger redeploy on Render
+      run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
