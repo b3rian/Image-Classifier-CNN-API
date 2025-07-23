@@ -1,0 +1,14 @@
+version: "3.8"
+
+# Define services (containers) for the application
+services:
+
+  # FastAPI backend service
+  fastapi:
+    build:
+      context: ./api_backend   # Path to Dockerfile and source code for FastAPI
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"            # Map host port 8000 to container port 8000
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    # Runs the FastAPI app using Uvicorn with live reload (useful in dev)
