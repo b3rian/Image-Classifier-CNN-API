@@ -49,3 +49,20 @@ jobs:
         echo "TAG=${MANUAL_TAG}" >> $GITHUB_OUTPUT
         echo "FULL_TAG=${{ env.DOCKER_IMAGE_BASE }}:${MANUAL_TAG}" >> $GITHUB_OUTPUT
         echo "LATEST_TAG=${{ env.DOCKER_IMAGE_BASE }}:latest" >> $GITHUB_OUTPUT
+
+    # Step 7: Build and push Docker image
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ${{ steps.meta.outputs.FULL_TAG }}
+          ${{ steps.meta.outputs.LATEST_TAG }}
+
+    # Step 8: Deploy to Hugging Face Spaces
+    - name: Deploy to Hugging Face Spaces
+      run: |
+        huggingface-cli login --token "${{ secrets.HF_TOKEN }}"
+        python deploy.py
