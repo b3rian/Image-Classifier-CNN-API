@@ -67,5 +67,5 @@ jobs:
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        echo "$HF_TOKEN" | huggingface-cli login --token
+        huggingface-cli login --token "$HF_TOKEN"
         python deploy.py
