@@ -12,3 +12,15 @@ services:
       - "8000:8000"            # Map host port 8000 to container port 8000
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     # Runs the FastAPI app using Uvicorn with live reload (useful in dev)
+
+  # Streamlit frontend service
+  streamlit:
+    build:
+      context: ./streamlit_app  # Path to Dockerfile and source code for Streamlit
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"             # Map host port 8501 to container port 8501 (Streamlit default)
+    depends_on:
+      - fastapi                # Ensure FastAPI starts before Streamlit
+    command: streamlit run main.py --server.port 8501 --server.address 0.0.0.0
+    # Launches the Streamlit frontend and binds it to all network interfaces
