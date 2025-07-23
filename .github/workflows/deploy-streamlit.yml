@@ -1,0 +1,12 @@
+name: Create & Push Docker Image to Docker Hub and Deploy Streamlit UI to Hugging Face & Render
+
+on:
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE_BASE: b3rian/image-classifier-ui
+  BRANCH_NAME: deploy-streamlit-hugging-face
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
