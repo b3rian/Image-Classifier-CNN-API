@@ -1,0 +1,7 @@
+sdk: docker
+title: My FastAPI Model API
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+app_port: 7860
+pinned: false
