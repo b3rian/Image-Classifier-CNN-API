@@ -41,7 +41,7 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    # Step 6: Define image tags using commit SHA and date
+    # Step 6: Define Docker image tags
     - name: Define Docker tags
       id: meta
       run: |
