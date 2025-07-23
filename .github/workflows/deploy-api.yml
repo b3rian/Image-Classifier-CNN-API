@@ -10,3 +10,16 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the deploy-api branch code
+    - name: Checkout deploy-api branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.BRANCH_NAME }}
+
+    # Step 2: Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.10
