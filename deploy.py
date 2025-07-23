@@ -1,9 +1,9 @@
 from huggingface_hub import HfApi, upload_folder
-
+from pathlib import Path
 # Set your repo info
 username = "b3rian"
-repo_name = "AskTheModel"
-local_dir =  "D:/Documents/Projects/resnet-vit-comparison" # path to your streamlit folder
+repo_name = "streamlit-ui"
+local_dir =  Path(__file__).resolve().parent  # Automatically detect current folder
 repo_type = "space"
 space_sdk = "docker" 
 
