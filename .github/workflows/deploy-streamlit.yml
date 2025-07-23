@@ -66,3 +66,8 @@ jobs:
       run: |
         huggingface-cli login --token "${{ secrets.HF_TOKEN }}"
         python deploy.py
+
+    # Step 9: Deploy to Render
+    - name: Deploy to Render
+      run: |
+        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
