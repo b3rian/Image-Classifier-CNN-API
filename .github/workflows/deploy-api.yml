@@ -45,10 +45,9 @@ jobs:
     - name: Define Docker tags
       id: meta
       run: |
-        SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
-        DATE=$(date +%F)
-        echo "TAG=${SHORT_SHA}-${DATE}" >> $GITHUB_OUTPUT
-        echo "FULL_TAG=${{ env.DOCKER_IMAGE_BASE }}:${SHORT_SHA}-${DATE}" >> $GITHUB_OUTPUT
+        MANUAL_TAG="v1.0.0"
+        echo "TAG=${MANUAL_TAG}" >> $GITHUB_OUTPUT
+        echo "FULL_TAG=${{ env.DOCKER_IMAGE_BASE }}:${MANUAL_TAG}" >> $GITHUB_OUTPUT
         echo "LATEST_TAG=${{ env.DOCKER_IMAGE_BASE }}:latest" >> $GITHUB_OUTPUT
 
     # Step 7: Build and push Docker images
