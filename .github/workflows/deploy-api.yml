@@ -1,0 +1,4 @@
+name: Manual Deploy to Hugging Face
+
+on:
+  workflow_dispatch:
