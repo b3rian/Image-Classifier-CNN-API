@@ -36,3 +36,17 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # Step 5: Set up Docker Buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # Step 6: Define image tags using commit SHA and date
+    - name: Define Docker tags
+      id: meta
+      run: |
+        SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+        DATE=$(date +%F)
+        echo "TAG=${SHORT_SHA}-${DATE}" >> $GITHUB_OUTPUT
+        echo "FULL_TAG=${{ env.DOCKER_IMAGE_BASE }}:${SHORT_SHA}-${DATE}" >> $GITHUB_OUTPUT
+        echo "LATEST_TAG=${{ env.DOCKER_IMAGE_BASE }}:latest" >> $GITHUB_OUTPUT
