@@ -2,3 +2,11 @@ name: Create & Push Docker Image to Docker Hub and Deploy API to Hugging Face
 
 on:
   workflow_dispatch:
+
+env:
+  DOCKER_IMAGE_BASE: b3rian/image-classifier-api
+  BRANCH_NAME: deploy-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
