@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE_BASE: b3rian/image-classifier-api
+  DOCKER_IMAGE_BASE: b3rian/image-classifier-fastapi-streamlit
   BRANCH_NAME: deploy-api
 
 jobs:
