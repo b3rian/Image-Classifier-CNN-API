@@ -40,3 +40,12 @@ jobs:
     # Step 5: Set up Docker Buildx
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+
+    # Step 6: Define Docker tags
+    - name: Define Docker tags
+      id: meta
+      run: |
+        MANUAL_TAG="v1.0.0"
+        echo "TAG=${MANUAL_TAG}" >> $GITHUB_OUTPUT
+        echo "FULL_TAG=${{ env.DOCKER_IMAGE_BASE }}:${MANUAL_TAG}" >> $GITHUB_OUTPUT
+        echo "LATEST_TAG=${{ env.DOCKER_IMAGE_BASE }}:latest" >> $GITHUB_OUTPUT
