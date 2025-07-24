@@ -22,7 +22,6 @@ def evaluate(model_path, config):
     print(f"/n[TEST RESULTS for {os.path.basename(model_path)}]")
     for k, v in results.items():
         print(f"{k}: {v:.4f}")
-
     return results
 
 if __name__ == "__main__":
