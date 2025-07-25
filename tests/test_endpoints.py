@@ -1,3 +1,4 @@
+"""Test cases for the FastAPI image prediction endpoint"""
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import status, UploadFile

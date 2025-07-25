@@ -1,3 +1,4 @@
+"""Unit tests for the input pipeline module."""
 import pytest
 import tensorflow as tf
 import os
@@ -12,7 +13,7 @@ from data.input_pipeline2 import (
     NUM_CLASSES
 )
 
-# Replace this with your actual dataset root for testing
+# Test configuration for input pipeline
 DATA_DIR = "D:/Downloads/tiny-224"
 
 @pytest.fixture(scope="session")

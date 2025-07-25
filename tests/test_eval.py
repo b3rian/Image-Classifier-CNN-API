@@ -1,3 +1,4 @@
+"""Unit tests for the evaluate function in eval.py"""
 import pytest
 import tensorflow as tf
 from unittest.mock import patch, MagicMock
@@ -11,6 +12,7 @@ def dummy_config():
     }
 
 def test_evaluate_function_returns_metrics(dummy_config):
+    """Test that the evaluate function returns expected metrics."""
     dummy_metrics = {"loss": 0.1234, "accuracy": 0.9876}
 
     with patch("eval.get_test_dataset") as mock_get_dataset, \

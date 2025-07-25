@@ -1,10 +1,11 @@
+"""Test suite for the model preprocessing layer in TensorFlow."""
 import pytest
 import tensorflow as tf
 
 from data.input_pipeline2 import get_datasets
 from data.preprocessing import get_model_preprocessing_layer
 
-# Replace this with your actual path to Tiny ImageNet-200
+# Configuration for the test
 DATA_DIR = "D:/Downloads/tiny-224" 
 
 @pytest.fixture(scope="session")
