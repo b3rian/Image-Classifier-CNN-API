@@ -110,7 +110,7 @@ docker run -p 8501:8501 image-classifier-ui
 
 - 🖥️ UI: https://cnn-image-classifier.streamlit.app/
 
-# 🔁 CI/CD
+# 🔁 CI/CD Pipeline
 
 - GitHub Actions builds and pushes Docker images to [Docker Hub](https://hub.docker.com)
 
@@ -139,3 +139,13 @@ This project is licensed under the GPL-3.0 License.
 - [Docker](https://www.docker.com/)
 
 - [Hugging Face Spaces](https://huggingface.co/spaces)
+
+- [Streamlit Cloud](https://streamlit.io/cloud)
+
+- [Python](https://www.python.org/)
+
+# 📬 Contact
+
+Feel free to reach out for collaboration or feedback:
+
+- 📧(brianliboso84@gmail.com)
