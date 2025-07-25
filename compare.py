@@ -1,7 +1,10 @@
+"Compare different models' performance on the same dataset using eval module"
+
 import os
 import yaml
 from eval import evaluate
 
+# Ensure the eval module is in the same directory or adjust the import accordingly
 models = {
     "ResNet18": {
         "path": "checkpoints/resnet.h5",
