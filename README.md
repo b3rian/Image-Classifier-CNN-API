@@ -48,3 +48,25 @@ ResNet50: **90%**, EfficientNetV2L: **96%**
 🔁 **GitHub Actions** – CI/CD automation
 
 ☁️ **HF Spaces & Streamlit Cloud** – Deployment
+
+# 📦 Installation (Local)
+
+1. Clone the repo
+
+git clone https://github.com/b3rian/Image-Classifier-CNN-API
+cd image-classifier-api
+
+2. Build & Run with Docker
+
+FastAPI API
+
+cd api_backend
+docker build -t image-classifier-api .
+docker run -p 8000:8000 image-classifier-api
+
+Streamlit Frontend
+
+cd streamlit_app
+docker build -t image-classifier-ui .
+docker run -p 8501:8501 image-classifier-ui
+
