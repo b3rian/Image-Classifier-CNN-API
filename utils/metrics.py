@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+# Utility function to get classification metrics for Keras models
 def get_classification_metrics():
     return [
         tf.keras.metrics.CategoricalAccuracy(name="accuracy"),
