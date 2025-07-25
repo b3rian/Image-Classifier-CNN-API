@@ -1,3 +1,7 @@
+# 🖼️ Frontend Preview
+
+![Streamlit Frontend](assets/frontend_sample.png)
+
 # 🧠 Image Classifier API & UI — ResNet50 & EfficientNetV2L
 
 This project is a full-stack deep learning deployment pipeline for image classification using two powerful models: ResNet50 and EfficientNetV2L. It showcases the training of high-performance models, REST API development using FastAPI, and a Streamlit frontend that allows users to interact with the models through a user-friendly web interface. The project is containerized with Docker and CI/CD automated using GitHub Actions. It is deployed to production via Hugging Face Spaces and Streamlit Community Cloud.
