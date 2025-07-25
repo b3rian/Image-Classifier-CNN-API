@@ -1,18 +1,21 @@
+"""Input pipeline for loading and preprocessing images for training, validation, and testing."""
 import tensorflow as tf
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
 
+# Constants
 AUTOTUNE = tf.data.AUTOTUNE
 IMAGE_SIZE = (64, 64)
 NUM_CLASSES = 200
 
-# This function decodes JPEG images to RGB format.
 def decode_img(img):
+    """Decode JPEG image to float32 tensor in [0, 255]."""
     img = tf.image.decode_jpeg(img, channels=3)
     return img
 
 def process_train_image(file_path, label):
+    """Process training images with augmentation."""
     img = tf.io.read_file(file_path)
     img = decode_img(img)  # float32 in [0, 255]
     # Brightness & contrast (ImageNet-style color augmentation)
@@ -36,23 +39,27 @@ def process_train_image(file_path, label):
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_val_image(file_path, label):
+    """Process validation images without augmentation."""
     img = tf.io.read_file(file_path)
     img = decode_img(img)  # Already resized to IMAGE_SIZE (64×64)
     img = tf.image.resize(img, IMAGE_SIZE)
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def process_test_image(file_path, label):
+    """Process test images without augmentation."""
     img = tf.io.read_file(file_path)
     img = decode_img(img)
     img = tf.image.resize(img, IMAGE_SIZE)
     return img, tf.one_hot(label, NUM_CLASSES)
 
 def get_label_map(train_dir):
+    """Create a label map from training directory."""
     class_names = sorted(os.listdir(train_dir))
     label_map = {name: idx for idx, name in enumerate(class_names)}
     return label_map
 
 def load_dataset(image_dir, label_map=None, split="train"):
+    """Load dataset from the specified directory."""
     image_paths = []
     labels = []
 
@@ -79,6 +86,7 @@ def load_dataset(image_dir, label_map=None, split="train"):
     return image_paths, labels
 
 def create_dataset(image_paths, labels, batch_size=256, split="train"):
+    """Create a TensorFlow dataset from image paths and labels."""
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
 
     if split == "train":
@@ -96,6 +104,7 @@ def create_dataset(image_paths, labels, batch_size=256, split="train"):
     return dataset
 
 def get_datasets(data_dir, batch_size=256, val_split=0.8):
+    """Get training, validation, and test datasets."""
     train_dir = os.path.join(data_dir, "train")
     val_dir = os.path.join(data_dir, "val")
 

@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 def get_model_preprocessing_layer():
+    """Returns a preprocessing layer for the model."""
     return tf.keras.Sequential([
         tf.keras.layers.Resizing(64, 64),  # Keep target size (Tiny ImageNet size)
         tf.keras.layers.Rescaling(1./255),  # Scale [0, 255] → [0, 1]
