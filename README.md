@@ -74,3 +74,12 @@ docker build -t image-classifier-ui .
 
 docker run -p 8501:8501 image-classifier-ui
 
+# 🖼️ Usage
+
+🔁 **Streamlit Frontend**
+
+Upload an image.
+
+Select **ResNet**, **EfficientNet**, or Both.
+
+Click **"Classify Image"** to get classification results.
