@@ -1,7 +1,9 @@
+"""Builds a Vision Transformer (ViT) model using TensorFlow and Keras."""
 import tensorflow as tf
 from tensorflow.keras import layers
 
 class PatchEmbedding(layers.Layer):
+    """Converts images into patches and embeds them into a higher-dimensional space."""
     def __init__(self, patch_size=16, embed_dim=768, **kwargs):
         super().__init__(**kwargs)
         self.patch_size = patch_size

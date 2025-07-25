@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import layers, models, initializers
 
 def make_tiny_imagenet_model(input_shape=(None, None, 3), num_classes=200):
+    """Builds a CNN model for the Tiny ImageNet dataset with preprocessing included."""
     he_init = tf.keras.initializers.HeNormal()
 
     inputs = tf.keras.Input(shape=input_shape)

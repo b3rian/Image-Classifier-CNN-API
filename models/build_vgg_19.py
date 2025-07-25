@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 
 def simple_cnn_tiny_imagenet(input_shape=(64, 64, 3), num_classes=200):
+    """Builds a simple CNN model for the Tiny ImageNet dataset."""
     model = models.Sequential([
         # Layer 1
         layers.Conv2D(32, (3, 3), activation='relu', padding='same', input_shape=input_shape),

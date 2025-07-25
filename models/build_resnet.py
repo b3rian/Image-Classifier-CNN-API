@@ -1,7 +1,10 @@
+"""ResNet-18 model implementation using TensorFlow and Keras."""
+
 import tensorflow as tf
 from tensorflow.keras import layers, models
 
 def conv3x3(filters, stride=1):
+    """3x3 convolution with padding"""
     return layers.Conv2D(filters, kernel_size=3, strides=stride, padding='same', use_bias=False,
                          kernel_initializer='he_normal')
 
@@ -49,6 +52,7 @@ def ResNet18(input_shape=(64, 64, 3), num_classes=200):
     outputs = layers.Dense(num_classes, activation='softmax')(x)
 
     model = models.Model(inputs, outputs, name="ResNet18")
+
     return model
 
  
