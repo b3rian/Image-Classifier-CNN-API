@@ -1,6 +1,6 @@
 # 🖼️ Frontend Preview
 
-[Streamlit Frontend](https://raw.githubusercontent.com/b3rian/resnet-vit-comparison/main/assets/frontend_sample.png)
+![Streamlit Frontend](assets/frontend_sample.png)
 
 # 🧠 Image Classifier API & UI — ResNet50 & EfficientNetV2L
 
