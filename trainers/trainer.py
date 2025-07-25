@@ -1,3 +1,4 @@
+"""Trainer class for managing the training process of a Keras model."""
 import tensorflow as tf
 from utils.metrics import get_classification_metrics
 from utils.logger import get_callbacks
