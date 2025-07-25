@@ -131,3 +131,11 @@ This project is licensed under the GPL-3.0 License.
 - [ImageNet](https://image-net.org/)
 
 - [FastAPI](https://fastapi.tiangolo.com/)
+
+- [Streamlit](https://streamlit.io/)
+
+- [Tensorflow](https://www.tensorflow.org/)
+
+- [Docker](https://www.docker.com/)
+
+- [Hugging Face Spaces](https://huggingface.co/spaces)
