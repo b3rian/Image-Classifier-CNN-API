@@ -114,4 +114,4 @@ docker run -p 8501:8501 image-classifier-ui
 
 - GitHub Actions builds and pushes Docker images to [Docker Hub](https://hub.docker.com)
 
-- Docker images automatically deployed to HF Spaces.
+- Docker images automatically deployed to [HF Spaces](https://huggingface.co/spaces)
