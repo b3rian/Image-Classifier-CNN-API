@@ -78,8 +78,24 @@ docker run -p 8501:8501 image-classifier-ui
 
 🔁 **Streamlit Frontend**
 
-Upload an image.
+- Upload an image.
 
-Select **ResNet**, **EfficientNet**, or Both.
+- Select **ResNet**, **EfficientNet**, or Both.
 
-Click **"Classify Image"** to get classification results.
+- Click **"Classify Image"** to get classification results.
+
+# 📦 Deployment URLs
+
+**Docker Hub:** 
+
+- https://hub.docker.com/repository/docker/b3rian/image-classifier-ui
+
+- https://hub.docker.com/repository/docker/b3rian/image-classifier-api
+
+**Hugging Face API:**
+
+- https://b3rian-image-classifier-api.hf.space
+
+**Streamlit UI:**
+
+- https://cnn-image-classifier.streamlit.app/
