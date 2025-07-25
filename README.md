@@ -38,7 +38,6 @@ ResNet50: **90%**, EfficientNetV2L: **96%**
 **Model**	                    **Top-1 Accuracy**	                       **Top-5 Accuracy**
 
 **ResNet50**	                      80%	                                      90%
-
 **EfficientNetV2L**	                  86%	                                      96%
 
 Training was conducted on **ImageNet** dataset with 1000 classes for 2 days using **Tensorflow distributed training on 2 GPUs.**
