@@ -84,18 +84,28 @@ docker run -p 8501:8501 image-classifier-ui
 
 - Click **"Classify Image"** to get classification results.
 
+# 🔌 FastAPI Endpoints
+
+**Health Check**
+
+- GET  /health
+
+**Predict**
+
+- POST /predict
+
 # 📦 Deployment URLs
 
 **Docker Hub:** 
 
-- https://hub.docker.com/repository/docker/b3rian/image-classifier-ui
+-  🖥️ UI Image: https://hub.docker.com/repository/docker/b3rian/image-classifier-ui
 
-- https://hub.docker.com/repository/docker/b3rian/image-classifier-api
+- 🧠 API Image: https://hub.docker.com/repository/docker/b3rian/image-classifier-api
 
 **Hugging Face API:**
 
-- https://b3rian-image-classifier-api.hf.space
+- 🧠 API: https://b3rian-image-classifier-api.hf.space
 
 **Streamlit UI:**
 
-- https://cnn-image-classifier.streamlit.app/
+- 🖥️ UI: https://cnn-image-classifier.streamlit.app/
