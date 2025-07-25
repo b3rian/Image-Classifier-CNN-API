@@ -32,3 +32,13 @@ ResNet50: **90%**, EfficientNetV2L: **96%**
    - **Frontend** to Streamlit Community Cloud
 
 ✅ Achieves average response latency of **~2.5 seconds.**
+
+# 📊 Model Performance
+  
+**Model**	        **Top-1 Accuracy**	     **Top-5 Accuracy**
+
+**ResNet50**	          80%	            90%
+
+**EfficientNetV2L**	      86%	            96%
+
+Training was conducted on **ImageNet** dataset with 1000 classes for 2 days using **Tensorflow distributed training on 2 GPUs.**
