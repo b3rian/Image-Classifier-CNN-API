@@ -109,3 +109,9 @@ docker run -p 8501:8501 image-classifier-ui
 **Streamlit UI:**
 
 - 🖥️ UI: https://cnn-image-classifier.streamlit.app/
+
+# 🔁 CI/CD
+
+- GitHub Actions builds and pushes Docker images to [Docker Hub](https://hub.docker.com)
+
+- Docker images automatically deployed to HF Spaces.
