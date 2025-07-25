@@ -33,12 +33,18 @@ ResNet50: **90%**, EfficientNetV2L: **96%**
 
 ✅ Achieves average response latency of **~2.5 seconds.**
 
-# 📊 Model Performance
-  
-**Model**	                    **Top-1 Accuracy**	                       **Top-5 Accuracy**
+# 🔧 Tech Stack
 
-**ResNet50**	                      80%	                                      90%
+🐍 **Python** – Core programming language
 
-**EfficientNetV2L**	                  86%	                                      96%
+🧠 **Tensorflow** – Model training
 
-Training was conducted on **ImageNet** dataset with 1000 classes for 2 days using **Tensorflow distributed training on 2 GPUs.**
+⚡ **FastAPI** – REST API
+
+🌐 **Streamlit** – Frontend UI
+
+🐳 **Docker** – Containerization
+
+🔁 **GitHub Actions** – CI/CD automation
+
+☁️ **HF Spaces & Streamlit Cloud** – Deployment
