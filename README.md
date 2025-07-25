@@ -148,4 +148,4 @@ This project is licensed under the GPL-3.0 License.
 
 Feel free to reach out for collaboration or feedback:
 
-- [📧 Email](brianliboso84@gmail.com)
+- 📧 Email(brianliboso84@gmail.com)
