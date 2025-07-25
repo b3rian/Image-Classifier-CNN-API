@@ -5,6 +5,7 @@ This project is a full-stack deep learning deployment pipeline for image classif
 # 🚀 Project Features
 
 ✅ Trained **ResNet50** and **EfficientNetV2L** on ImageNet using Tensorflow distributed training on 2 GPUs.
+
 ✅ Achieved **top-1 accuracy** of:
 
 ResNet50: **80%**, EfficientNetV2L: **86%**
@@ -26,7 +27,8 @@ ResNet50: **90%**, EfficientNetV2L: **96%**
 ✅ Automated CI/CD with **GitHub Actions.**
 
 ✅ Deployed:
-   **- API** to Hugging Face Spaces
-   **- Frontend** to Streamlit Community Cloud
-   
+
+   - **API** to Hugging Face Spaces
+   - **Frontend** to Streamlit Community Cloud
+
 ✅ Achieves average response latency of **~2.5 seconds.**
