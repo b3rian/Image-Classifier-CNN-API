@@ -51,22 +51,22 @@ ResNet50: **90%**, EfficientNetV2L: **96%**
 
 # 📦 Installation (Local)
 
-1. Clone the repo
+**Clone the repo**
 
 git clone https://github.com/b3rian/Image-Classifier-CNN-API
 
 cd image-classifier-api
 
-2. Build & Run with Docker
+**Build & Run with Docker**
 
-FastAPI API
+- FastAPI API
 
 cd api_backend
 docker build -t image-classifier-api .
 
 docker run -p 8000:8000 image-classifier-api
 
-Streamlit Frontend
+- Streamlit Frontend
 
 cd streamlit_app
 
