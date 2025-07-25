@@ -115,3 +115,13 @@ docker run -p 8501:8501 image-classifier-ui
 - GitHub Actions builds and pushes Docker images to [Docker Hub](https://hub.docker.com)
 
 - Docker images automatically deployed to [HF Spaces](https://huggingface.co/spaces)
+
+# 📈 Performance
+
+- Average API latency: **2.5 seconds**
+
+- Handles synchronous prediction requests for single or both models
+
+# 📜 License
+
+This project is licensed under the MIT License.
