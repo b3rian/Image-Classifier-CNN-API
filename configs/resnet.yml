@@ -3,6 +3,7 @@ dataset:
   data_dir: "/kaggle/input/tiny-imagenett/tiny-imagenet-200"
   batch_size: 512
 
+# Base configuration for training and evaluation
 model:
   name: ResNet
   input_shape: [64, 64, 3]
@@ -25,6 +26,6 @@ training:
       factor: 0.1
   weight_decay: 0.0001
   momentum: 0.9
-  epochs: 100 # Total number of iterations for training
+  epochs: 100 # Total number of epochs for training
   pretrained: false  # train from scratch
   label_smoothing: 0.1  

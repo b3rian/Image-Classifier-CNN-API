@@ -1,8 +1,10 @@
+# This configuration file is for training a VGG19 model on the Tiny ImageNet dataset.
 model:
   name: "vgg19"
   num_classes: 200 
   input_shape: [224, 224, 3]
-  use_batch_norm: false  
+  use_batch_norm: false  # VGG19 does not use batch normalization
+  weight_init: "he_normal"  # He initialization for ReLU activations
 
 dataset:
   data_dir: "/kaggle/input/tiny-imagenet-dataset/tiny-224"

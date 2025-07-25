@@ -1,7 +1,8 @@
+# Base configuration for training and evaluation
 dataset:
   name: ImageNet-200
   train_augmentation:
-    resize_shorter_side_range: [256, 480]
+    resize_shorter_side_range: [256, 480] # Range for resizing the shorter side
     crop_size: 224
     random_horizontal_flip: true
     subtract_mean: true
@@ -9,4 +10,4 @@ dataset:
   test_augmentation:
     mode: 10-crop
     fully_convolutional_eval: true
-    multi_scale_eval: [224, 256, 384, 480, 640]
+    multi_scale_eval: [224, 256, 384, 480, 640] # Multi-scale evaluation sizes
