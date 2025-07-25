@@ -15,6 +15,6 @@ def set_seed(seed: int = 42):
     np.random.seed(seed)
     tf.random.set_seed(seed)
 
-    # Optional: For even more reproducibility
+    # For even more reproducibility
     tf.keras.utils.set_random_seed(seed)
     tf.config.experimental.enable_op_determinism()
